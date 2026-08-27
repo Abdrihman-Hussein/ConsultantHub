@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Consultant Discovery - ConsultantHub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-tertiary-container": "#009668",
+                      "outline-variant": "#c6c6cd",
+                      "tertiary": "#000000",
+                      "on-primary-fixed-variant": "#3f465c",
+                      "trust-gold": "#B45309",
+                      "outline": "#76777d",
+                      "tertiary-fixed-dim": "#4edea3",
+                      "primary-fixed-dim": "#bec6e0",
+                      "secondary-container": "#316bf3",
+                      "background": "#f8f9ff",
+                      "surface-container-low": "#eff4ff",
+                      "inverse-surface": "#213145",
+                      "on-background": "#0b1c30",
+                      "secondary-fixed-dim": "#b4c5ff",
+                      "primary-fixed": "#dae2fd",
+                      "on-tertiary-fixed": "#002113",
+                      "on-primary-fixed": "#131b2e",
+                      "on-secondary-container": "#fefcff",
+                      "surface-variant": "#d3e4fe",
+                      "surface-tint": "#565e74",
+                      "surface-bright": "#f8f9ff",
+                      "error-crimson": "#E11D48",
+                      "primary": "#000000",
+                      "secondary": "#0051d5",
+                      "surface-container-high": "#dce9ff",
+                      "on-secondary-fixed": "#00174b",
+                      "on-tertiary-fixed-variant": "#005236",
+                      "tertiary-fixed": "#6ffbbe",
+                      "surface-alt": "#F8FAFC",
+                      "on-surface-variant": "#45464d",
+                      "on-primary": "#ffffff",
+                      "error": "#ba1a1a",
+                      "primary-container": "#131b2e",
+                      "tertiary-container": "#002113",
+                      "inverse-primary": "#bec6e0",
+                      "surface": "#f8f9ff",
+                      "surface-dim": "#cbdbf5",
+                      "on-surface": "#0b1c30",
+                      "inverse-on-surface": "#eaf1ff",
+                      "secondary-fixed": "#dbe1ff",
+                      "on-error": "#ffffff",
+                      "on-primary-container": "#7c839b",
+                      "surface-container-highest": "#d3e4fe",
+                      "on-tertiary": "#ffffff",
+                      "success-emerald": "#059669",
+                      "on-error-container": "#93000a",
+                      "error-container": "#ffdad6",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-container": "#e5eeff",
+                      "on-secondary": "#ffffff",
+                      "on-secondary-fixed-variant": "#003ea8"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "stack-sm": "8px",
+                      "max-width": "1280px",
+                      "stack-lg": "32px",
+                      "margin-page": "auto",
+                      "unit": "4px",
+                      "stack-md": "16px",
+                      "section-gap": "80px",
+                      "gutter-md": "24px"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": ["Hanken Grotesk"],
+                      "body-lg": ["Inter"],
+                      "headline-md": ["Hanken Grotesk"],
+                      "headline-lg": ["Hanken Grotesk"],
+                      "display-lg": ["Hanken Grotesk"],
+                      "label-sm": ["JetBrains Mono"],
+                      "body-md": ["Inter"],
+                      "label-md": ["JetBrains Mono"]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col font-body-md text-body-md">
+<!-- TopNavBar Component -->
+<header class="bg-surface border-b border-outline-variant full-width top-0 z-50 sticky">
+<div class="flex justify-between items-center w-full px-8 h-20 max-w-max-width mx-auto">
+<div class="flex items-center gap-6">
+<!-- Brand Logo -->
+<a class="font-headline-lg text-headline-lg font-bold text-primary" href="#">
+                    ConsultantHub
+                </a>
+<!-- Search Bar (on_left as per JSON) -->
+<div class="relative hidden md:block w-64 ml-4">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="w-full pl-9 pr-4 py-2 bg-surface-alt border border-outline-variant rounded-full text-label-md font-label-md focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/20 transition-all" placeholder="Search consultants..." type="text"/>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="hidden md:flex items-center space-x-8">
+<!-- Active Item: Browse -->
+<a class="text-secondary font-bold border-b-2 border-secondary h-20 flex items-center hover:bg-surface-container-low transition-colors px-2" href="#">
+                    Browse
+                </a>
+<!-- Inactive Items -->
+<a class="text-on-surface-variant hover:text-secondary hover:bg-surface-container-low transition-colors h-20 flex items-center px-2" href="#">
+                    Dashboard
+                </a>
+<a class="text-on-surface-variant hover:text-secondary hover:bg-surface-container-low transition-colors h-20 flex items-center px-2" href="#">
+                    Resources
+                </a>
+</nav>
+<!-- Actions -->
+<div class="flex items-center space-x-4">
+<button class="font-label-md text-label-md text-secondary border border-secondary px-4 py-2 rounded hover:bg-secondary/5 transition-colors">
+                    Log In
+                </button>
+<button class="font-label-md text-label-md bg-secondary text-white px-4 py-2 rounded hover:bg-secondary/90 transition-colors shadow-sm">
+                    Profile
+                </button>
+</div>
+<!-- Mobile Menu Toggle (Placeholder) -->
+<button class="md:hidden text-on-surface-variant">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-grow max-w-max-width mx-auto w-full px-4 md:px-8 py-section-gap flex flex-col md:flex-row gap-gutter-md">
+<!-- Filters Sidebar (Custom for this page, not SideNavBar from JSON as that's an app shell nav) -->
+<aside class="w-full md:w-64 flex-shrink-0 flex flex-col gap-6">
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm">
+<h2 class="font-headline-md text-headline-md text-primary mb-6">Filters</h2>
+<!-- Specialty Filter -->
+<div class="mb-6">
+<h3 class="font-label-md text-label-md text-on-surface mb-3 font-semibold">Specialty</h3>
+<div class="space-y-2">
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="rounded border-outline-variant text-secondary focus:ring-secondary/20 bg-surface-alt w-4 h-4 cursor-pointer" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-primary transition-colors">Marketing</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="rounded border-outline-variant text-secondary focus:ring-secondary/20 bg-surface-alt w-4 h-4 cursor-pointer" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-primary transition-colors">Engineering</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="rounded border-outline-variant text-secondary focus:ring-secondary/20 bg-surface-alt w-4 h-4 cursor-pointer" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-primary transition-colors">Law</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="rounded border-outline-variant text-secondary focus:ring-secondary/20 bg-surface-alt w-4 h-4 cursor-pointer" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-primary transition-colors">Finance</span>
+</label>
+</div>
+</div>
+<!-- Years of Experience Filter -->
+<div class="mb-6">
+<h3 class="font-label-md text-label-md text-on-surface mb-3 font-semibold">Years of Experience</h3>
+<div class="space-y-2">
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="border-outline-variant text-secondary focus:ring-secondary/20 bg-surface-alt w-4 h-4 cursor-pointer" name="exp" type="radio"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-primary transition-colors">Any</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="border-outline-variant text-secondary focus:ring-secondary/20 bg-surface-alt w-4 h-4 cursor-pointer" name="exp" type="radio"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-primary transition-colors">0 - 5 years</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="border-outline-variant text-secondary focus:ring-secondary/20 bg-surface-alt w-4 h-4 cursor-pointer" name="exp" type="radio"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-primary transition-colors">5 - 10 years</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="border-outline-variant text-secondary focus:ring-secondary/20 bg-surface-alt w-4 h-4 cursor-pointer" name="exp" type="radio"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-primary transition-colors">10+ years</span>
+</label>
+</div>
+</div>
+<!-- Price Range Filter -->
+<div>
+<h3 class="font-label-md text-label-md text-on-surface mb-3 font-semibold">Price Range ($/hr)</h3>
+<div class="flex items-center gap-2">
+<input class="w-full bg-surface-alt border border-outline-variant rounded px-2 py-1 text-sm focus:border-secondary focus:ring-1 focus:ring-secondary/20 outline-none" placeholder="Min" type="number"/>
+<span class="text-on-surface-variant">-</span>
+<input class="w-full bg-surface-alt border border-outline-variant rounded px-2 py-1 text-sm focus:border-secondary focus:ring-1 focus:ring-secondary/20 outline-none" placeholder="Max" type="number"/>
+</div>
+</div>
+<button class="w-full mt-6 bg-surface-container-low text-secondary font-label-md text-label-md py-2 rounded border border-secondary/20 hover:bg-surface-container transition-colors">
+                    Reset Filters
+                </button>
+</div>
+</aside>
+<!-- Consultant Grid Canvas -->
+<section class="flex-grow">
+<!-- Results Header -->
+<div class="flex justify-between items-end mb-6">
+<div>
+<h1 class="font-display-lg text-display-lg text-primary md:text-[48px] text-[36px]">Expert Consultants</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-2">Find the right professional for your next project.</p>
+</div>
+<div class="hidden sm:flex items-center gap-2 text-sm text-on-surface-variant">
+<span>Sort by:</span>
+<select class="bg-surface-alt border border-outline-variant rounded px-3 py-1 text-label-md font-label-md focus:outline-none focus:border-secondary">
+<option>Relevance</option>
+<option>Highest Rated</option>
+<option>Price: Low to High</option>
+<option>Price: High to Low</option>
+</select>
+</div>
+</div>
+<!-- Bento-style Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Card 1 -->
+<article class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 flex flex-col hover:-translate-y-1 hover:shadow-[0px_4px_12px_rgba(15,23,42,0.05)] transition-all duration-300">
+<div class="flex justify-between items-start mb-4">
+<img class="w-16 h-16 rounded-full object-cover border border-outline-variant" data-alt="A professional headshot of a confident female marketing consultant in her 30s. She is wearing a modern tailored navy blazer over a crisp white blouse. The background is a slightly blurred, bright contemporary corporate office setting with natural light creating a soft, trustworthy light-mode aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9a6uRHh0-toAEFe6d0Gs5mkCo38NM82MgcJX8BjP5SoeNdnwiQbLUYJPOtagWj_fxXcb3DCewenbyGjCG_I7w71jh_I7kaRk-1aUdJ_wqozcdMm3BVX9ru4szAlpkGrDre0-9MEESGCwruc8AKdV22xzEfew8-lt0uI3UiwUFpS6CrFvvQuYYDKooCMOvj05TPrm3nsOQ1VrplXXcBHD_4_gPab9v2UrXJt6mZffwDZklstvS3b8-"/>
+<div class="flex items-center gap-1 bg-surface-container-low text-secondary px-2 py-1 rounded text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-[14px]">star</span>
+<span>4.9</span>
+</div>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary mb-1">Sarah Jenkins</h3>
+<p class="font-label-md text-label-md text-trust-gold mb-3">Strategic Marketing</p>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 line-clamp-3 flex-grow">
+                        Specializing in go-to-market strategies for B2B SaaS startups. Over 10 years of experience scaling marketing teams and driving ROI through data-driven campaigns.
+                    </p>
+<div class="flex justify-between items-center pt-4 border-t border-outline-variant/50">
+<span class="font-label-md text-label-md text-on-surface font-semibold">$150/hr</span>
+<button class="text-secondary font-label-md text-label-md hover:underline flex items-center gap-1">
+                            View Profile <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 flex flex-col hover:-translate-y-1 hover:shadow-[0px_4px_12px_rgba(15,23,42,0.05)] transition-all duration-300">
+<div class="flex justify-between items-start mb-4">
+<img class="w-16 h-16 rounded-full object-cover border border-outline-variant" data-alt="A professional headshot of a serious male engineering consultant in his 40s. He wears glasses and a smart-casual light blue button-down shirt. The setting is a minimalist tech workspace with clean lines, brightly lit with a cool, corporate modernist tone." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBW7TNGqPPOxidm2ydwYRhuwI2NlYJp3D66cDjXqSnKK2aIl2rGh3AtqtxT599hUjUoWj86FicFhsWZkwvCbc_N0XwyO-mLEkIpD571pqinrNNk-4r1TjeOYmm6jFWGXWsHyZ0EPFaVdYXLtNRS39BHpIZ3QUSRr5kzwM3H5s0dMYwVNREwb4dItGA-t-XFoiME2nMlzHjJ_EBDqWZBDPcWtL1gSt1Ze-IaLCHQQk5aZ4U0Urg2lsik"/>
+<div class="flex items-center gap-1 bg-surface-container-low text-secondary px-2 py-1 rounded text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-[14px]">star</span>
+<span>5.0</span>
+</div>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary mb-1">David Chen</h3>
+<p class="font-label-md text-label-md text-trust-gold mb-3">Systems Engineering</p>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 line-clamp-3 flex-grow">
+                        Expert in scalable cloud architecture and infrastructure optimization. Former lead engineer at Fortune 500 tech firms, dedicated to building resilient distributed systems.
+                    </p>
+<div class="flex justify-between items-center pt-4 border-t border-outline-variant/50">
+<span class="font-label-md text-label-md text-on-surface font-semibold">$200/hr</span>
+<button class="text-secondary font-label-md text-label-md hover:underline flex items-center gap-1">
+                            View Profile <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</article>
+<!-- Card 3 -->
+<article class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 flex flex-col hover:-translate-y-1 hover:shadow-[0px_4px_12px_rgba(15,23,42,0.05)] transition-all duration-300">
+<div class="flex justify-between items-start mb-4">
+<img class="w-16 h-16 rounded-full object-cover border border-outline-variant" data-alt="A professional headshot of an approachable female legal consultant in her 50s. She is wearing a sharp grey suit jacket. The background is a bright, high-key modern law office with abstract minimalist art, conveying authority, trust, and a clean light-mode aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvQHRCYrUJ2CDNk1g06sYQ1Xh5sZeXeCr0hsxe2r5nCpM20P8a5-zEmkuT7hfa5DIFJMqBpuuJ2GKxeCpU_Tw7JE6MJP5bestcFUkA5MfjSFdcsbAcz1GjsuJ0x4TSqykgZhUZj879mQ_083IFgDiewIrcRD-EmD8mGjFxgpUat0qJIqwMd7ET64Vm0SmcWtZ9BZofPQayV8OMkq3SLAK3gRkO2jrTwVDHbOzibN5gvN1ToTQAi7Uy"/>
+<div class="flex items-center gap-1 bg-surface-container-low text-secondary px-2 py-1 rounded text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-[14px]">star</span>
+<span>4.8</span>
+</div>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary mb-1">Elena Rodriguez</h3>
+<p class="font-label-md text-label-md text-trust-gold mb-3">Corporate Law</p>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 line-clamp-3 flex-grow">
+                        Providing strategic counsel on mergers, acquisitions, and corporate governance. Known for navigating complex regulatory landscapes with precision and clarity.
+                    </p>
+<div class="flex justify-between items-center pt-4 border-t border-outline-variant/50">
+<span class="font-label-md text-label-md text-on-surface font-semibold">$250/hr</span>
+<button class="text-secondary font-label-md text-label-md hover:underline flex items-center gap-1">
+                            View Profile <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</article>
+<!-- Card 4 -->
+<article class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 flex flex-col hover:-translate-y-1 hover:shadow-[0px_4px_12px_rgba(15,23,42,0.05)] transition-all duration-300">
+<div class="flex justify-between items-start mb-4">
+<img class="w-16 h-16 rounded-full object-cover border border-outline-variant" data-alt="A professional headshot of a young male finance consultant in his late 20s. He is wearing a crisp white shirt without a tie. The background is a bright, minimal workspace with soft lighting, creating a modern, accessible, and trustworthy corporate visual style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1L6ythsyZ6HOO8bFKps9hyJnuNiw-d2PLG0LC1FVPkATy9IolRmAEZucF1GRRXgD1-4UmbPgMvlfnf3M4tU5wuo4SIybBBAY2PC2f2bgueTYszQDN9_FTR3BTwfAOkpyjqkY3JujA-nleQtaQwO_Vi5ZQxpn0m-lRielT3oGctHuCW6kYq1SAxWTS0rC7O84_4EbnZFo3_PR1HH4nhtI3rJSOKmEnbJvkVTY4ttOdcIY2pDMvCbpA"/>
+<div class="flex items-center gap-1 bg-surface-container-low text-secondary px-2 py-1 rounded text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-[14px]">star</span>
+<span>4.7</span>
+</div>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary mb-1">Marcus Thorne</h3>
+<p class="font-label-md text-label-md text-trust-gold mb-3">Financial Modeling</p>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 line-clamp-3 flex-grow">
+                        Specialist in financial forecasting, valuation, and capital raising strategies for early-stage ventures. Translating complex data into actionable insights.
+                    </p>
+<div class="flex justify-between items-center pt-4 border-t border-outline-variant/50">
+<span class="font-label-md text-label-md text-on-surface font-semibold">$120/hr</span>
+<button class="text-secondary font-label-md text-label-md hover:underline flex items-center gap-1">
+                            View Profile <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</article>
+</div>
+<!-- Pagination (Placeholder) -->
+<div class="mt-12 flex justify-center items-center gap-2">
+<button class="p-2 border border-outline-variant rounded hover:bg-surface-container-low text-on-surface-variant transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center bg-secondary text-white rounded font-label-sm">1</button>
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded hover:bg-surface-container-low text-on-surface-variant font-label-sm transition-colors">2</button>
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded hover:bg-surface-container-low text-on-surface-variant font-label-sm transition-colors">3</button>
+<button class="p-2 border border-outline-variant rounded hover:bg-surface-container-low text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</section>
+</main>
+<!-- Footer Component -->
+<footer class="bg-primary-container full-width border-t border-outline-variant mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center py-12 px-8 max-w-max-width mx-auto gap-6 md:gap-0">
+<div class="flex flex-col items-center md:items-start">
+<span class="font-headline-md text-headline-md text-on-primary-container mb-2">
+                    ConsultantHub
+                </span>
+<span class="font-body-md text-body-md text-on-primary-container/80 text-center md:text-left">
+                    © 2024 ConsultantHub. All professional rights reserved.
+                </span>
+</div>
+<nav class="flex flex-wrap justify-center gap-6">
+<a class="font-label-sm text-label-sm text-on-primary-container/80 hover:text-on-primary-container hover:opacity-100 transition-opacity" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm text-on-primary-container/80 hover:text-on-primary-container hover:opacity-100 transition-opacity" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm text-on-primary-container/80 hover:text-on-primary-container hover:opacity-100 transition-opacity" href="#">Contact Support</a>
+<a class="font-label-sm text-label-sm text-on-primary-container/80 hover:text-on-primary-container hover:opacity-100 transition-opacity" href="#">Become a Consultant</a>
+</nav>
+</div>
+</footer>
+</body></html>

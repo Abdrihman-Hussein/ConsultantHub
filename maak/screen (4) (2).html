@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Consultant Profile | ConsultantHub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#009668",
+                        "outline-variant": "#c6c6cd",
+                        "tertiary": "#000000",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "trust-gold": "#B45309",
+                        "outline": "#76777d",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "primary-fixed-dim": "#bec6e0",
+                        "secondary-container": "#316bf3",
+                        "background": "#f8f9ff",
+                        "surface-container-low": "#eff4ff",
+                        "inverse-surface": "#213145",
+                        "on-background": "#0b1c30",
+                        "secondary-fixed-dim": "#b4c5ff",
+                        "primary-fixed": "#dae2fd",
+                        "on-tertiary-fixed": "#002113",
+                        "on-primary-fixed": "#131b2e",
+                        "on-secondary-container": "#fefcff",
+                        "surface-variant": "#d3e4fe",
+                        "surface-tint": "#565e74",
+                        "surface-bright": "#f8f9ff",
+                        "error-crimson": "#E11D48",
+                        "primary": "#000000",
+                        "secondary": "#0051d5",
+                        "surface-container-high": "#dce9ff",
+                        "on-secondary-fixed": "#00174b",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "tertiary-fixed": "#6ffbbe",
+                        "surface-alt": "#F8FAFC",
+                        "on-surface-variant": "#45464d",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "primary-container": "#131b2e",
+                        "tertiary-container": "#002113",
+                        "inverse-primary": "#bec6e0",
+                        "surface": "#f8f9ff",
+                        "surface-dim": "#cbdbf5",
+                        "on-surface": "#0b1c30",
+                        "inverse-on-surface": "#eaf1ff",
+                        "secondary-fixed": "#dbe1ff",
+                        "on-error": "#ffffff",
+                        "on-primary-container": "#7c839b",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-tertiary": "#ffffff",
+                        "success-emerald": "#059669",
+                        "on-error-container": "#93000a",
+                        "error-container": "#ffdad6",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#e5eeff",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed-variant": "#003ea8"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "stack-sm": "8px",
+                        "max-width": "1280px",
+                        "stack-lg": "32px",
+                        "margin-page": "auto",
+                        "unit": "4px",
+                        "stack-md": "16px",
+                        "section-gap": "80px",
+                        "gutter-md": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "display-lg": ["Hanken Grotesk"],
+                        "label-sm": ["JetBrains Mono"],
+                        "body-md": ["Inter"],
+                        "label-md": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700&amp;family=Inter:wght@400&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: theme('colors.background'); color: theme('colors.on-background'); }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Hanken Grotesk', sans-serif; }
+        .label { font-family: 'JetBrains Mono', monospace; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col antialiased">
+<!-- TopNavBar (Shared Component) -->
+<nav class="bg-surface dark:bg-background docked full-width top-0 border-b border-outline-variant dark:border-outline flat no shadows hidden md:block w-full sticky z-50">
+<div class="flex justify-between items-center w-full px-8 h-20 max-w-max-width mx-auto">
+<div class="flex items-center space-x-gutter-md">
+<a class="font-headline-lg text-headline-lg font-bold text-primary dark:text-on-primary-fixed" href="#">ConsultantHub</a>
+<div class="flex space-x-6 pl-4">
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-secondary hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors font-label-md text-label-md py-2 px-3 rounded-DEFAULT" href="#">Browse</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-secondary hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors font-label-md text-label-md py-2 px-3 rounded-DEFAULT" href="#">Dashboard</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-secondary hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors font-label-md text-label-md py-2 px-3 rounded-DEFAULT" href="#">Resources</a>
+</div>
+</div>
+<div class="flex items-center space-x-4">
+<div class="relative w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 transform -translate-y-1/2 text-outline-variant text-sm">search</span>
+<input class="w-full pl-9 pr-4 py-2 bg-surface-container-lowest border border-outline-variant rounded-DEFAULT font-body-md text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all" placeholder="Search consultants..." type="text"/>
+</div>
+<button class="font-label-md text-label-md text-primary dark:text-primary-fixed bg-transparent border border-primary px-4 py-2 rounded-DEFAULT hover:bg-surface-container-low transition-colors">Log In</button>
+<button class="font-label-md text-label-md text-on-primary bg-secondary px-4 py-2 rounded-DEFAULT hover:bg-secondary/90 transition-colors">Profile</button>
+</div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow w-full max-w-max-width mx-page px-4 md:px-8 py-section-gap">
+<!-- Profile Header (Bento Style) -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter-md mb-section-gap">
+<div class="md:col-span-8 bg-surface-alt border border-outline-variant rounded-xl p-8 flex flex-col md:flex-row items-start md:items-center gap-stack-lg relative overflow-hidden">
+<!-- Abstract Background Detail -->
+<div class="absolute -right-20 -top-20 w-64 h-64 bg-surface-variant rounded-full opacity-50 blur-3xl pointer-events-none"></div>
+<div class="w-32 h-32 flex-shrink-0">
+<img class="w-full h-full object-cover rounded-full border-2 border-surface-container-high shadow-sm" data-alt="A professional headshot of a female business consultant in a modern, light-filled corporate office setting. She wears a tailored navy blazer and has a confident, approachable expression. The background features subtle architectural lines and soft, bright lighting, emphasizing a corporate modernism aesthetic with deep blacks, pristine whites, and blue accents. The mood is authoritative yet accessible." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZw34AKspj_AeDB2Ki0JPcm_ezsWXx3Hcu3Ssu-0zNtl5-YfZNtUhoBr_6uwshkWcvSOH7-mxBTOUvsEt7iIy3FF-x-nn4kNtuu1iENEwTx2lfArTt7j8Zhw1e7NtR_0R35jg7i_2iTORP_3uza33g4jWpdySBbLvPZR6OgE73lRP7UgAGLeTDUP3GGCih_qUE1LKYtm4iP4TBUcELr5tOtzhkdTFahj16dqyoxKk6co-yeDmkzaoS"/>
+</div>
+<div class="flex-grow z-10">
+<div class="flex items-center gap-stack-sm mb-2">
+<span class="bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm px-2 py-1 rounded-DEFAULT border border-outline-variant/50">Strategy &amp; Operations</span>
+<span class="bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm px-2 py-1 rounded-DEFAULT border border-outline-variant/50 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">verified</span> Verified</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-primary mb-1">Dr. Elena Rostova</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-4">Senior Principal Consultant, Ex-McKinsey</p>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-1 text-trust-gold">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star_half</span>
+<span class="font-label-md text-label-md text-on-surface-variant ml-1">4.9 (128 Reviews)</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant font-label-md text-label-md">
+<span class="material-symbols-outlined">location_on</span>
+                            New York, NY (Remote)
+                        </div>
+</div>
+</div>
+</div>
+<div class="md:col-span-4 bg-surface-alt border border-outline-variant rounded-xl p-8 flex flex-col justify-center">
+<h3 class="font-headline-md text-headline-md text-primary mb-4">Key Metrics</h3>
+<div class="grid grid-cols-2 gap-stack-md">
+<div class="bg-surface-container-lowest border border-outline-variant/50 p-4 rounded-lg">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1 uppercase tracking-wider">Sessions</p>
+<p class="font-headline-lg text-headline-lg text-primary">450+</p>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant/50 p-4 rounded-lg">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1 uppercase tracking-wider">Response</p>
+<p class="font-headline-lg text-headline-lg text-primary">&lt; 2h</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Two Column Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter-md">
+<!-- Left Column: Bio & Experience -->
+<div class="lg:col-span-7 space-y-stack-lg">
+<section class="bg-surface-alt border border-outline-variant rounded-xl p-8">
+<h2 class="font-headline-md text-headline-md text-primary mb-4 border-b border-outline-variant/30 pb-2">About Elena</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4 leading-relaxed">
+                        With over 15 years of experience in management consulting and corporate strategy, I specialize in helping mid-to-large market enterprises navigate complex digital transformations and operational restructuring. My approach bridges high-level strategic planning with actionable, on-the-ground execution.
+                    </p>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                        Prior to independent consulting, I served as an Engagement Manager at McKinsey &amp; Company, where I led cross-functional teams in the financial services and healthcare sectors. I am passionate about building scalable operational models that drive sustainable growth.
+                    </p>
+</section>
+<section class="bg-surface-alt border border-outline-variant rounded-xl p-8">
+<h2 class="font-headline-md text-headline-md text-primary mb-4 border-b border-outline-variant/30 pb-2">Professional Experience</h2>
+<div class="space-y-6">
+<div class="relative pl-6 border-l border-outline-variant/50">
+<div class="absolute w-3 h-3 bg-secondary rounded-full -left-[6.5px] top-1.5 border-2 border-surface-alt"></div>
+<h4 class="font-headline-md text-headline-md text-primary text-lg">Independent Strategy Consultant</h4>
+<p class="font-label-sm text-label-sm text-secondary mb-2">2020 - Present</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Advising Series B+ startups and Fortune 500 companies on operational efficiency and market entry strategies.</p>
+</div>
+<div class="relative pl-6 border-l border-outline-variant/50">
+<div class="absolute w-3 h-3 bg-outline-variant rounded-full -left-[6.5px] top-1.5 border-2 border-surface-alt"></div>
+<h4 class="font-headline-md text-headline-md text-primary text-lg">Engagement Manager</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-2">McKinsey &amp; Company | 2014 - 2020</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Led strategic engagements focusing on M&amp;A integration and digital operating model design.</p>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Booking Widget -->
+<div class="lg:col-span-5">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm sticky top-28">
+<h2 class="font-headline-md text-headline-md text-primary mb-6">Book an Appointment</h2>
+<!-- Services Selection -->
+<div class="mb-6">
+<label class="block font-label-md text-label-md text-primary mb-3">Select Service</label>
+<div class="space-y-3">
+<label class="flex items-start p-4 border border-outline-variant rounded-lg cursor-pointer hover:border-secondary hover:bg-surface-container-low transition-colors bg-surface-container-lowest group relative">
+<input checked="" class="mt-1 text-secondary focus:ring-secondary border-outline-variant" name="service" type="radio"/>
+<div class="ml-3 flex-grow">
+<div class="flex justify-between items-center mb-1">
+<span class="font-headline-md text-headline-md text-base text-primary">15min Intro Call</span>
+<span class="font-label-md text-label-md text-on-surface-variant font-bold">Free</span>
+</div>
+<p class="font-body-md text-body-md text-sm text-on-surface-variant">Brief alignment to discuss needs and fit.</p>
+</div>
+<div class="absolute inset-0 border-2 border-secondary rounded-lg opacity-100 pointer-events-none"></div>
+</label>
+<label class="flex items-start p-4 border border-outline-variant rounded-lg cursor-pointer hover:border-secondary hover:bg-surface-container-low transition-colors bg-surface-alt group">
+<input class="mt-1 text-secondary focus:ring-secondary border-outline-variant" name="service" type="radio"/>
+<div class="ml-3 flex-grow">
+<div class="flex justify-between items-center mb-1">
+<span class="font-headline-md text-headline-md text-base text-primary">60min Strategy Session</span>
+<span class="font-label-md text-label-md text-on-surface-variant font-bold">$250</span>
+</div>
+<p class="font-body-md text-body-md text-sm text-on-surface-variant">Deep dive into a specific business challenge.</p>
+</div>
+</label>
+</div>
+</div>
+<!-- Date/Time Picker -->
+<div class="mb-6">
+<label class="block font-label-md text-label-md text-primary mb-3">Select Date &amp; Time (EST)</label>
+<!-- Simple Calendar UI -->
+<div class="border border-outline-variant rounded-lg p-4 mb-4 bg-surface-alt">
+<div class="flex justify-between items-center mb-4">
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined">chevron_left</span></button>
+<span class="font-label-md text-label-md text-primary font-bold">October 2023</span>
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined">chevron_right</span></button>
+</div>
+<div class="grid grid-cols-7 gap-1 text-center font-label-sm text-label-sm mb-2">
+<div class="text-on-surface-variant/70">Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div class="text-on-surface-variant/70">Sa</div>
+</div>
+<div class="grid grid-cols-7 gap-1 text-center font-body-md text-sm">
+<!-- Mock Dates -->
+<div class="p-2 text-outline-variant/30">1</div><div class="p-2 text-outline-variant/30">2</div><div class="p-2 text-outline-variant/30">3</div>
+<div class="p-2 cursor-pointer hover:bg-surface-container-low rounded">4</div>
+<div class="p-2 cursor-pointer bg-primary text-on-primary rounded font-bold">5</div>
+<div class="p-2 cursor-pointer hover:bg-surface-container-low rounded">6</div>
+<div class="p-2 text-outline-variant/30">7</div>
+<!-- ... truncated for brevity ... -->
+</div>
+</div>
+<!-- Availability Grid -->
+<div class="grid grid-cols-3 gap-2">
+<button class="py-2 px-3 border border-outline-variant rounded bg-surface-alt font-label-sm text-label-sm text-on-surface-variant line-through opacity-50 cursor-not-allowed">09:00 AM</button>
+<button class="py-2 px-3 border border-secondary rounded bg-surface-container-lowest font-label-sm text-label-sm text-secondary hover:bg-secondary hover:text-on-primary transition-colors">10:30 AM</button>
+<button class="py-2 px-3 border border-secondary rounded bg-surface-container-lowest font-label-sm text-label-sm text-secondary hover:bg-secondary hover:text-on-primary transition-colors">11:00 AM</button>
+<button class="py-2 px-3 bg-primary rounded font-label-sm text-label-sm text-on-primary shadow-sm">01:00 PM</button>
+<button class="py-2 px-3 border border-secondary rounded bg-surface-container-lowest font-label-sm text-label-sm text-secondary hover:bg-secondary hover:text-on-primary transition-colors">02:30 PM</button>
+<button class="py-2 px-3 border border-outline-variant rounded bg-surface-alt font-label-sm text-label-sm text-on-surface-variant line-through opacity-50 cursor-not-allowed">04:00 PM</button>
+</div>
+</div>
+<button class="w-full bg-secondary text-on-primary font-label-md text-label-md py-3 rounded-lg hover:bg-secondary/90 transition-colors shadow-sm flex justify-center items-center gap-2">
+                        Continue to Booking <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+<p class="text-center font-label-sm text-label-sm text-outline-variant mt-3">No charge until confirmed.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="bg-primary-container dark:bg-tertiary-container full-width border-t border-outline-variant dark:border-outline flat no shadows mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center py-12 px-8 max-w-max-width mx-auto">
+<div class="flex flex-col items-center md:items-start mb-6 md:mb-0 space-y-4">
+<span class="font-headline-md text-headline-md text-on-primary-container">ConsultantHub</span>
+<span class="font-body-md text-body-md text-on-primary-container/80 text-sm">© 2024 ConsultantHub. All professional rights reserved.</span>
+</div>
+<div class="flex flex-wrap justify-center gap-6 font-label-sm text-label-sm">
+<a class="text-on-primary-container/80 hover:text-on-primary-container hover:opacity-100 transition-opacity" href="#">Terms of Service</a>
+<a class="text-on-primary-container/80 hover:text-on-primary-container hover:opacity-100 transition-opacity" href="#">Privacy Policy</a>
+<a class="text-on-primary-container/80 hover:text-on-primary-container hover:opacity-100 transition-opacity" href="#">Contact Support</a>
+<a class="text-on-primary-container/80 hover:text-on-primary-container hover:opacity-100 transition-opacity" href="#">Become a Consultant</a>
+</div>
+</div>
+</footer>
+</body></html>
