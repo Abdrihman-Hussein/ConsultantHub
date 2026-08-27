@@ -8,12 +8,38 @@ ConsultantHub helps clients discover consultants, view their services, and book 
 
 **Live Demo:** [Add Vercel URL after deployment]
 
+## Design System
+
+Built from the prototypes in `maak/` folder:
+
+| Element | Value |
+|---------|-------|
+| Primary | `#000000` (dark) |
+| Secondary | `#0051d5` (blue) |
+| Background | `#f8f9ff` |
+| Surface Alt | `#F8FAFC` |
+| Surface Container | `#e5eeff` |
+| Surface Container Low | `#eff4ff` |
+| Surface Container High | `#dce9ff` |
+| Outline Variant | `#c6c6cd` |
+| Trust Gold | `#B45309` |
+| Success Emerald | `#059669` |
+| Error Crimson | `#E11D48` |
+| Headlines | Hanken Grotesk |
+| Body | Inter |
+| Labels | JetBrains Mono |
+| Icons | Google Material Symbols |
+
+Design files: `maak/DESIGN (2).html`, `maak/code (1) (2).html`, `maak/screen (4) (2).html`
+
 ## Team
 
-- **Team Lead** — Repository, GitHub workflow, integration, deployment
-- **Frontend 1** — Consultant listing, profiles, search
-- **Frontend 2** — Booking flow, dashboards
-- **Frontend 3** (optional) — Shared components, layout
+| Person | Focus | Tasks |
+|--------|-------|-------|
+| **You (Lead)** | Setup + Router + Deploy | Tasks 1, 2, 9, 10 |
+| **Frontend 1** | Browse + Profile pages | Tasks 6, 7 |
+| **Frontend 2** | Dashboard + Layout | Tasks 4, 8 |
+| **Frontend 3** (optional) | Types + Mock Data + Auth pages | Tasks 3, 5 |
 
 ## Tech Stack (Frontend Only for MVP)
 
@@ -28,41 +54,36 @@ ConsultantHub helps clients discover consultants, view their services, and book 
 
 **No backend in MVP** — using mock data (`client/src/data/`)
 
-## Features (MVP Scope)
+## Pages (MVP)
 
-### Public Pages
-- **Home** — Hero, featured consultants, how it works
-- **Consultants** — List with search/filter by specialty
-- **Consultant Profile** — Bio, services, "Book" buttons
+| Page | Route | Description |
+|------|-------|-------------|
+| Home | `/` | Hero, specialties, featured consultants, how it works |
+| Browse | `/consultants` | Filter sidebar + consultant cards grid |
+| Profile | `/consultants/:id` | Bio, experience, booking widget with calendar |
+| Dashboard | `/client/dashboard` | Sidebar + upcoming/past appointments + stats |
+| Login | `/login` | Email + password form |
+| Register | `/register` | Name + email + password + role form |
 
-### Auth (Simulated)
-- Login/Register pages (UI only, no real auth)
-- Role selection: Client / Consultant / Admin
+### Design References
+- **Browse page**: `maak/code (1) (2).html` — filter sidebar, consultant cards, pagination
+- **Profile page**: `maak/screen (4) (2).html` — profile header, about, experience, booking widget
+- **Dashboard**: `maak/DESIGN (2).html` — sidebar nav, upcoming appointments, past appointments, stats
 
-### Client Dashboard
-- Upcoming appointments
-- Past appointments
-- Profile settings
+## Implementation Plan
 
-### Consultant Dashboard
-- My services (CRUD UI)
-- My availability (UI only)
-- Appointment requests (Accept/Reject/Complete)
+Full step-by-step plan: `docs/superpowers/plans/2026-08-27-consultanthub-mvp.md`
 
-### Admin Dashboard
-- Users table
-- Consultants table
-- Appointments table
+10 tasks, ~3 hours total. Each task has files, code, and commit messages.
 
 ## Quick Start
 
 ```bash
 # Clone
 git clone <repository-url>
-cd consultanthub
+cd consultanthub/client
 
 # Install dependencies
-cd client
 npm install
 
 # Start dev server
@@ -70,6 +91,14 @@ npm run dev
 ```
 
 Open `http://localhost:5173`
+
+### Available Scripts
+
+```bash
+npm run dev      # Start dev server
+npm run build    # Build for production
+npm run preview  # Preview production build
+```
 
 ## Project Structure
 
@@ -79,16 +108,36 @@ consultanthub/
 │   ├── public/
 │   ├── src/
 │   │   ├── assets/
-│   │   ├── components/     # Reusable UI (Button, Card, Navbar, Modal)
-│   │   ├── data/           # Mock data (consultants, appointments)
-│   │   ├── pages/          # Page components
-│   │   ├── types/          # TypeScript interfaces
-│   │   ├── App.tsx
-│   │   └── main.tsx
+│   │   ├── components/
+│   │   │   ├── layout/       # Navbar, Footer, Sidebar
+│   │   │   ├── ui/           # Button, Card, Badge, Modal
+│   │   │   └── consultants/  # ConsultantCard, FilterSidebar, BookingWidget
+│   │   ├── data/             # Mock data (consultants, services, appointments)
+│   │   ├── pages/            # All page components
+│   │   │   ├── Home.tsx
+│   │   │   ├── Login.tsx
+│   │   │   ├── Register.tsx
+│   │   │   ├── Consultants.tsx
+│   │   │   ├── ConsultantProfile.tsx
+│   │   │   └── client/
+│   │   │       └── ClientDashboard.tsx
+│   │   ├── types/            # TypeScript interfaces
+│   │   ├── App.tsx           # Router setup
+│   │   ├── main.tsx          # Entry point
+│   │   └── index.css         # Tailwind imports
 │   ├── index.html
 │   ├── package.json
 │   ├── tsconfig.json
-│   └── vite.config.ts
+│   ├── vite.config.ts
+│   └── tailwind.config.js    # Design system tokens
+├── maak/                     # Design prototypes
+│   ├── design.md             # Full project spec
+│   ├── DESIGN (2).html       # Client Dashboard design
+│   ├── code (1) (2).html     # Browse page design
+│   └── screen (4) (2).html   # Profile page design
+├── docs/
+│   └── superpowers/
+│       └── plans/            # Implementation plan
 ├── .github/
 │   ├── ISSUE_TEMPLATE/
 │   └── pull_request_template.md
@@ -96,14 +145,31 @@ consultanthub/
 └── README.md
 ```
 
+## Project Status
+
+| Task | Status |
+|------|--------|
+| Task 1: Project Setup | ✅ Done (issue #1 closed) |
+| Task 2: Tailwind Config | ✅ Done (issue #2 closed) |
+| Task 3: Types + Mock Data | ✅ Done (issue #3 closed) |
+| Task 4: Layout Components | ⬜ Open (issue #4) |
+| Task 5: Home/Login/Register | ⬜ Open (issue #5) |
+| Task 6: Browse Page | ⬜ Open (issue #6) |
+| Task 7: Profile Page | ⬜ Open (issue #7) |
+| Task 8: Dashboard | ⬜ Open (issue #8) |
+| Task 9: Router Setup | ⬜ Open (issue #9) |
+| Task 10: Deploy | ⬜ Open (issue #10) |
+
+All work is tracked in GitHub Issues: https://github.com/Abdrihman-Hussein/ConsultantHub/issues
+
 ## GitHub Workflow
 
-We use **feature branches** + **Pull Requests**:
+We use **feature branches** + **Pull Requests** into `main`:
 
 ```bash
-# 1. Start from develop
-git checkout develop
-git pull origin develop
+# 1. Start from main
+git checkout main
+git pull origin main
 
 # 2. Create feature branch
 git checkout -b feature/consultant-profile
@@ -114,7 +180,7 @@ git commit -m "feat: add consultant profile page"
 
 # 4. Push and create PR
 git push origin feature/consultant-profile
-# Open PR on GitHub → develop
+# Open PR on GitHub → main
 ```
 
 ### Commit Convention
@@ -127,10 +193,25 @@ style: formatting
 chore: maintenance
 ```
 
-### Branch Protection
-- `main` — protected, requires PR + review
-- `develop` — integration branch
+Closing issues: add `Closes #N` to a commit message and the issue auto-closes when merged into `main`.
+
+### Branch Protection (recommended)
+- `main` — protect it: require PR + review, no direct pushes
 - `feature/*` — feature branches
+
+### Task → Branch Mapping
+| Task | Branch Name |
+|------|-------------|
+| Task 1: Project Setup | `feature/project-setup` |
+| Task 2: Tailwind Config | `feature/tailwind-config` |
+| Task 3: Types + Data | `feature/mock-data` |
+| Task 4: Layout Components | `feature/layout-components` |
+| Task 5: Home/Login/Register | `feature/auth-pages` |
+| Task 6: Browse Page | `feature/consultants-browse` |
+| Task 7: Profile Page | `feature/consultant-profile` |
+| Task 8: Dashboard | `feature/client-dashboard` |
+| Task 9: Router Setup | `feature/router-setup` |
+| Task 10: Deploy | `feature/deployment` |
 
 ## Deployment
 
@@ -144,14 +225,15 @@ chore: maintenance
 
 ## Hackathon Schedule (1 Day)
 
-| Time | Activity |
-|------|----------|
-| 0:00-0:30 | Repo setup, GitHub config, clone, install |
-| 0:30-1:30 | Shared components + layout + types + mock data |
-| 1:30-4:30 | Parallel page development |
-| 4:30-5:30 | Integration, testing, conflict resolution |
-| 5:30-6:00 | Deploy to Vercel, create demo accounts |
-| 6:00-6:30 | Retrospective, document lessons learned |
+| Time | Activity | Who |
+|------|----------|-----|
+| 0:00-0:30 | Repo setup, GitHub config, clone, install | Lead |
+| 0:30-1:00 | Tailwind config + Types + Mock data | Lead + F3 |
+| 1:00-1:30 | Layout components (Navbar, Footer, Sidebar) | F2 |
+| 1:30-3:00 | Parallel page development | Everyone |
+| 3:00-4:00 | Integration, routing, testing | Lead |
+| 4:00-4:30 | Deploy to Vercel | Lead |
+| 4:30-5:00 | Retrospective, document lessons learned | Everyone |
 
 ## Learning Goals
 
