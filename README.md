@@ -1,49 +1,159 @@
 # ConsultantHub
 
-A consultant appointment booking platform built as a **1-day hackathon MVP** by a beginner team.
+**Find the right consultant. Book in minutes.**
 
-## Project Overview
+ConsultantHub is a consultant discovery and appointment booking platform. Clients browse verified consultants by specialty, review their experience and rates, and book sessions directly — no back-and-forth emails, no scheduling friction.
 
-ConsultantHub helps clients discover consultants, view their services, and book appointments. Built as a learning exercise for GitHub collaboration, React/TypeScript/Tailwind, and deployment.
+**Live Demo:** _Coming soon_
 
-**Live Demo:** [Add Vercel URL after deployment]
+---
+
+## Features
+
+- **Browse & filter** consultants by specialty, availability, and rating
+- **Rich profiles** — bio, experience, services, and real-time availability
+- **Instant booking** — select a time slot and confirm in one flow
+- **Client dashboard** — manage upcoming and past appointments in one place
+- **Role-based access** — separate flows for clients and consultants
+
+---
+
+## Tech Stack
+
+| Layer        | Technology                        |
+| ------------ | --------------------------------- |
+| Frontend     | React 18 + TypeScript             |
+| Styling      | Tailwind CSS                      |
+| Routing      | React Router v6                   |
+| Build        | Vite                              |
+| Deployment   | Vercel                            |
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- npm
+
+### Installation
+
+```bash
+git clone https://github.com/Abdrihman-Hussein/ConsultantHub.git
+cd ConsultantHub/client
+npm install
+npm run dev
+```
+
+Open `http://localhost:5173`
+
+### Scripts
+
+```bash
+npm run dev      # Start dev server
+npm run build    # Production build (TypeScript must pass)
+npm run preview  # Preview production build locally
+```
+
+---
+
+## Pages
+
+| Page             | Route               | Description                                   |
+| ---------------- | ------------------- | --------------------------------------------- |
+| Home             | `/`                 | Hero, featured consultants, how it works      |
+| Browse           | `/consultants`      | Filter and search all consultants             |
+| Profile          | `/consultants/:id`  | Consultant detail + booking widget            |
+| Client Dashboard | `/client/dashboard` | Appointments, history, account overview       |
+| Login            | `/login`            | Sign in                                       |
+| Register         | `/register`         | Create client or consultant account           |
+
+---
+
+## Project Structure
+
+```
+ConsultantHub/
+├── client/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── layout/       # Navbar, Footer, Sidebar
+│   │   │   ├── ui/           # Button, Card, Badge, Modal
+│   │   │   └── consultants/  # ConsultantCard, FilterSidebar, BookingWidget
+│   │   ├── data/             # Mock data (dev only)
+│   │   ├── pages/            # Route-level page components
+│   │   ├── types/            # Shared TypeScript interfaces
+│   │   ├── App.tsx           # Router config
+│   │   └── main.tsx          # Entry point
+│   ├── package.json
+│   ├── vite.config.ts
+│   └── tailwind.config.js
+├── design/                   # UI prototypes and specs
+└── docs/                     # Architecture and planning docs
+```
+
+---
 
 ## Design System
 
-Built from the prototypes in `maak/` folder:
+Built on a clean, trust-first visual language.
 
-| Element | Value |
-|---------|-------|
-| Primary | `#000000` (dark) |
-| Secondary | `#0051d5` (blue) |
-| Background | `#f8f9ff` |
-| Surface Alt | `#F8FAFC` |
-| Surface Container | `#e5eeff` |
-| Surface Container Low | `#eff4ff` |
-| Surface Container High | `#dce9ff` |
-| Outline Variant | `#c6c6cd` |
-| Trust Gold | `#B45309` |
-| Success Emerald | `#059669` |
-| Error Crimson | `#E11D48` |
-| Headlines | Hanken Grotesk |
-| Body | Inter |
-| Labels | JetBrains Mono |
-| Icons | Google Material Symbols |
+| Token           | Value           |
+| --------------- | --------------- |
+| Primary         | `#000000`       |
+| Secondary       | `#0051d5`       |
+| Background      | `#f8f9ff`       |
+| Trust Gold      | `#B45309`       |
+| Success         | `#059669`       |
+| Error           | `#E11D48`       |
+| Headline font   | Hanken Grotesk  |
+| Body font       | Inter           |
+| Label font      | JetBrains Mono  |
 
-Design files: `maak/DESIGN (2).html`, `maak/code (1) (2).html`, `maak/screen (4) (2).html`
+---
 
-## Team
+## Roadmap
 
-| Person | Focus | Tasks |
-|--------|-------|-------|
-| **You (Lead)** | Setup + Router + Deploy | Tasks 1, 2, 9, 10 |
-| **Frontend 1** | Browse + Profile pages | Tasks 6, 7 |
-| **Frontend 2** | Dashboard + Layout | Tasks 4, 8 |
-| **Frontend 3** (optional) | Types + Mock Data + Auth pages | Tasks 3, 5 |
+### v1 — Current (Frontend MVP)
+- [x] Project setup and design system
+- [x] TypeScript types and mock data
+- [ ] Layout components
+- [ ] Home, Login, Register pages
+- [ ] Browse and Profile pages
+- [ ] Client Dashboard
+- [ ] Deployment
 
-## Tech Stack (Frontend Only for MVP)
+### v2 — Backend
+- [ ] REST API: Express + TypeScript
+- [ ] Database: PostgreSQL + Prisma ORM
+- [ ] Authentication: JWT + refresh tokens
+- [ ] Consultant dashboard — availability management, booking control
+- [ ] Real booking engine with conflict detection
+- [ ] Email notifications
 
-| Technology | Purpose |
+### v3 — Growth
+- [ ] Payments: Stripe integration
+- [ ] Reviews and ratings
+- [ ] Admin panel
+- [ ] Mobile app
+
+---
+
+## Contributing
+
+1. Fork the repo
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Commit with clear messages: `feat: add booking confirmation flow`
+4. Open a Pull Request against `main`
+
+All PRs require a passing build (`npm run build`) before review.
+
+---
+
+## License
+
+MIT — open to use, fork, and build on.
 |------------|---------|
 | React 18 | UI framework |
 | TypeScript | Type safety |
