@@ -162,44 +162,135 @@ consultanthub/
 
 All work is tracked in GitHub Issues: https://github.com/Abdrihman-Hussein/ConsultantHub/issues
 
-## GitHub Workflow
+## GitHub Workflow (Full)
 
-We use **feature branches** + **Pull Requests** into `main`:
+We use the **feature branch workflow**: every task gets its own branch, a Pull Request, and a code review before merging into `main`.
+
+### 1. First Time Setup (once per person)
 
 ```bash
-# 1. Start from main
+# Clone the repo
+git clone https://github.com/Abdrihman-Hussein/ConsultantHub.git
+cd consultanthub
+
+# Install dependencies
+cd client
+npm install
+```
+
+Verify your setup:
+```bash
+npm run dev        # should start the server at http://localhost:5173
+npm run build      # should pass without errors
+```
+
+### 2. Pick a Task (GitHub Issue)
+
+1. Go to **Issues**: https://github.com/Abdrihman-Hussein/ConsultantHub/issues
+2. Choose an open issue (Tasks 4-10 are available)
+3. **Assign yourself** (right side → Assignees)
+4. Move the issue to **In Progress** on the Project board
+5. Note the issue number (e.g. `#6`)
+
+### 3. Create a Feature Branch
+
+Never work directly on `main`. Always branch:
+
+```bash
+cd C:\Users\hp\consultantHub
+
+# Make sure you have the latest code
 git checkout main
 git pull origin main
 
-# 2. Create feature branch
-git checkout -b feature/consultant-profile
-
-# 3. Work, commit with conventional messages
-git add .
-git commit -m "feat: add consultant profile page"
-
-# 4. Push and create PR
-git push origin feature/consultant-profile
-# Open PR on GitHub → main
+# Create your feature branch (name matches the task)
+git checkout -b feature/consultants-browse
 ```
 
-### Commit Convention
+### 4. Do the Work + Commit Small
+
+Work on the task. Make **small, descriptive commits** as you go:
+
+```bash
+git add client/src/pages/Consultants.tsx
+git commit -m "feat: add consultants browse page"
+
+git add client/src/components/consultants/ConsultantCard.tsx
+git commit -m "feat: add consultant card component"
 ```
-feat: new feature
-fix: bug fix
-refactor: code restructuring
-docs: documentation
-style: formatting
-chore: maintenance
+
+### 5. Commit Convention
+
+| Prefix | Use for |
+|--------|---------|
+| `feat:` | New feature |
+| `fix:` | Bug fix |
+| `refactor:` | Code restructuring |
+| `docs:` | Documentation |
+| `style:` | Formatting / layout |
+| `test:` | Adding tests |
+| `chore:` | Maintenance, dependencies |
+
+Examples:
+```bash
+feat: add consultant card component
+fix: prevent duplicate time slots
+refactor: simplify booking widget
+docs: update API documentation
 ```
 
-Closing issues: add `Closes #N` to a commit message and the issue auto-closes when merged into `main`.
+**Avoid** bad commits like `update`, `fix`, `changes`, `final`, `final2`, `new`.
 
-### Branch Protection (recommended)
-- `main` — protect it: require PR + review, no direct pushes
-- `feature/*` — feature branches
+### 6. Test Before Pushing
 
-### Task → Branch Mapping
+```bash
+cd client
+npm run build      # MUST pass — no TypeScript errors
+npm run dev        # manually check your page in the browser
+```
+
+### 7. Push + Create a Pull Request
+
+```bash
+git push origin feature/consultants-browse
+```
+
+Then open a PR on GitHub:
+- **Base:** `main`
+- **Compare:** `feature/consultants-browse`
+- Title: e.g. `feat: add consultants browse page`
+- Body: what changed, how you tested it, screenshot
+- Add label (e.g. `frontend`, `ui`)
+
+### 8. Code Review
+
+1. Ask a teammate to review your PR
+2. Reviewer checks: code quality, matches design, build passes
+3. If changes are requested → push more commits to the same branch
+4. Once approved → **merge** the PR
+
+### 9. Close the Issue
+
+Add `Closes #N` (N = issue number) to the PR description or commit message. The issue auto-closes when the PR merges into `main`:
+
+```text
+feat: add consultants browse page
+
+Closes #6
+```
+
+### 10. Update Your Local Repo
+
+After your PR merges, get the latest code:
+
+```bash
+git checkout main
+git pull origin main
+git branch -d feature/consultants-browse   # delete old branch (local)
+```
+
+### 11. Task → Branch Mapping
+
 | Task | Branch Name |
 |------|-------------|
 | Task 1: Project Setup | `feature/project-setup` |
@@ -212,6 +303,25 @@ Closing issues: add `Closes #N` to a commit message and the issue auto-closes wh
 | Task 8: Dashboard | `feature/client-dashboard` |
 | Task 9: Router Setup | `feature/router-setup` |
 | Task 10: Deploy | `feature/deployment` |
+
+### 12. Merge Conflict Help
+
+If GitHub says "can't merge automatically":
+
+```bash
+git checkout main
+git pull origin main
+git checkout feature/consultants-browse
+git merge main        # pull latest main into your branch
+# Fix conflicts in the files GitHub marks, then:
+git add .
+git commit -m "merge: resolve conflicts with main"
+git push origin feature/consultants-browse
+```
+
+### Branch Protection (recommended)
+- `main` — protect it: require PR + review, no direct pushes
+- `feature/*` — all work happens here
 
 ## Deployment
 
