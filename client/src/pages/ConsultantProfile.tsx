@@ -1,0 +1,136 @@
+import { Link, useParams } from 'react-router-dom'
+import { consultants } from '../data/consultants'
+import { services } from '../data/services'
+import Container from '../components/ui/Container'
+import Button from '../components/ui/Button'
+import Badge from '../components/ui/Badge'
+import Avatar from '../components/ui/Avatar'
+import Rating from '../components/ui/Rating'
+import Card from '../components/ui/Card'
+import BookingWidget from '../components/consultants/BookingWidget'
+
+export default function ConsultantProfile() {
+  const { id } = useParams<{ id: string }>()
+  const consultant = consultants.find((candidate) => candidate.id === id)
+
+  if (!consultant) {
+    return (
+      <Container className="py-24 text-center">
+        <h1 className="font-display text-display-md text-ink-950">Consultant not found</h1>
+        <p className="mx-auto mt-3 max-w-sm text-base text-muted">
+          That profile may have been removed or the link is incorrect.
+        </p>
+        <Button to="/consultants" className="mt-8">
+          Back to directory
+        </Button>
+      </Container>
+    )
+  }
+
+  const consultantServices = services.filter((service) => service.consultantId === consultant.id)
+
+  const stats = [
+    { label: 'Sessions', value: `${consultant.sessions}+` },
+    { label: 'Experience', value: consultant.experience },
+    { label: 'Response', value: consultant.responseTime },
+    { label: 'Rate', value: `$${consultant.hourlyRate}/hr` },
+  ]
+
+  return (
+    <>
+      <section className="border-b border-line bg-surface">
+        <Container className="py-14">
+          <Link
+            to="/consultants"
+            className="mb-8 inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-ink-950"
+          >
+            <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M16 10H4M9 5l-5 5 5 5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            All consultants
+          </Link>
+
+          <div className="flex flex-col gap-7 sm:flex-row sm:items-start">
+            <Avatar src={consultant.avatar} name={consultant.name} size="xl" className="ring-2 ring-white" />
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-3">
+                <h1 className="font-display text-display-lg text-ink-950">{consultant.name}</h1>
+                {consultant.verified && <Badge tone="accent">Verified</Badge>}
+              </div>
+              <p className="mt-2 text-lg text-muted">{consultant.title}</p>
+              <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted">
+                <Rating value={consultant.rating} reviewCount={consultant.reviewCount} />
+                <span className="flex items-center gap-1.5">
+                  <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.4">
+                    <path d="M10 17.5s6-5.2 6-9.4a6 6 0 1 0-12 0c0 4.2 6 9.4 6 9.4z" />
+                    <circle cx="10" cy="8" r="2" />
+                  </svg>
+                  {consultant.location}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <dl className="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-4">
+            {stats.map((stat) => (
+              <div key={stat.label} className="bg-surface px-5 py-4">
+                <dt className="text-xs text-subtle">{stat.label}</dt>
+                <dd className="mt-1 text-lg font-semibold tracking-tight text-ink-950">
+                  {stat.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </Container>
+      </section>
+
+      <Container className="py-14">
+        <div className="grid gap-12 lg:grid-cols-[1fr_380px] lg:items-start">
+          <div className="space-y-12">
+            <section>
+              <h2 className="text-lg font-semibold tracking-tight text-ink-950">About</h2>
+              <p className="mt-3 text-base leading-relaxed text-muted">{consultant.bio}</p>
+            </section>
+
+            <section>
+              <h2 className="text-lg font-semibold tracking-tight text-ink-950">Services</h2>
+              <div className="mt-4 space-y-3">
+                {consultantServices.length === 0 ? (
+                  <p className="text-sm text-muted">No services listed yet.</p>
+                ) : (
+                  consultantServices.map((service) => (
+                    <Card key={service.id} className="flex items-start justify-between gap-6 p-5">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="font-medium text-ink-950">{service.name}</h3>
+                          {service.isFree && <Badge tone="accent">Free</Badge>}
+                        </div>
+                        <p className="mt-1.5 text-sm leading-relaxed text-muted">
+                          {service.description}
+                        </p>
+                        <p className="mt-2.5 text-xs text-subtle">{service.duration} minutes</p>
+                      </div>
+                      <p className="shrink-0 text-lg font-semibold tracking-tight text-ink-950">
+                        {service.isFree ? 'Free' : `$${service.price}`}
+                      </p>
+                    </Card>
+                  ))
+                )}
+              </div>
+            </section>
+          </div>
+
+          <aside className="lg:sticky lg:top-24">
+            {consultantServices.length > 0 ? (
+              <BookingWidget services={consultantServices} />
+            ) : (
+              <Card className="p-6">
+                <p className="text-sm text-muted">This consultant hasn&apos;t published services yet.</p>
+              </Card>
+            )}
+          </aside>
+        </div>
+      </Container>
+    </>
+  )
+}
