@@ -100,21 +100,21 @@ ConsultantHub/
 
 ## Design System
 
-Built on a clean, trust-first visual language.
+Warm, human, and approachable — cream surfaces, terracotta accent, soft radii.
 
 | Token             | Value                    |
 | ----------------- | ------------------------ |
-| Ink scale         | Stone, 50 → 950          |
+| Ink scale         | Cream-tinted warm, 50 → 950 |
 | Primary surface   | `#FFFFFF`                |
-| Page background   | `#FAFAF9`                |
-| Accent            | `#059669` (emerald 600)  |
-| Accent hover      | `#065F46`                |
+| Page background   | `#FDF8F3`                |
+| Accent            | `#C2622D` (terracotta)   |
+| Accent hover      | `#A9521F`                |
 | Gold (ratings)    | `#D9A441`                |
-| Border            | `#E7E5E4`                |
-| Body text         | `#1C1917`                |
-| Muted text        | `#78716C`                |
-| Error             | `#B91C1C`                |
-| Display font      | Instrument Serif         |
+| Border            | `#EADFD2`                |
+| Body text         | `#2A2118`                |
+| Muted text        | `#7A6A5B`                |
+| Error             | `#B4231C`                |
+| Display font      | Fraunces                 |
 | Body / UI font    | Inter                    |
 
 ---
