@@ -1,14 +1,17 @@
 import { Appointment } from '../types';
+import { consultants } from './consultants';
 
-export const appointments: Appointment[] = [
+// Appointments are stored as seeds and hydrated from `consultants` so that names
+// and avatars can never drift out of sync with the consultant directory.
+type AppointmentSeed = Omit<Appointment, 'consultantName' | 'consultantAvatar'>;
+
+const seeds: AppointmentSeed[] = [
   {
     id: 'a1',
     clientId: 'u1',
     consultantId: '2',
-    consultantName: 'Dr. Robert Chen',
-    consultantAvatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAUW-3JmLpbmTRAv8VPOI7_kLgc5GLfbdh9M_2wyhgSSY-KB3_-4MRhu_hYgbszJ7HCImYj0lUZO1P3vI_bGoEZhCeO-r82A8qDd3OAST75IgXTgs56OiqAepHHIRp6ItkSNOAAlJ92AOKigWO8H5kMBQXyJB8OZh_iOGwGZPICe9BsRgsT7dEkQT0JuKyZ5mcxc0B1SJgE9jzRApvlKionZWRFN4jBT0lFTwbAbgpcSQkAAqJrDN1m',
-    serviceName: 'Strategic Financial Planning',
-    date: '2024-10-24',
+    serviceName: 'Architecture Review',
+    date: '2026-10-24',
     startTime: '10:00',
     endTime: '11:30',
     status: 'PENDING',
@@ -17,11 +20,9 @@ export const appointments: Appointment[] = [
   {
     id: 'a2',
     clientId: 'u1',
-    consultantId: '3',
-    consultantName: 'Elena Rostova',
-    consultantAvatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCKy_1q0yt8vAxuAu6-Z4VpN22r6FImKhRCMRgBv33vj9sUbWDUpzKtHlTIBJPCSn84fxm7d6vTxFV6X4w040ZJRDQ4d6bKBRUpwt48mJVdgpVbdYqE1GNMi8Ax5nj2WnefUEEJvhOS47Y06gbHQl-BgiGQTHTCNvHTyfQhDtu4IpmZVS51Gq7viVaeH2jRpwx1OeIwDClioSsb0cur-p2mYm11-bg1nebaPDr5EQyrW7Ama-tdF7uu',
-    serviceName: 'Q4 Marketing Strategy Review',
-    date: '2024-10-28',
+    consultantId: '1',
+    serviceName: 'Marketing Strategy Session',
+    date: '2026-10-28',
     startTime: '14:00',
     endTime: '15:00',
     status: 'CONFIRMED',
@@ -32,10 +33,8 @@ export const appointments: Appointment[] = [
     id: 'a3',
     clientId: 'u1',
     consultantId: '4',
-    consultantName: 'Marcus Johnson',
-    consultantAvatar: '',
-    serviceName: 'Legal Compliance',
-    date: '2024-10-12',
+    serviceName: 'Financial Modeling Consultation',
+    date: '2026-09-25',
     startTime: '09:00',
     endTime: '10:00',
     status: 'COMPLETED',
@@ -45,10 +44,8 @@ export const appointments: Appointment[] = [
     id: 'a4',
     clientId: 'u1',
     consultantId: '3',
-    consultantName: 'Elena Rostova',
-    consultantAvatar: '',
-    serviceName: 'Initial Audit',
-    date: '2024-09-30',
+    serviceName: 'Contract Review',
+    date: '2026-09-18',
     startTime: '11:00',
     endTime: '12:00',
     status: 'COMPLETED',
@@ -58,13 +55,25 @@ export const appointments: Appointment[] = [
     id: 'a5',
     clientId: 'u1',
     consultantId: '2',
-    consultantName: 'Dr. Robert Chen',
-    consultantAvatar: '',
-    serviceName: 'Financial Plan',
-    date: '2024-09-15',
+    serviceName: 'Quick Consultation',
+    date: '2026-09-10',
     startTime: '14:00',
     endTime: '15:00',
     status: 'CANCELLED',
     meetingType: 'video',
   },
 ];
+
+export const appointments: Appointment[] = seeds.map((seed) => {
+  const consultant = consultants.find((candidate) => candidate.id === seed.consultantId);
+
+  if (!consultant) {
+    throw new Error(`appointments: unknown consultantId "${seed.consultantId}"`);
+  }
+
+  return {
+    ...seed,
+    consultantName: consultant.name,
+    consultantAvatar: consultant.avatar,
+  };
+});

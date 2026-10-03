@@ -9,4 +9,5 @@ export const services: Service[] = [
   { id: 's6', consultantId: '3', name: '15min Intro Call', description: 'Brief alignment to discuss needs and fit.', duration: 15, price: 0, isFree: true },
   { id: 's7', consultantId: '4', name: 'Financial Modeling Consultation', description: 'Review your financial model and projections.', duration: 60, price: 120, isFree: false },
   { id: 's8', consultantId: '4', name: 'Quick Financial Check', description: 'Quick overview of your financial situation.', duration: 15, price: 0, isFree: true },
+  { id: 's9', consultantId: '3', name: 'Contract Review', description: 'Walk through your agreements and flag risk before you sign.', duration: 60, price: 250, isFree: false },
 ];
