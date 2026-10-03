@@ -4,32 +4,33 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Warm neutral scale — the base of the "quiet premium" look.
+        // Warm neutral scale — cream-tinted rather than grey, to sit with the
+        // terracotta accent.
         ink: {
-          50: '#FAFAF9',
-          100: '#F5F5F4',
-          200: '#E7E5E4',
-          300: '#D6D3D1',
-          400: '#A8A29E',
-          500: '#78716C',
-          600: '#57534E',
-          700: '#44403C',
-          800: '#292524',
-          900: '#1C1917',
-          950: '#0C0A09',
+          50: '#FDF8F3',
+          100: '#F9F1E8',
+          200: '#F5EBE0',
+          300: '#EADFD2',
+          400: '#D6C4B2',
+          500: '#B79E88',
+          600: '#9C8069',
+          700: '#7A6A5B',
+          800: '#5A4A3E',
+          900: '#3D3229',
+          950: '#2A2118',
         },
-        // Single restrained accent for actions + trust signals.
+        // Terracotta — the single accent for actions and trust signals.
         accent: {
-          50: '#ECFDF5',
-          100: '#D1FAE5',
-          200: '#A7F3D0',
-          300: '#6EE7B7',
-          400: '#34D399',
-          500: '#10B981',
-          600: '#059669',
-          700: '#047857',
-          800: '#065F46',
-          900: '#064E3B',
+          50: '#FDF4EF',
+          100: '#FAE6DA',
+          200: '#F2C9B2',
+          300: '#E7A483',
+          400: '#DB8259',
+          500: '#C2622D',
+          600: '#A9521F',
+          700: '#8A4219',
+          800: '#6B3414',
+          900: '#4C2510',
         },
         gold: {
           300: '#E8C88A',
@@ -39,18 +40,21 @@ export default {
         },
         // Flat semantic aliases so components read cleanly.
         surface: '#FFFFFF',
-        'surface-subtle': '#FAFAF9',
-        'surface-muted': '#F5F5F4',
-        line: '#E7E5E4',
-        'line-strong': '#D6D3D1',
-        body: '#1C1917',
-        muted: '#78716C',
-        subtle: '#A8A29E',
-        danger: '#B91C1C',
+        'surface-subtle': '#FDF8F3',
+        'surface-muted': '#F9F1E8',
+        line: '#EADFD2',
+        'line-strong': '#D6C4B2',
+        body: '#2A2118',
+        muted: '#7A6A5B',
+        subtle: '#9C8069',
+        danger: '#B4231C',
+        'danger-soft': '#FCEBE9',
+        // Matches the Badge 'accent' fill — used to knock shapes out of a seal.
+        'on-accent-soft': '#FDF4EF',
       },
       fontFamily: {
-        // Editorial serif for display, neutral sans for everything else.
-        display: ['"Instrument Serif"', 'Georgia', 'serif'],
+        // Soft, slightly wonky serif for display; neutral sans for UI.
+        display: ['Fraunces', 'Georgia', 'serif'],
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       fontSize: {
@@ -61,14 +65,21 @@ export default {
       },
       borderRadius: {
         // NOTE: intentionally not overriding DEFAULT/lg/xl/full so that
-        // `rounded-full` resolves to 9999px (the previous config mapped it to
-        // 0.75rem, which silently broke every pill/avatar in the app).
-        '4xl': '2rem',
+        // `rounded-full` resolves to 9999px. Soft, generous radii are the
+        // signature of this direction.
+        sm: '0.5rem',
+        DEFAULT: '0.75rem',
+        md: '1rem',
+        lg: '1.25rem',
+        xl: '1.5rem',
+        '2xl': '1.5rem',
+        '3xl': '2rem',
+        '4xl': '2.5rem',
       },
       boxShadow: {
-        card: '0 1px 2px rgba(12, 10, 9, 0.04), 0 8px 24px -12px rgba(12, 10, 9, 0.10)',
-        lift: '0 2px 4px rgba(12, 10, 9, 0.04), 0 18px 40px -16px rgba(12, 10, 9, 0.18)',
-        ring: '0 0 0 1px rgba(12, 10, 9, 0.06)',
+        card: '0 2px 4px rgba(42, 33, 24, 0.03), 0 18px 36px -20px rgba(42, 33, 24, 0.18)',
+        lift: '0 4px 8px rgba(42, 33, 24, 0.04), 0 28px 56px -24px rgba(42, 33, 24, 0.28)',
+        ring: '0 0 0 1px rgba(42, 33, 24, 0.07)',
       },
       maxWidth: {
         shell: '1200px',
