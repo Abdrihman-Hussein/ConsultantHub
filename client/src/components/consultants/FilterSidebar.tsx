@@ -116,7 +116,7 @@ export default function FilterSidebar({
           step={10}
           value={filters.maxRate}
           onChange={(event) => set('maxRate', Number(event.target.value))}
-          className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-ink-200 accent-ink-950"
+          className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-ink-200 accent-accent-500"
         />
         <div className="mt-1 flex justify-between text-xs text-subtle">
           <span>$50</span>

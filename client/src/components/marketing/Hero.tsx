@@ -31,13 +31,13 @@ export default function Hero({
           </div>
           <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-3 text-sm text-muted">
             <span className="flex items-center gap-2">
-              <svg viewBox="0 0 20 20" className="h-4 w-4 text-accent-600" fill="currentColor">
+              <svg viewBox="0 0 20 20" className="h-4 w-4 text-accent-500" fill="currentColor">
                 <path d="M10 1.5l2.2 4.7 5.1.6-3.8 3.5 1 5.1L10 12.8l-4.5 2.6 1-5.1L2.7 6.8l5.1-.6L10 1.5z" />
               </svg>
               4.9 average rating
             </span>
             <span className="flex items-center gap-2">
-              <svg viewBox="0 0 20 20" className="h-4 w-4 text-accent-600" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <svg viewBox="0 0 20 20" className="h-4 w-4 text-accent-500" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <circle cx="10" cy="7" r="3" />
                 <path d="M4 16.5c.6-2.9 2.9-4.5 6-4.5s5.4 1.6 6 4.5" strokeLinecap="round" />
               </svg>

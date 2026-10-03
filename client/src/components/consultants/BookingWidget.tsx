@@ -94,7 +94,7 @@ export default function BookingWidget({ services, onConfirm }: BookingWidgetProp
                 onClick={() => updateSelection(() => setTime(candidate))}
                 className={`rounded-xl border px-3 py-2 text-sm transition-colors ${
                   time === candidate
-                    ? 'border-accent-600 bg-accent-600 text-white'
+                    ? 'border-accent-500 bg-accent-500 text-white'
                     : 'border-line-strong text-muted hover:border-ink-950 hover:text-body'
                 }`}
               >
@@ -120,7 +120,7 @@ export default function BookingWidget({ services, onConfirm }: BookingWidgetProp
       </Button>
 
       {confirmed && service && time && (
-        <p className="mt-3 text-center text-sm text-accent-700">
+        <p className="mt-3 text-center text-sm text-accent-600">
           Requested {service.name} on {date} at {time}. You&apos;ll get a confirmation shortly.
         </p>
       )}

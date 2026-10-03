@@ -18,7 +18,15 @@ export default function ConsultantCard({ consultant }: ConsultantCardProps) {
           <Badge tone="accent">
             <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="currentColor">
               <path d="M8 1l1.9 1.2 2.2-.3.9 2 1.9 1-.3 2.2 1.2 1.9-1.2 1.9.3 2.2-1.9 1-.9 2-2.2-.3L8 15l-1.9-1.2-2.2.3-.9-2-1.9-1 .3-2.2L1.2 8l1.2-1.9-.3-2.2 1.9-1 .9-2 2.2.3L8 1z" />
-              <path d="M5.6 8.1l1.6 1.6 3.3-3.3" stroke="#ECFDF5" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+              {/* Knocked out of the seal — stroke matches the badge fill. */}
+              <path
+                d="M5.6 8.1l1.6 1.6 3.3-3.3"
+                stroke="var(--ch-badge-fill)"
+                strokeWidth="1.4"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
             Verified
           </Badge>

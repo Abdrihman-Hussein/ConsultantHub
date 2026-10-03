@@ -51,7 +51,7 @@ export default function Register() {
                       value={option.value}
                       checked={role === option.value}
                       onChange={() => setRole(option.value)}
-                      className="mt-1 h-4 w-4 accent-ink-950"
+                      className="mt-1 h-4 w-4 accent-accent-500"
                     />
                     <span>
                       <span className="block text-sm font-medium text-ink-950">{option.label}</span>
