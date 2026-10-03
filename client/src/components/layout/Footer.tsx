@@ -1,22 +1,78 @@
+import { Link } from 'react-router-dom'
+import Container from '../ui/Container'
+
+const columns = [
+  {
+    title: 'Product',
+    links: [
+      { label: 'Browse consultants', to: '/consultants' },
+      { label: 'How it works', to: '/#how-it-works' },
+      { label: 'Pricing', to: '/#pricing' },
+    ],
+  },
+  {
+    title: 'Company',
+    links: [
+      { label: 'Become a consultant', to: '/register' },
+      { label: 'Client dashboard', to: '/client/dashboard' },
+      { label: 'Contact support', to: '/#' },
+    ],
+  },
+  {
+    title: 'Legal',
+    links: [
+      { label: 'Terms of service', to: '/#' },
+      { label: 'Privacy policy', to: '/#' },
+    ],
+  },
+]
+
 export default function Footer() {
   return (
-    <footer className="bg-primary-container full-width border-t border-outline-variant mt-auto">
-      <div className="flex flex-col md:flex-row justify-between items-center py-12 px-8 max-w-max-width mx-auto gap-6 md:gap-0">
-        <div className="flex flex-col items-center md:items-start">
-          <span className="font-headline-md text-headline-md text-on-primary-container mb-2">
-            ConsultantHub
-          </span>
-          <span className="font-body-md text-body-md text-on-primary-container/80 text-center md:text-left">
-            © 2024 ConsultantHub. All professional rights reserved.
-          </span>
+    <footer className="border-t border-line bg-surface">
+      <Container className="py-16">
+        <div className="grid gap-12 md:grid-cols-[1.5fr_repeat(3,1fr)]">
+          <div className="max-w-xs">
+            <Link to="/" className="flex items-center gap-2.5">
+              <span className="grid h-7 w-7 place-items-center rounded-full bg-ink-950 text-xs font-semibold text-white">
+                C
+              </span>
+              <span className="text-[15px] font-semibold tracking-tight text-ink-950">
+                ConsultantHub
+              </span>
+            </Link>
+            <p className="mt-4 text-sm leading-relaxed text-muted">
+              A trusted network of verified consultants. Find the right person and book a session
+              in minutes.
+            </p>
+          </div>
+
+          {columns.map((column) => (
+            <div key={column.title}>
+              <h3 className="eyebrow mb-4">{column.title}</h3>
+              <ul className="space-y-2.5">
+                {column.links.map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      to={link.to}
+                      className="text-sm text-muted transition-colors hover:text-ink-950"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
-        <nav className="flex flex-wrap justify-center gap-6">
-          <a className="font-label-sm text-label-sm text-on-primary-container/80 hover:text-on-primary-container hover:opacity-100 transition-opacity" href="#">Terms of Service</a>
-          <a className="font-label-sm text-label-sm text-on-primary-container/80 hover:text-on-primary-container hover:opacity-100 transition-opacity" href="#">Privacy Policy</a>
-          <a className="font-label-sm text-label-sm text-on-primary-container/80 hover:text-on-primary-container hover:opacity-100 transition-opacity" href="#">Contact Support</a>
-          <a className="font-label-sm text-label-sm text-on-primary-container/80 hover:text-on-primary-container hover:opacity-100 transition-opacity" href="#">Become a Consultant</a>
-        </nav>
-      </div>
+
+        <div className="mt-14 flex flex-col gap-3 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-subtle">
+            © {new Date().getFullYear()} ConsultantHub. All rights reserved.
+          </p>
+          <p className="text-xs text-subtle">MIT licensed.</p>
+        </div>
+      </Container>
     </footer>
-  );
+  )
 }

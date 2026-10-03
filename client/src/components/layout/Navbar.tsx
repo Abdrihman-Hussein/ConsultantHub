@@ -1,65 +1,118 @@
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react'
+import { Link, NavLink, useLocation } from 'react-router-dom'
+import Button from '../ui/Button'
+import Container from '../ui/Container'
+import Avatar from '../ui/Avatar'
+import { users } from '../../data/users'
 
-interface NavbarProps {
-  activePage?: 'browse' | 'dashboard' | 'home';
-}
+const navLinks = [
+  { to: '/consultants', label: 'Browse' },
+  { to: '/client/dashboard', label: 'Dashboard' },
+  { to: '/#how-it-works', label: 'How it works' },
+]
 
-export default function Navbar({ activePage = 'home' }: NavbarProps) {
+export default function Navbar() {
+  const [open, setOpen] = useState(false)
+  const { pathname } = useLocation()
+  const currentUser = users[0]
+
+  // Close the mobile sheet whenever the route changes.
+  useEffect(() => setOpen(false), [pathname])
+
   return (
-    <header className="bg-surface border-b border-outline-variant full-width top-0 z-50 sticky">
-      <div className="flex justify-between items-center w-full px-8 h-20 max-w-max-width mx-auto">
-        <div className="flex items-center gap-6">
-          <Link to="/" className="font-headline-lg text-headline-lg font-bold text-primary">
-            ConsultantHub
-          </Link>
-          <div className="relative hidden md:block w-64 ml-4">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">
-              search
+    <header className="sticky top-0 z-50 border-b border-line/70 bg-surface-subtle/80 backdrop-blur-md">
+      <Container>
+        <div className="flex h-16 items-center justify-between gap-6">
+          <Link to="/" className="flex items-center gap-2.5">
+            <span className="grid h-7 w-7 place-items-center rounded-full bg-ink-950 text-xs font-semibold text-white">
+              C
             </span>
-            <input
-              className="w-full pl-9 pr-4 py-2 bg-surface-alt border border-outline-variant rounded-full text-label-md font-label-md focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/20 transition-all"
-              placeholder="Search consultants..."
-              type="text"
-            />
+            <span className="text-[15px] font-semibold tracking-tight text-ink-950">
+              ConsultantHub
+            </span>
+          </Link>
+
+          <nav className="hidden items-center gap-1 md:flex">
+            {navLinks.map((link) =>
+              link.to.includes('#') ? (
+                <a
+                  key={link.to}
+                  href={link.to}
+                  className="rounded-full px-3.5 py-2 text-sm text-muted transition-colors hover:bg-ink-100 hover:text-body"
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  className={({ isActive }) =>
+                    `rounded-full px-3.5 py-2 text-sm transition-colors ${
+                      isActive
+                        ? 'bg-ink-100 font-medium text-ink-950'
+                        : 'text-muted hover:bg-ink-100 hover:text-body'
+                    }`
+                  }
+                >
+                  {link.label}
+                </NavLink>
+              ),
+            )}
+          </nav>
+
+          <div className="hidden items-center gap-3 md:flex">
+            <Button to="/login" variant="ghost" size="sm">
+              Log in
+            </Button>
+            <Link to="/client/dashboard" className="flex items-center gap-2 pl-1">
+              <Avatar src={currentUser.avatar} name={currentUser.name} size="sm" />
+              <span className="hidden text-sm font-medium text-body lg:inline">
+                {currentUser.name}
+              </span>
+            </Link>
           </div>
-        </div>
-        <nav className="hidden md:flex items-center space-x-8">
-          <Link
-            to="/consultants"
-            className={`font-label-md text-label-md h-20 flex items-center px-2 transition-colors ${
-              activePage === 'browse'
-                ? 'text-secondary font-bold border-b-2 border-secondary'
-                : 'text-on-surface-variant hover:text-secondary hover:bg-surface-container-low'
-            }`}
+
+          <button
+            type="button"
+            onClick={() => setOpen((prev) => !prev)}
+            aria-expanded={open}
+            aria-label="Toggle navigation"
+            className="grid h-9 w-9 place-items-center rounded-full text-body transition-colors hover:bg-ink-100 md:hidden"
           >
-            Browse
-          </Link>
-          <Link
-            to="/client/dashboard"
-            className={`font-label-md text-label-md h-20 flex items-center px-2 transition-colors ${
-              activePage === 'dashboard'
-                ? 'text-secondary font-bold border-b-2 border-secondary'
-                : 'text-on-surface-variant hover:text-secondary hover:bg-surface-container-low'
-            }`}
-          >
-            Dashboard
-          </Link>
-          <a className="text-on-surface-variant hover:text-secondary hover:bg-surface-container-low transition-colors font-label-md text-label-md h-20 flex items-center px-2" href="#">
-            Resources
-          </a>
-        </nav>
-        <div className="flex items-center space-x-4">
-          <Link to="/login" className="font-label-md text-label-md text-secondary border border-secondary px-4 py-2 rounded hover:bg-secondary/5 transition-colors">
-            Log In
-          </Link>
-          <Link to="/register" className="font-label-md text-label-md bg-secondary text-white px-4 py-2 rounded hover:bg-secondary/90 transition-colors shadow-sm">
-            Profile
-          </Link>
+            <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.5">
+              {open ? (
+                <path d="M5 5l10 10M15 5L5 15" strokeLinecap="round" />
+              ) : (
+                <path d="M3 6h14M3 10h14M3 14h14" strokeLinecap="round" />
+              )}
+            </svg>
+          </button>
         </div>
-        <button className="md:hidden text-on-surface-variant">
-          <span className="material-symbols-outlined">menu</span>
-        </button>
-      </div>
+      </Container>
+
+      {open && (
+        <div className="border-t border-line bg-surface md:hidden">
+          <Container className="space-y-1 py-4">
+            {navLinks.map((link) => (
+              <a
+                key={link.to}
+                href={link.to}
+                className="block rounded-xl px-3 py-2.5 text-sm text-body hover:bg-ink-100"
+              >
+                {link.label}
+              </a>
+            ))}
+            <div className="flex items-center gap-3 pt-3">
+              <Button to="/login" variant="outline" size="sm" className="flex-1">
+                Log in
+              </Button>
+              <Button to="/register" size="sm" className="flex-1">
+                Get started
+              </Button>
+            </div>
+          </Container>
+        </div>
+      )}
     </header>
-  );
+  )
 }
