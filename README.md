@@ -65,7 +65,8 @@ npm run preview  # Preview production build locally
 | Home             | `/`                 | Hero, featured consultants, how it works      |
 | Browse           | `/consultants`      | Filter and search all consultants             |
 | Profile          | `/consultants/:id`  | Consultant detail + booking widget            |
-| Client Dashboard | `/client/dashboard` | Appointments, history, account overview       |
+| Client Dashboard | `/client/dashboard` | Stats, upcoming appointments, history         |
+| My Appointments  | `/client/appointments` | All bookings, filterable by status         |
 | Login            | `/login`            | Sign in                                       |
 | Register         | `/register`         | Create client or consultant account           |
 
@@ -78,19 +79,21 @@ ConsultantHub/
 ├── client/
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── layout/       # Navbar, Footer, Sidebar
-│   │   │   ├── ui/           # Button, Card, Badge, Modal
-│   │   │   └── consultants/  # ConsultantCard, FilterSidebar, BookingWidget
-│   │   ├── data/             # Mock data (dev only)
-│   │   ├── pages/            # Route-level page components
-│   │   ├── types/            # Shared TypeScript interfaces
-│   │   ├── App.tsx           # Router config
-│   │   └── main.tsx          # Entry point
+│   │   │   ├── layout/         # Navbar, Footer, PublicLayout, DashboardLayout
+│   │   │   ├── ui/             # Button, Card, Badge, Avatar, Rating, Input, Select
+│   │   │   ├── consultants/    # ConsultantCard, FilterSidebar, BookingWidget
+│   │   │   ├── appointments/   # AppointmentCard
+│   │   │   └── marketing/      # Hero, HowItWorks
+│   │   ├── data/               # Mock data (dev only)
+│   │   ├── pages/              # Route-level page components
+│   │   ├── types/              # Shared TypeScript interfaces
+│   │   ├── App.tsx             # Router config
+│   │   └── main.tsx            # Entry point
 │   ├── package.json
 │   ├── vite.config.ts
 │   └── tailwind.config.js
-├── design/                   # UI prototypes and specs
-└── docs/                     # Architecture and planning docs
+├── maak/                       # UI prototypes and specs
+└── docs/                       # Architecture and planning docs
 ```
 
 ---
@@ -99,17 +102,20 @@ ConsultantHub/
 
 Built on a clean, trust-first visual language.
 
-| Token           | Value           |
-| --------------- | --------------- |
-| Primary         | `#000000`       |
-| Secondary       | `#0051d5`       |
-| Background      | `#f8f9ff`       |
-| Trust Gold      | `#B45309`       |
-| Success         | `#059669`       |
-| Error           | `#E11D48`       |
-| Headline font   | Hanken Grotesk  |
-| Body font       | Inter           |
-| Label font      | JetBrains Mono  |
+| Token             | Value                    |
+| ----------------- | ------------------------ |
+| Ink scale         | Stone, 50 → 950          |
+| Primary surface   | `#FFFFFF`                |
+| Page background   | `#FAFAF9`                |
+| Accent            | `#059669` (emerald 600)  |
+| Accent hover      | `#065F46`                |
+| Gold (ratings)    | `#D9A441`                |
+| Border            | `#E7E5E4`                |
+| Body text         | `#1C1917`                |
+| Muted text        | `#78716C`                |
+| Error             | `#B91C1C`                |
+| Display font      | Instrument Serif         |
+| Body / UI font    | Inter                    |
 
 ---
 
