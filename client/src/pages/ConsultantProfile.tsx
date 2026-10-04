@@ -7,6 +7,7 @@ import Badge from '../components/ui/Badge'
 import Avatar from '../components/ui/Avatar'
 import Rating from '../components/ui/Rating'
 import Card from '../components/ui/Card'
+import Reveal from '../components/ui/Reveal'
 import BookingWidget from '../components/consultants/BookingWidget'
 
 export default function ConsultantProfile() {
@@ -16,13 +17,21 @@ export default function ConsultantProfile() {
   if (!consultant) {
     return (
       <Container className="py-24 text-center">
-        <h1 className="font-display text-display-md text-ink-950">Consultant not found</h1>
-        <p className="mx-auto mt-3 max-w-sm text-base text-muted">
-          That profile may have been removed or the link is incorrect.
-        </p>
-        <Button to="/consultants" className="mt-8">
-          Back to directory
-        </Button>
+        <Reveal>
+          <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-accent-50 text-accent-500">
+            <svg viewBox="0 0 20 20" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.4">
+              <circle cx="9" cy="9" r="5.5" />
+              <path d="M13 13l4 4" strokeLinecap="round" />
+            </svg>
+          </span>
+          <h1 className="mt-6 font-display text-display-md text-ink-950">Consultant not found</h1>
+          <p className="mx-auto mt-3 max-w-sm text-base text-muted">
+            That profile may have been removed or the link is incorrect.
+          </p>
+          <Button to="/consultants" className="mt-8">
+            Back to directory
+          </Button>
+        </Reveal>
       </Container>
     )
   }
@@ -38,21 +47,42 @@ export default function ConsultantProfile() {
 
   return (
     <>
-      <section className="border-b border-line bg-surface">
-        <Container className="py-14">
-          <Link
-            to="/consultants"
-            className="mb-8 inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-ink-950"
-          >
-            <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M16 10H4M9 5l-5 5 5 5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            All consultants
-          </Link>
+      <section className="relative overflow-hidden border-b border-line bg-surface">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full bg-accent-100/40 blur-3xl"
+        />
+
+        <Container className="relative py-14">
+          <Reveal>
+            <Link
+              to="/consultants"
+              className="group mb-8 inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-ink-950"
+            >
+              <svg
+                viewBox="0 0 20 20"
+                className="h-4 w-4 transition-transform duration-300 ease-spring group-hover:-translate-x-1"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              >
+                <path d="M16 10H4M9 5l-5 5 5 5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              All consultants
+            </Link>
+          </Reveal>
 
           <div className="flex flex-col gap-7 sm:flex-row sm:items-start">
-            <Avatar src={consultant.avatar} name={consultant.name} size="xl" className="ring-2 ring-white" />
-            <div className="min-w-0 flex-1">
+            <Reveal>
+              <Avatar
+                src={consultant.avatar}
+                name={consultant.name}
+                size="xl"
+                className="ring-4 ring-surface shadow-card"
+              />
+            </Reveal>
+
+            <Reveal delay={90} className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-3">
                 <h1 className="font-display text-display-lg text-ink-950">{consultant.name}</h1>
                 {consultant.verified && <Badge tone="accent">Verified</Badge>}
@@ -68,17 +98,19 @@ export default function ConsultantProfile() {
                   {consultant.location}
                 </span>
               </div>
-            </div>
+            </Reveal>
           </div>
 
           <dl className="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-4">
-            {stats.map((stat) => (
-              <div key={stat.label} className="bg-surface px-5 py-4">
-                <dt className="text-xs text-subtle">{stat.label}</dt>
-                <dd className="mt-1 text-lg font-semibold tracking-tight text-ink-950">
-                  {stat.value}
-                </dd>
-              </div>
+            {stats.map((stat, index) => (
+              <Reveal key={stat.label} delay={index * 70}>
+                <div className="h-full bg-surface px-5 py-4">
+                  <dt className="text-xs text-subtle">{stat.label}</dt>
+                  <dd className="mt-1 text-lg font-semibold tracking-tight text-ink-950">
+                    {stat.value}
+                  </dd>
+                </div>
+              </Reveal>
             ))}
           </dl>
         </Container>
@@ -87,48 +119,57 @@ export default function ConsultantProfile() {
       <Container className="py-14">
         <div className="grid gap-12 lg:grid-cols-[1fr_380px] lg:items-start">
           <div className="space-y-12">
-            <section>
-              <h2 className="text-lg font-semibold tracking-tight text-ink-950">About</h2>
-              <p className="mt-3 text-base leading-relaxed text-muted">{consultant.bio}</p>
-            </section>
+            <Reveal>
+              <section>
+                <h2 className="text-lg font-semibold tracking-tight text-ink-950">About</h2>
+                <p className="mt-3 text-base leading-relaxed text-muted">{consultant.bio}</p>
+              </section>
+            </Reveal>
 
-            <section>
-              <h2 className="text-lg font-semibold tracking-tight text-ink-950">Services</h2>
-              <div className="mt-4 space-y-3">
-                {consultantServices.length === 0 ? (
-                  <p className="text-sm text-muted">No services listed yet.</p>
-                ) : (
-                  consultantServices.map((service) => (
-                    <Card key={service.id} className="flex items-start justify-between gap-6 p-5">
-                      <div className="min-w-0">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="font-medium text-ink-950">{service.name}</h3>
-                          {service.isFree && <Badge tone="accent">Free</Badge>}
+            <Reveal>
+              <section>
+                <h2 className="text-lg font-semibold tracking-tight text-ink-950">Services</h2>
+                <div className="mt-4 space-y-3">
+                  {consultantServices.length === 0 ? (
+                    <p className="text-sm text-muted">No services listed yet.</p>
+                  ) : (
+                    consultantServices.map((service, index) => (
+                      <Card
+                        key={service.id}
+                        className="flex items-start justify-between gap-6 p-5 transition-all duration-300 hover:border-accent-300 hover:shadow-lift"
+                      >
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="font-medium text-ink-950">{service.name}</h3>
+                            {service.isFree && <Badge tone="accent">Free</Badge>}
+                          </div>
+                          <p className="mt-1.5 text-sm leading-relaxed text-muted">
+                            {service.description}
+                          </p>
+                          <p className="mt-2.5 text-xs text-subtle">{service.duration} minutes</p>
                         </div>
-                        <p className="mt-1.5 text-sm leading-relaxed text-muted">
-                          {service.description}
+                        <p className="shrink-0 text-lg font-semibold tracking-tight text-ink-950">
+                          {service.isFree ? 'Free' : `$${service.price}`}
                         </p>
-                        <p className="mt-2.5 text-xs text-subtle">{service.duration} minutes</p>
-                      </div>
-                      <p className="shrink-0 text-lg font-semibold tracking-tight text-ink-950">
-                        {service.isFree ? 'Free' : `$${service.price}`}
-                      </p>
-                    </Card>
-                  ))
-                )}
-              </div>
-            </section>
+                      </Card>
+                    ))
+                  )}
+                </div>
+              </section>
+            </Reveal>
           </div>
 
-          <aside className="lg:sticky lg:top-24">
+          <Reveal delay={120} className="lg:sticky lg:top-24">
             {consultantServices.length > 0 ? (
               <BookingWidget services={consultantServices} />
             ) : (
               <Card className="p-6">
-                <p className="text-sm text-muted">This consultant hasn&apos;t published services yet.</p>
+                <p className="text-sm text-muted">
+                  This consultant hasn&apos;t published services yet.
+                </p>
               </Card>
             )}
-          </aside>
+          </Reveal>
         </div>
       </Container>
     </>

@@ -4,6 +4,7 @@ import type { Appointment, AppointmentStatus } from '../../types'
 import Container from '../../components/ui/Container'
 import Button from '../../components/ui/Button'
 import Card from '../../components/ui/Card'
+import Reveal from '../../components/ui/Reveal'
 import AppointmentCard from '../../components/appointments/AppointmentCard'
 
 type Tab = 'ALL' | AppointmentStatus
@@ -55,14 +56,19 @@ export default function ClientAppointments() {
               key={option.value}
               type="button"
               onClick={() => setTab(option.value)}
-              className={`rounded-full px-4 py-2 text-sm transition-colors ${
+              aria-pressed={tab === option.value}
+              className={`rounded-full px-4 py-2 text-sm transition-all duration-200 ease-out ${
                 tab === option.value
-                  ? 'bg-ink-950 text-white'
-                  : 'border border-line-strong text-muted hover:border-ink-950 hover:text-body'
+                  ? 'bg-accent-500 text-white shadow-glow'
+                  : 'border border-line-strong text-muted hover:border-accent-400 hover:text-body'
               }`}
             >
               {option.label}
-              <span className={tab === option.value ? 'ml-1.5 text-white/60' : 'ml-1.5 text-subtle'}>
+              <span
+                className={`ml-1.5 transition-colors ${
+                  tab === option.value ? 'text-white/70' : 'text-subtle'
+                }`}
+              >
                 {count}
               </span>
             </button>
@@ -70,20 +76,24 @@ export default function ClientAppointments() {
         })}
       </div>
 
-      {visible.length === 0 ? (
-        <Card className="mt-8 p-12 text-center">
-          <p className="text-sm text-muted">Nothing here.</p>
-          <Button to="/consultants" size="sm" className="mt-5">
-            Book a session
-          </Button>
-        </Card>
-      ) : (
-        <div className="mt-8 space-y-4">
-          {visible.map((appointment) => (
-            <AppointmentCard key={appointment.id} appointment={appointment} onCancel={cancel} />
-          ))}
-        </div>
-      )}
+      <div key={tab} className="animate-fade-in">
+        {visible.length === 0 ? (
+          <Card className="mt-8 p-12 text-center">
+            <p className="text-sm text-muted">Nothing here.</p>
+            <Button to="/consultants" size="sm" className="mt-5">
+              Book a session
+            </Button>
+          </Card>
+        ) : (
+          <div className="mt-8 space-y-4">
+            {visible.map((appointment, index) => (
+              <Reveal key={appointment.id} delay={index * 70}>
+                <AppointmentCard appointment={appointment} onCancel={cancel} />
+              </Reveal>
+            ))}
+          </div>
+        )}
+      </div>
     </Container>
   )
 }
