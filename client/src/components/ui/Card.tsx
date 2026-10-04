@@ -6,9 +6,14 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
   interactive?: boolean
 }
 
-export default function Card({ children, className = '', interactive = false, ...rest }: CardProps) {
+export default function Card({
+  children,
+  className = '',
+  interactive = false,
+  ...rest
+}: CardProps) {
   const interactiveClasses =
-    'transition-all duration-300 ease-smooth hover:-translate-y-0.5 hover:border-line-strong hover:shadow-lift'
+    'transition-all duration-500 ease-out hover:-translate-y-1 hover:border-accent-300 hover:shadow-lift'
 
   return (
     <div

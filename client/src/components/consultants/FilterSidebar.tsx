@@ -37,7 +37,7 @@ function Toggle({
       {label}
       <span
         className={`relative h-6 w-10 shrink-0 rounded-full transition-colors duration-200 ${
-          checked ? 'bg-ink-950' : 'bg-ink-200'
+          checked ? 'bg-accent-500' : 'bg-ink-200'
         }`}
       >
         <span
@@ -132,10 +132,10 @@ export default function FilterSidebar({
               key={rating}
               type="button"
               onClick={() => set('minRating', rating)}
-              className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
+              className={`rounded-full border px-3.5 py-1.5 text-sm transition-all duration-200 ease-out ${
                 filters.minRating === rating
-                  ? 'border-ink-950 bg-ink-950 text-white'
-                  : 'border-line-strong text-muted hover:border-ink-950 hover:text-body'
+                  ? 'border-accent-500 bg-accent-500 text-white shadow-glow'
+                  : 'border-line-strong text-muted hover:border-accent-400 hover:text-body'
               }`}
             >
               {rating === 0 ? 'Any' : `${rating}+`}

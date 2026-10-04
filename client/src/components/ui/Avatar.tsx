@@ -25,23 +25,38 @@ function initials(name: string) {
 }
 
 export default function Avatar({ src, name, size = 'md', className = '' }: AvatarProps) {
+  const [loaded, setLoaded] = useState(false)
   const [failed, setFailed] = useState(false)
-  const showImage = src && !failed
+  const showImage = Boolean(src) && !failed
 
   return (
     <div
-      className={`shrink-0 overflow-hidden rounded-full bg-ink-100 ring-1 ring-line ${sizes[size]} ${className}`}
+      className={`relative shrink-0 overflow-hidden rounded-full bg-accent-50 ring-1 ring-line ${sizes[size]} ${className}`}
     >
+      {/* Shimmer placeholder, visible until the image decodes. */}
+      {showImage && !loaded && (
+        <span
+          aria-hidden="true"
+          className="absolute inset-0 overflow-hidden bg-accent-100"
+        >
+          <span className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/60 to-transparent" />
+        </span>
+      )}
+
       {showImage ? (
         <img
           src={src}
           alt={name}
           loading="lazy"
+          decoding="async"
+          onLoad={() => setLoaded(true)}
           onError={() => setFailed(true)}
-          className="h-full w-full object-cover"
+          className={`h-full w-full object-cover transition-opacity duration-500 ${
+            loaded ? 'opacity-100' : 'opacity-0'
+          }`}
         />
       ) : (
-        <span className="flex h-full w-full items-center justify-center font-medium text-ink-500">
+        <span className="flex h-full w-full items-center justify-center font-medium text-accent-700">
           {initials(name)}
         </span>
       )}
