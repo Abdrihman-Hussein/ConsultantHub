@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Portrait preview</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 40px;
+        background: #fdf8f3;
+        color: #2a2118;
+        font: 15px/1.5 Inter, system-ui, sans-serif;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0 0 6px;
+      }
+      p.sub {
+        margin: 0 0 32px;
+        color: #7a6a5b;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 28px;
+        max-width: 1000px;
+      }
+      figure {
+        margin: 0;
+        background: #fff;
+        border: 1px solid #eadfd2;
+        border-radius: 16px;
+        padding: 18px;
+        box-shadow: 0 2px 4px rgba(42, 33, 24, 0.03), 0 18px 36px -20px rgba(42, 33, 24, 0.18);
+      }
+      img.big {
+        width: 100%;
+        border-radius: 12px;
+        display: block;
+      }
+      .sizes {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-top: 16px;
+      }
+      .circle {
+        border-radius: 999px;
+        overflow: hidden;
+        border: 1px solid #eadfd2;
+        flex: none;
+      }
+      .circle img {
+        display: block;
+      }
+      .s36 { width: 36px; height: 36px; }
+      .s48 { width: 48px; height: 48px; }
+      .s64 { width: 64px; height: 64px; }
+      .s112 { width: 112px; height: 112px; }
+      figcaption {
+        margin-top: 14px;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Consultant portraits</h1>
+    <p class="sub">Large, then the sizes the app actually renders them at.</p>
+    <div class="grid" id="grid"></div>
+    <script>
+      const names = [
+        'Ahmed Warsame',
+        'Omar Nur',
+        'Khalid Abdi',
+        'Hassan Ali',
+        'Yusuf Abdullahi',
+        'Ibrahim Osman',
+      ];
+      document.getElementById('grid').innerHTML = names
+        .map(
+          (name, i) => `
+        <figure>
+          <img class="big" src="/portraits/consultant-${i + 1}.svg" alt="${name}" />
+          <div class="sizes">
+            <span class="circle s36"><img src="/portraits/consultant-${i + 1}.svg" width="36" height="36" alt="" /></span>
+            <span class="circle s48"><img src="/portraits/consultant-${i + 1}.svg" width="48" height="48" alt="" /></span>
+            <span class="circle s64"><img src="/portraits/consultant-${i + 1}.svg" width="64" height="64" alt="" /></span>
+            <span class="circle s112"><img src="/portraits/consultant-${i + 1}.svg" width="112" height="112" alt="" /></span>
+          </div>
+          <figcaption>${name}</figcaption>
+        </figure>`,
+        )
+        .join('');
+    </script>
+  </body>
+</html>
