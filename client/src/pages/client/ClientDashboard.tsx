@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react'
 import { appointments as seedAppointments } from '../../data/appointments'
+import { consultants } from '../../data/consultants'
 import type { Appointment } from '../../types'
 import Container from '../../components/ui/Container'
 import Button from '../../components/ui/Button'
 import Card from '../../components/ui/Card'
 import Reveal from '../../components/ui/Reveal'
-import AppointmentCard from '../../components/appointments/AppointmentCard'
+import AppointmentCard, { formatDate } from '../../components/appointments/AppointmentCard'
 import { users } from '../../data/users'
 
 const today = new Date().toISOString().slice(0, 10)
@@ -41,13 +42,17 @@ export default function ClientDashboard() {
       ),
     )
 
-  // Rough spend: hours booked × a nominal blended rate, completed only.
+  /*
+   * Spend on completed sessions only. Uses each consultant's real hourly rate
+   * rather than an invented average, so the figure matches the rest of the app.
+   */
   const totalSpent = past
     .filter((appointment) => appointment.status === 'COMPLETED')
     .reduce((sum, appointment) => {
       const [startHour] = appointment.startTime.split(':').map(Number)
       const [endHour] = appointment.endTime.split(':').map(Number)
-      return sum + (endHour - startHour) * 95
+      const rate = consultants.find((c) => c.id === appointment.consultantId)?.hourlyRate ?? 0
+      return sum + (endHour - startHour) * rate
     }, 0)
 
   const stats = [
@@ -104,7 +109,7 @@ export default function ClientDashboard() {
                   {nextUp.serviceName} with {nextUp.consultantName}
                 </p>
                 <p className="mt-1 text-sm text-muted">
-                  {nextUp.date} · {nextUp.startTime} – {nextUp.endTime}
+                  {formatDate(nextUp.date)} · {nextUp.startTime} – {nextUp.endTime}
                 </p>
               </div>
               <Button to="/client/appointments" variant="outline" size="sm">

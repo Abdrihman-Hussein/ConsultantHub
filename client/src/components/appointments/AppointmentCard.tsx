@@ -10,6 +10,7 @@ const statusTone: Record<AppointmentStatus, 'accent' | 'gold' | 'muted' | 'dange
   CANCELLED: 'danger',
 }
 
+/** Renders an ISO date as e.g. "Fri, Oct 24, 2026". */
 function formatDate(iso: string) {
   const date = new Date(`${iso}T00:00:00`)
   if (Number.isNaN(date.getTime())) return iso
@@ -20,6 +21,8 @@ function formatDate(iso: string) {
     year: 'numeric',
   })
 }
+
+export { formatDate }
 
 interface AppointmentCardProps {
   appointment: Appointment

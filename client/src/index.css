@@ -74,18 +74,6 @@
   .eyebrow {
     @apply font-sans text-eyebrow font-medium uppercase text-subtle;
   }
-
-  /* Fades the top and bottom edges of a horizontally scrolling strip. */
-  .mask-fade-x {
-    -webkit-mask-image: linear-gradient(
-      to right,
-      transparent,
-      #000 8%,
-      #000 92%,
-      transparent
-    );
-    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
-  }
 }
 
 /*

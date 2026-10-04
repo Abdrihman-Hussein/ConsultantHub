@@ -19,17 +19,27 @@ const specializations = Array.from(new Set(consultants.map((c) => c.specializati
 
 export default function Consultants() {
   const [searchParams, setSearchParams] = useSearchParams()
-  const [filters, setFilters] = useState<Filters>({
+  const [filters, setFilters] = useState<Filters>(() => ({
     ...defaultFilters,
     specialization: searchParams.get('specialty') ?? '',
-  })
+  }))
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
 
-  // Keeps the deep link in sync when a filter changes, so the URL can be shared.
+  /*
+   * Mirrors the specialty filter into the URL so the view can be shared. Writes
+   * in both directions: clearing the filter drops the param rather than leaving
+   * a stale one behind.
+   */
   useEffect(() => {
-    if (!filters.specialization) return
-    setSearchParams({ specialty: filters.specialization }, { replace: true })
-  }, [filters.specialization, setSearchParams])
+    const current = searchParams.get('specialty') ?? ''
+    if (current === filters.specialization) return
+
+    const next = new URLSearchParams(searchParams)
+    if (filters.specialization) next.set('specialty', filters.specialization)
+    else next.delete('specialty')
+
+    setSearchParams(next, { replace: true })
+  }, [filters.specialization, searchParams, setSearchParams])
 
   const results = useMemo(() => {
     const query = filters.search.trim().toLowerCase()

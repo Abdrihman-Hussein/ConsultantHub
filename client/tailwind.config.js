@@ -133,10 +133,6 @@ export default {
         shimmer: {
           '100%': { transform: 'translateX(100%)' },
         },
-        marquee: {
-          '0%': { transform: 'translateX(0)' },
-          '100%': { transform: 'translateX(-50%)' },
-        },
         'pulse-ring': {
           '0%': { transform: 'scale(.9)', opacity: '.7' },
           '70%': { transform: 'scale(1.9)', opacity: '0' },
@@ -151,7 +147,6 @@ export default {
         float: 'float 6s ease-in-out infinite',
         blob: 'blob 18s ease-in-out infinite',
         shimmer: 'shimmer 2.2s infinite',
-        marquee: 'marquee 42s linear infinite',
         'pulse-ring': 'pulse-ring 2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite',
       },
     },

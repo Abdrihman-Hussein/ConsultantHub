@@ -78,7 +78,7 @@ export default function FilterSidebar({
           value={filters.search}
           onChange={(event) => set('search', event.target.value)}
           placeholder="Name or expertise"
-          className="w-full rounded-xl border border-line-strong bg-surface px-3.5 py-2.5 text-sm placeholder:text-subtle focus:border-ink-950 focus:outline-none focus:ring-2 focus:ring-accent-500/20"
+          className="w-full cursor-text rounded-xl border border-line-strong bg-surface px-3.5 py-2.5 text-sm placeholder:text-subtle transition-all duration-200 hover:border-ink-400 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/20"
         />
       </div>
 
@@ -90,7 +90,7 @@ export default function FilterSidebar({
           id="filter-specialization"
           value={filters.specialization}
           onChange={(event) => set('specialization', event.target.value)}
-          className="w-full rounded-xl border border-line-strong bg-surface px-3.5 py-2.5 text-sm focus:border-ink-950 focus:outline-none focus:ring-2 focus:ring-accent-500/20"
+          className="w-full cursor-pointer rounded-xl border border-line-strong bg-surface px-3.5 py-2.5 text-sm transition-all duration-200 hover:border-ink-400 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/20"
         >
           <option value="">All specialties</option>
           {specializations.map((specialization) => (
