@@ -1,4 +1,4 @@
-import { Link, NavLink, Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import Container from '../ui/Container'
 import Avatar from '../ui/Avatar'
 import Button from '../ui/Button'
@@ -34,20 +34,43 @@ const navItems = [
   },
 ]
 
+function Logo() {
+  return (
+    <Link to="/" className="group flex items-center gap-2.5">
+      <span className="grid h-8 w-8 place-items-center rounded-full bg-accent-500 text-xs font-semibold text-white transition-transform duration-300 ease-spring group-hover:scale-110">
+        C
+      </span>
+      <span className="text-[15px] font-semibold tracking-tight text-ink-950">
+        ConsultantHub
+      </span>
+    </Link>
+  )
+}
+
+function NavIcon({ children }: { children: React.ReactNode }) {
+  return (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      className="h-[18px] w-[18px] shrink-0"
+    >
+      {children}
+    </svg>
+  )
+}
+
 export default function DashboardLayout() {
   const currentUser = users[0]
+  const { pathname } = useLocation()
 
   return (
     <div className="flex min-h-screen bg-surface-subtle">
       <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-line bg-surface px-4 py-6 lg:flex">
-        <Link to="/" className="flex items-center gap-2.5 px-2">
-          <span className="grid h-7 w-7 place-items-center rounded-full bg-ink-950 text-xs font-semibold text-white">
-            C
-          </span>
-          <span className="text-[15px] font-semibold tracking-tight text-ink-950">
-            ConsultantHub
-          </span>
-        </Link>
+        <div className="px-2">
+          <Logo />
+        </div>
 
         <nav className="mt-8 flex-1 space-y-1">
           {navItems.map((item) => (
@@ -55,29 +78,31 @@ export default function DashboardLayout() {
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
-                `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors ${
+                `group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-200 ease-out ${
                   isActive
-                    ? 'bg-ink-100 font-medium text-ink-950'
-                    : 'text-muted hover:bg-ink-50 hover:text-body'
+                    ? 'bg-accent-50 font-medium text-accent-700'
+                    : 'text-muted hover:bg-ink-100/60 hover:text-body'
                 }`
               }
             >
-              <svg
-                viewBox="0 0 20 20"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.4"
-                className="h-[18px] w-[18px]"
-              >
-                {item.icon}
-              </svg>
-              {item.label}
+              {({ isActive }) => (
+                <>
+                  {/* Accent bar that slides in for the active section. */}
+                  <span
+                    className={`absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-accent-500 transition-all duration-300 ease-out ${
+                      isActive ? 'opacity-100' : 'opacity-0'
+                    }`}
+                  />
+                  <NavIcon>{item.icon}</NavIcon>
+                  {item.label}
+                </>
+              )}
             </NavLink>
           ))}
         </nav>
 
         <div className="border-t border-line pt-4">
-          <div className="flex items-center gap-3 px-2">
+          <div className="flex items-center gap-3 rounded-xl px-2 py-1.5 transition-colors hover:bg-ink-100/60">
             <Avatar src={currentUser.avatar} name={currentUser.name} size="sm" />
             <div className="min-w-0">
               <p className="truncate text-sm font-medium text-body">{currentUser.name}</p>
@@ -88,24 +113,17 @@ export default function DashboardLayout() {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-40 border-b border-line/70 bg-surface-subtle/80 backdrop-blur-md lg:hidden">
-          <Container className="flex h-16 items-center justify-between">
-            <Link to="/" className="flex items-center gap-2.5">
-              <span className="grid h-7 w-7 place-items-center rounded-full bg-ink-950 text-xs font-semibold text-white">
-                C
-              </span>
-              <span className="text-[15px] font-semibold tracking-tight text-ink-950">
-                ConsultantHub
-              </span>
-            </Link>
+        <header className="sticky top-0 z-40 border-b border-line/70 bg-surface-subtle/85 backdrop-blur-md lg:hidden">
+          <Container className="flex h-16 items-center justify-between gap-4">
+            <Logo />
             <nav className="flex items-center gap-1">
-              {navItems.map((item) => (
+              {navItems.slice(0, 2).map((item) => (
                 <NavLink
                   key={item.to}
                   to={item.to}
                   className={({ isActive }) =>
                     `rounded-full px-3 py-2 text-xs font-medium transition-colors ${
-                      isActive ? 'bg-ink-100 text-ink-950' : 'text-muted hover:bg-ink-100'
+                      isActive ? 'bg-accent-50 text-accent-700' : 'text-muted hover:bg-ink-100'
                     }`
                   }
                 >
@@ -116,7 +134,7 @@ export default function DashboardLayout() {
           </Container>
         </header>
 
-        <main className="flex-1">
+        <main key={pathname} className="flex-1 animate-fade-in">
           <Outlet />
         </main>
 
