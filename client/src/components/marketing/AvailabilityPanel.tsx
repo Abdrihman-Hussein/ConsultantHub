@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { consultants } from '../../data/consultants'
+import { consultants } from '../../data'
 import Container from '../ui/Container'
 import Avatar from '../ui/Avatar'
 import Badge from '../ui/Badge'
