@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
 import Container from '../ui/Container'
+import Reveal from '../ui/Reveal'
+import CountUp from '../ui/CountUp'
 
 interface HeroProps {
   eyebrow: string
@@ -10,6 +12,12 @@ interface HeroProps {
   aside?: ReactNode
 }
 
+const proof = [
+  { value: 4.9, suffix: '', label: 'Average rating', decimals: 1 },
+  { value: 1160, suffix: '+', label: 'Sessions booked', decimals: 0 },
+  { value: 2.4, suffix: 'h', label: 'Median reply time', decimals: 1 },
+]
+
 export default function Hero({
   eyebrow,
   title,
@@ -19,34 +27,61 @@ export default function Hero({
   aside,
 }: HeroProps) {
   return (
-    <section className="border-b border-line bg-surface">
-      <Container className="grid items-center gap-14 py-20 lg:grid-cols-[1.15fr_1fr] lg:py-28">
-        <div className="animate-fade-up">
-          <p className="eyebrow mb-5">{eyebrow}</p>
-          <h1 className="font-display text-display-xl text-ink-950">{title}</h1>
-          <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">{description}</p>
-          <div className="mt-9 flex flex-wrap items-center gap-3">
-            {primaryAction}
-            {secondaryAction}
-          </div>
-          <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-3 text-sm text-muted">
-            <span className="flex items-center gap-2">
-              <svg viewBox="0 0 20 20" className="h-4 w-4 text-accent-500" fill="currentColor">
-                <path d="M10 1.5l2.2 4.7 5.1.6-3.8 3.5 1 5.1L10 12.8l-4.5 2.6 1-5.1L2.7 6.8l5.1-.6L10 1.5z" />
-              </svg>
-              4.9 average rating
-            </span>
-            <span className="flex items-center gap-2">
-              <svg viewBox="0 0 20 20" className="h-4 w-4 text-accent-500" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <circle cx="10" cy="7" r="3" />
-                <path d="M4 16.5c.6-2.9 2.9-4.5 6-4.5s5.4 1.6 6 4.5" strokeLinecap="round" />
-              </svg>
-              1,160+ sessions booked
-            </span>
-          </div>
+    <section className="relative overflow-hidden border-b border-line bg-surface">
+      {/* Soft ambient wash — terracotta tint bleeding in from the top right. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-32 -top-40 h-[32rem] w-[32rem] rounded-full bg-accent-100/50 blur-3xl"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -left-40 top-1/3 h-96 w-96 animate-blob bg-gold-300/20 blur-3xl"
+      />
+
+      <Container className="relative grid items-center gap-14 py-20 lg:grid-cols-[1.15fr_1fr] lg:py-28">
+        <div>
+          <Reveal>
+            <p className="eyebrow mb-5">{eyebrow}</p>
+          </Reveal>
+
+          <Reveal delay={80}>
+            <h1 className="font-display text-display-xl text-ink-950">{title}</h1>
+          </Reveal>
+
+          <Reveal delay={160}>
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">{description}</p>
+          </Reveal>
+
+          <Reveal delay={240}>
+            <div className="mt-9 flex flex-wrap items-center gap-3">
+              {primaryAction}
+              {secondaryAction}
+            </div>
+          </Reveal>
+
+          <Reveal delay={320}>
+            <dl className="mt-12 grid max-w-lg grid-cols-3 gap-6 border-t border-line pt-8">
+              {proof.map((stat) => (
+                <div key={stat.label}>
+                  <dd className="font-display text-2xl text-ink-950">
+                    <CountUp
+                      value={stat.value}
+                      suffix={stat.suffix}
+                      decimals={stat.decimals}
+                    />
+                  </dd>
+                  <dt className="mt-1 text-xs leading-snug text-muted">{stat.label}</dt>
+                </div>
+              ))}
+            </dl>
+          </Reveal>
         </div>
 
-        {aside && <div className="animate-fade-up">{aside}</div>}
+        {aside && (
+          <Reveal delay={200} distance={24}>
+            {aside}
+          </Reveal>
+        )}
       </Container>
     </section>
   )
