@@ -64,9 +64,8 @@ export default {
         eyebrow: ['11px', { lineHeight: '16px', letterSpacing: '0.14em' }],
       },
       borderRadius: {
-        // NOTE: intentionally not overriding DEFAULT/lg/xl/full so that
-        // `rounded-full` resolves to 9999px. Soft, generous radii are the
-        // signature of this direction.
+        // NOTE: intentionally not overriding `full` so `rounded-full` resolves
+        // to 9999px. Soft, generous radii are the signature of this direction.
         sm: '0.5rem',
         DEFAULT: '0.75rem',
         md: '1rem',
@@ -79,22 +78,81 @@ export default {
       boxShadow: {
         card: '0 2px 4px rgba(42, 33, 24, 0.03), 0 18px 36px -20px rgba(42, 33, 24, 0.18)',
         lift: '0 4px 8px rgba(42, 33, 24, 0.04), 0 28px 56px -24px rgba(42, 33, 24, 0.28)',
+        glow: '0 10px 30px -12px rgba(194, 98, 45, 0.45)',
         ring: '0 0 0 1px rgba(42, 33, 24, 0.07)',
       },
       maxWidth: {
         shell: '1200px',
       },
+      // Tailwind's default transition scale jumps 300 → 500. The nav sheet and
+      // specialty cards want a 400ms step, so it is added here rather than left
+      // to fall back to no transition at all.
+      transitionDuration: {
+        400: '400ms',
+      },
       transitionTimingFunction: {
         smooth: 'cubic-bezier(0.4, 0, 0.2, 1)',
+        out: 'cubic-bezier(0.16, 1, 0.3, 1)',
+        spring: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
       },
       keyframes: {
         'fade-up': {
-          from: { opacity: '0', transform: 'translateY(12px)' },
+          from: { opacity: '0', transform: 'translateY(14px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
+        },
+        'fade-in': {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
+        },
+        'scale-in': {
+          from: { opacity: '0', transform: 'scale(.96)' },
+          to: { opacity: '1', transform: 'scale(1)' },
+        },
+        'slide-in-right': {
+          from: { opacity: '0', transform: 'translateX(-10px)' },
+          to: { opacity: '1', transform: 'translateX(0)' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-8px)' },
+        },
+        blob: {
+          '0%, 100%': {
+            transform: 'translate(0, 0) scale(1)',
+            borderRadius: '58% 42% 46% 54% / 46% 52% 48% 54%',
+          },
+          '33%': {
+            transform: 'translate(14px, -18px) scale(1.06)',
+            borderRadius: '46% 54% 38% 62% / 58% 42% 58% 42%',
+          },
+          '66%': {
+            transform: 'translate(-12px, 12px) scale(.96)',
+            borderRadius: '52% 48% 60% 40% / 42% 60% 40% 58%',
+          },
+        },
+        shimmer: {
+          '100%': { transform: 'translateX(100%)' },
+        },
+        marquee: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
+        'pulse-ring': {
+          '0%': { transform: 'scale(.9)', opacity: '.7' },
+          '70%': { transform: 'scale(1.9)', opacity: '0' },
+          '100%': { transform: 'scale(1.9)', opacity: '0' },
         },
       },
       animation: {
-        'fade-up': 'fade-up 0.5s cubic-bezier(0.4, 0, 0.2, 1) both',
+        'fade-up': 'fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both',
+        'fade-in': 'fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both',
+        'scale-in': 'scale-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both',
+        'slide-in-right': 'slide-in-right 0.5s cubic-bezier(0.16, 1, 0.3, 1) both',
+        float: 'float 6s ease-in-out infinite',
+        blob: 'blob 18s ease-in-out infinite',
+        shimmer: 'shimmer 2.2s infinite',
+        marquee: 'marquee 42s linear infinite',
+        'pulse-ring': 'pulse-ring 2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite',
       },
     },
   },
