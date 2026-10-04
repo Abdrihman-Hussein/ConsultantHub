@@ -106,7 +106,7 @@ const base = { ...defaultFilters }
 check('no filters returns everyone', searchConsultants(consultants, base).length === consultants.length)
 check(
   'name match',
-  searchConsultants(consultants, { ...base, search: 'chen' }).length === 1,
+  searchConsultants(consultants, { ...base, search: 'omar' }).length === 1,
 )
 check(
   'multi-word narrows rather than widens',
@@ -119,11 +119,11 @@ check(
 )
 check(
   'city is searchable',
-  searchConsultants(consultants, { ...base, search: 'berlin' }).length === 1,
+  searchConsultants(consultants, { ...base, search: 'dubai' }).length === 1,
 )
 check(
   'search is case-insensitive',
-  searchConsultants(consultants, { ...base, search: 'CHEN' }).length === 1,
+  searchConsultants(consultants, { ...base, search: 'OMAR' }).length === 1,
 )
 check(
   'specialty filter works',

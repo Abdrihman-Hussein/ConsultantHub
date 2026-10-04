@@ -63,12 +63,12 @@ export default function Login() {
       <div className="mb-6 rounded-xl border border-accent-200 bg-accent-50/60 p-4">
         <p className="text-xs font-medium text-accent-800">Demo account</p>
         <p className="mt-1 font-mono text-xs text-accent-700">
-          sarah@example.com · consultant123
+          amina@example.com · consultant123
         </p>
         <button
           type="button"
           onClick={() => {
-            setEmail('sarah@example.com')
+            setEmail('amina@example.com')
             setPassword('consultant123')
             setErrors({})
           }}
