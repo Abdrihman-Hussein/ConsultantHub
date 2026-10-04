@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { consultants } from '../data/consultants'
+import { consultants, specializations } from '../data'
 import Container from '../components/ui/Container'
 import SectionHeading from '../components/ui/SectionHeading'
 import Button from '../components/ui/Button'
@@ -11,36 +11,53 @@ import HowItWorks from '../components/marketing/HowItWorks'
 import AvailabilityPanel from '../components/marketing/AvailabilityPanel'
 import Rating from '../components/ui/Rating'
 
-const specialties = [
-  { name: 'Marketing', count: 128 },
-  { name: 'Engineering', count: 96 },
-  { name: 'Finance', count: 74 },
-  { name: 'Law', count: 51 },
-]
+/*
+ * Counts are derived from the directory rather than hardcoded, so the marketing
+ * copy cannot drift from what the app actually contains.
+ */
+const specialties = specializations.map((name) => ({
+  name,
+  count: consultants.filter((consultant) => consultant.specialization === name).length,
+}))
 
-const testimonials = [
+const guarantees = [
   {
-    quote:
-      'We replaced four weeks of email back-and-forth with one booking. The consultant was excellent and the process was almost absurdly simple.',
-    name: 'Priya Raman',
-    role: 'COO, Northwind Labs',
+    title: 'Identity-checked consultants',
+    body: 'Every consultant has been verified before appearing in the directory, so you are not guessing who you are booking.',
   },
   {
-    quote:
-      'I found a finance advisor who actually understood our stage. The filter for rate and rating meant I only ever looked at people who fit.',
-    name: 'Daniel Okonkwo',
-    role: 'Founder, Brightside',
+    title: 'Free intro calls',
+    body: 'Every consultant offers a complimentary short call. Find out whether it is worth the longer session before you pay for it.',
   },
   {
-    quote:
-      'As a consultant I get bookings without chasing anyone. My calendar fills and I spend my time on the actual work.',
-    name: 'Elena Rodríguez',
-    role: 'Corporate Counsel',
+    title: 'No scheduling back-and-forth',
+    body: 'Pick a service and an open slot directly. No email threads, no waiting to hear back about availability.',
   },
 ]
 
 export default function Home() {
-  const featured = consultants.slice(0, 3)
+  const featured = consultants.slice(0, 3);
+  const count = Math.max(consultants.length, 1);
+
+  // Derived from the directory so the hero cannot overstate what exists.
+  const proof = [
+    {
+      value: consultants.reduce((sum, c) => sum + c.rating, 0) / count,
+      decimals: 1,
+      label: 'Average rating',
+    },
+    {
+      value: consultants.reduce((sum, c) => sum + c.sessions, 0),
+      suffix: '+',
+      decimals: 0,
+      label: 'Sessions delivered',
+    },
+    {
+      value: consultants.filter((c) => c.verified).length,
+      decimals: 0,
+      label: 'Verified consultants',
+    },
+  ];
 
   return (
     <>
@@ -54,13 +71,14 @@ export default function Home() {
           </>
         }
         description="Browse vetted specialists by expertise, review their experience and rates, then book a session directly. No email threads, no scheduling friction."
-        primaryAction={<Button to="/consultants" size="lg">Browse consultants</Button>}
+        primaryAction={<Button to="/consultants" size="lg">Hire a consultant</Button>}
         secondaryAction={
-          <Button to="/register" variant="outline" size="lg">
+          <Button to="/become-a-consultant" variant="outline" size="lg">
             Become a consultant
           </Button>
         }
         aside={<AvailabilityPanel />}
+        proof={proof}
       />
 
       <section className="border-t border-line bg-surface-subtle">
@@ -123,25 +141,26 @@ export default function Home() {
       <section className="border-t border-line bg-surface-subtle">
         <Container className="py-20 lg:py-28">
           <Reveal>
-            <p className="eyebrow mb-3">In their words</p>
+            <p className="eyebrow mb-3">Why book here</p>
             <h2 className="max-w-2xl font-display text-display-lg text-ink-950">
-              What clients and consultants say
+              Less risk on both sides of the call
             </h2>
           </Reveal>
 
           <div className="mt-14 grid gap-6 md:grid-cols-3">
-            {testimonials.map((testimonial, index) => (
-              <Reveal key={testimonial.name} delay={index * 100}>
-                <figure className="flex h-full flex-col rounded-2xl border border-line bg-surface p-6 shadow-card transition-shadow duration-300 hover:shadow-lift">
-                  <Rating value={5} size="sm" compact />
-                  <blockquote className="mt-4 flex-1 text-[15px] leading-relaxed text-body">
-                    &ldquo;{testimonial.quote}&rdquo;
-                  </blockquote>
-                  <figcaption className="mt-6 border-t border-line pt-5">
-                    <p className="text-sm font-medium text-ink-950">{testimonial.name}</p>
-                    <p className="mt-0.5 text-xs text-muted">{testimonial.role}</p>
-                  </figcaption>
-                </figure>
+            {guarantees.map((guarantee, index) => (
+              <Reveal key={guarantee.title} delay={index * 100}>
+                <div className="group h-full rounded-2xl border border-line bg-surface p-6 shadow-card transition-all duration-300 ease-out hover:-translate-y-1 hover:border-accent-300 hover:shadow-lift">
+                  <span className="grid h-10 w-10 place-items-center rounded-full bg-accent-50 text-accent-600 transition-transform duration-300 ease-spring group-hover:scale-110">
+                    <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M4.5 10.5l3.5 3.5 7.5-8" />
+                    </svg>
+                  </span>
+                  <h3 className="mt-5 text-lg font-semibold tracking-tight text-ink-950">
+                    {guarantee.title}
+                  </h3>
+                  <p className="mt-2.5 text-sm leading-relaxed text-muted">{guarantee.body}</p>
+                </div>
               </Reveal>
             ))}
           </div>
@@ -160,28 +179,58 @@ export default function Home() {
 
           <Reveal delay={90}>
             <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-muted">
-              Every consultant offers a complimentary 15-minute intro call. Low commitment, and it
-              takes one click to book.
+              Every consultant offers a complimentary intro call. Low commitment, and it takes one
+              click to book.
             </p>
           </Reveal>
 
           <Reveal delay={160}>
+            {/* Two independent doors: hire someone, or offer your own services.
+                Neither one is gated behind picking a role at sign-up. */}
             <div className="mt-9 flex flex-wrap justify-center gap-3">
-              <Button to="/consultants" size="lg">Browse consultants</Button>
-              <Button to="/register" variant="outline" size="lg">Create an account</Button>
+              <Button to="/consultants" size="lg">
+                Hire a consultant
+              </Button>
+              <Button to="/become-a-consultant" variant="outline" size="lg">
+                Become a consultant
+              </Button>
             </div>
           </Reveal>
 
+          {/* Derived from the directory, so these figures cannot overstate it. */}
           <Reveal delay={230}>
-            <div className="mt-14 flex flex-wrap items-center justify-center gap-6 text-sm text-muted">
-              <Rating value={4.9} reviewCount={128} />
-              <span className="hidden h-4 w-px bg-line sm:block" />
-              <span>
-                <CountUp value={1160} suffix="+" /> sessions booked
-              </span>
-              <span className="hidden h-4 w-px bg-line sm:block" />
-              <span>Average reply time under 3 hours</span>
-            </div>
+            <dl className="mx-auto mt-14 grid max-w-xl grid-cols-3 gap-6">
+              <div>
+                <dd className="font-display text-2xl text-ink-950">
+                  <CountUp value={consultants.length} />
+                </dd>
+                <dt className="mt-1 text-xs text-muted">Consultants listed</dt>
+              </div>
+              <div>
+                <dd className="font-display text-2xl text-ink-950">
+                  <CountUp
+                    value={
+                      consultants.reduce((sum, c) => sum + c.sessions, 0) /
+                      Math.max(consultants.length, 1)
+                    }
+                    decimals={0}
+                  />
+                </dd>
+                <dt className="mt-1 text-xs text-muted">Avg sessions each</dt>
+              </div>
+              <div>
+                <dd className="font-display text-2xl text-ink-950">
+                  <CountUp
+                    value={
+                      consultants.reduce((sum, c) => sum + c.rating, 0) /
+                      Math.max(consultants.length, 1)
+                    }
+                    decimals={1}
+                  />
+                </dd>
+                <dt className="mt-1 text-xs text-muted">Avg rating</dt>
+              </div>
+            </dl>
           </Reveal>
         </Container>
       </section>

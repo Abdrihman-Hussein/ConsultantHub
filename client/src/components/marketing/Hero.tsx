@@ -3,6 +3,13 @@ import Container from '../ui/Container'
 import Reveal from '../ui/Reveal'
 import CountUp from '../ui/CountUp'
 
+interface ProofPoint {
+  value: number
+  suffix?: string
+  label: string
+  decimals?: number
+}
+
 interface HeroProps {
   eyebrow: string
   title: ReactNode
@@ -10,13 +17,12 @@ interface HeroProps {
   primaryAction: ReactNode
   secondaryAction?: ReactNode
   aside?: ReactNode
+  /**
+   * Figures shown under the hero. Passed in rather than hardcoded so they can be
+   * derived from the directory instead of invented.
+   */
+  proof?: ProofPoint[]
 }
-
-const proof = [
-  { value: 4.9, suffix: '', label: 'Average rating', decimals: 1 },
-  { value: 1160, suffix: '+', label: 'Sessions booked', decimals: 0 },
-  { value: 2.4, suffix: 'h', label: 'Median reply time', decimals: 1 },
-]
 
 export default function Hero({
   eyebrow,
@@ -25,6 +31,7 @@ export default function Hero({
   primaryAction,
   secondaryAction,
   aside,
+  proof = [],
 }: HeroProps) {
   return (
     <section className="relative overflow-hidden border-b border-line bg-surface">
@@ -59,22 +66,28 @@ export default function Hero({
             </div>
           </Reveal>
 
-          <Reveal delay={320}>
-            <dl className="mt-12 grid max-w-lg grid-cols-3 gap-6 border-t border-line pt-8">
-              {proof.map((stat) => (
-                <div key={stat.label}>
-                  <dd className="font-display text-2xl text-ink-950">
-                    <CountUp
-                      value={stat.value}
-                      suffix={stat.suffix}
-                      decimals={stat.decimals}
-                    />
-                  </dd>
-                  <dt className="mt-1 text-xs leading-snug text-muted">{stat.label}</dt>
-                </div>
-              ))}
-            </dl>
-          </Reveal>
+          {proof.length > 0 && (
+            <Reveal delay={320}>
+              <dl
+                className={`mt-12 grid gap-6 border-t border-line pt-8 ${
+                  proof.length === 3 ? 'max-w-lg grid-cols-3' : 'grid-cols-2'
+                }`}
+              >
+                {proof.map((stat) => (
+                  <div key={stat.label}>
+                    <dd className="font-display text-2xl text-ink-950">
+                      <CountUp
+                        value={stat.value}
+                        suffix={stat.suffix}
+                        decimals={stat.decimals ?? 0}
+                      />
+                    </dd>
+                    <dt className="mt-1 text-xs leading-snug text-muted">{stat.label}</dt>
+                  </div>
+                ))}
+              </dl>
+            </Reveal>
+          )}
         </div>
 
         {aside && (

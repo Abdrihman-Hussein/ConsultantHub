@@ -3,7 +3,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom'
 import Button from '../ui/Button'
 import Container from '../ui/Container'
 import Avatar from '../ui/Avatar'
-import { users } from '../../data/users'
+import { useApp } from '../../context/AppContext'
 
 const navLinks = [
   { to: '/consultants', label: 'Browse' },
@@ -15,7 +15,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const { pathname } = useLocation()
-  const currentUser = users[0]
+  const { session, logout } = useApp()
 
   // Close the mobile sheet whenever the route changes.
   useEffect(() => setOpen(false), [pathname])
@@ -86,18 +86,34 @@ export default function Navbar() {
           </nav>
 
           <div className="hidden items-center gap-3 md:flex">
-            <Button to="/login" variant="ghost" size="sm">
-              Log in
-            </Button>
-            <Link
-              to="/client/dashboard"
-              className="flex items-center gap-2 rounded-full p-0.5 pl-1 transition-colors hover:bg-ink-100"
-            >
-              <Avatar src={currentUser.avatar} name={currentUser.name} size="sm" />
-              <span className="hidden text-sm font-medium text-body lg:inline">
-                {currentUser.name}
-              </span>
-            </Link>
+            {session ? (
+              <>
+                <span className="hidden text-sm text-muted lg:inline">
+                  Hi, <span className="font-medium text-body">{session.name.split(' ')[0]}</span>
+                </span>
+                <Link
+                  to="/client/dashboard"
+                  className="flex items-center gap-2 rounded-full p-0.5 pl-1 transition-colors hover:bg-ink-100"
+                >
+                  <Avatar name={session.name} size="sm" />
+                  <span className="hidden text-sm font-medium text-body lg:inline">
+                    {session.name}
+                  </span>
+                </Link>
+                <Button variant="ghost" size="sm" onClick={logout}>
+                  Log out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button to="/login" variant="ghost" size="sm">
+                  Log in
+                </Button>
+                <Button to="/register" size="sm">
+                  Get started
+                </Button>
+              </>
+            )}
           </div>
 
           <button
@@ -141,12 +157,25 @@ export default function Navbar() {
             </a>
           ))}
           <div className="flex items-center gap-3 pt-3">
-            <Button to="/login" variant="outline" size="sm" className="flex-1">
-              Log in
-            </Button>
-            <Button to="/register" size="sm" className="flex-1">
-              Get started
-            </Button>
+            {session ? (
+              <>
+                <Button to="/client/dashboard" variant="outline" size="sm" className="flex-1">
+                  Dashboard
+                </Button>
+                <Button variant="outline" size="sm" className="flex-1" onClick={logout}>
+                  Log out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button to="/login" variant="outline" size="sm" className="flex-1">
+                  Log in
+                </Button>
+                <Button to="/register" size="sm" className="flex-1">
+                  Get started
+                </Button>
+              </>
+            )}
           </div>
         </Container>
       </div>

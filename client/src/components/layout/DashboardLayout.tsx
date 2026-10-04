@@ -2,7 +2,7 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import Container from '../ui/Container'
 import Avatar from '../ui/Avatar'
 import Button from '../ui/Button'
-import { users } from '../../data/users'
+import { useApp } from '../../context/AppContext'
 
 const navItems = [
   {
@@ -62,7 +62,7 @@ function NavIcon({ children }: { children: React.ReactNode }) {
 }
 
 export default function DashboardLayout() {
-  const currentUser = users[0]
+  const { session, logout } = useApp()
   const { pathname } = useLocation()
 
   return (
@@ -102,13 +102,30 @@ export default function DashboardLayout() {
         </nav>
 
         <div className="border-t border-line pt-4">
-          <div className="flex items-center gap-3 rounded-xl px-2 py-1.5 transition-colors hover:bg-ink-100/60">
-            <Avatar src={currentUser.avatar} name={currentUser.name} size="sm" />
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-body">{currentUser.name}</p>
-              <p className="truncate text-xs text-muted">{currentUser.email}</p>
+          {session ? (
+            <>
+              <div className="flex items-center gap-3 rounded-xl px-2 py-1.5 transition-colors hover:bg-ink-100/60">
+                <Avatar name={session.name} size="sm" />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-body">{session.name}</p>
+                  <p className="truncate text-xs text-muted">{session.email}</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={logout}
+                className="mt-1 w-full rounded-xl px-2 py-1.5 text-left text-sm text-muted transition-colors hover:bg-ink-100/60 hover:text-danger"
+              >
+                Log out
+              </button>
+            </>
+          ) : (
+            <div className="px-2">
+              <Button to="/login" variant="outline" size="sm" className="w-full">
+                Log in
+              </Button>
             </div>
-          </div>
+          )}
         </div>
       </aside>
 
