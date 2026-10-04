@@ -1,9 +1,33 @@
+/**
+ * Types shared across the app. `lib` holds the interfaces, `data` holds the
+ * seed content that gets copied into localStorage on first run.
+ */
+
+/** Roles a user can hold. Drives which flows are available to them. */
+export type UserRole = 'CLIENT' | 'CONSULTANT' | 'ADMIN';
+
+/**
+ * A stored user record. `passwordHash` is only ever a SHA-256 digest — see
+ * `lib/crypto.ts`. This is NOT real authentication: everything is client-side
+ * and readable by anyone with devtools. See README.
+ */
 export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'CLIENT' | 'CONSULTANT' | 'ADMIN';
+  role: UserRole;
   avatar?: string;
+  passwordHash: string;
+  /** ISO timestamp, used to sort and to show "member since". */
+  createdAt: string;
+}
+
+/** The signed-in user, without the password digest. */
+export interface Session {
+  userId: string;
+  email: string;
+  name: string;
+  role: UserRole;
 }
 
 export interface Consultant {
@@ -34,31 +58,35 @@ export interface Service {
   isFree: boolean;
 }
 
-export interface Availability {
-  id: string;
-  consultantId: string;
-  date: string;
-  timeSlots: TimeSlot[];
-}
-
-export interface TimeSlot {
-  time: string;
-  available: boolean;
-}
-
 export type AppointmentStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
 
+export type MeetingType = 'video' | 'in-person';
+
+/**
+ * A booked session. Consultant name/avatar and price are snapshotted at booking
+ * time so the record still reads correctly if the directory later changes.
+ */
 export interface Appointment {
   id: string;
   clientId: string;
   consultantId: string;
   consultantName: string;
   consultantAvatar: string;
+  serviceId: string;
   serviceName: string;
+  /** ISO date, `YYYY-MM-DD`. */
   date: string;
   startTime: string;
   endTime: string;
+  /** Price charged, snapshotted so totals stay accurate. */
+  price: number;
   status: AppointmentStatus;
-  meetingType: 'video' | 'in-person';
+  meetingType: MeetingType;
   location?: string;
+  createdAt: string;
 }
+
+/** Result of an auth attempt, so forms can show a specific message. */
+export type AuthResult =
+  | { ok: true; session: Session }
+  | { ok: false; error: string };

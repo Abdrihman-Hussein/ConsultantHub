@@ -1,12 +1,94 @@
-@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  background-color: #f8f9ff;
-  color: #0b1c30;
-  font-family: 'Inter', sans-serif;
+@layer base {
+  /*
+   * Exposes the palette as CSS custom properties. Tailwind drives the utility
+   * classes; these exist for the handful of places that need a raw colour
+   * value in markup — inline SVG attributes, mostly.
+   */
+  :root {
+    --ch-ink-100: #f9f1e8;
+    --ch-accent-50: #fdf4ef;
+    --ch-surface-muted: #f9f1e8;
+    --ch-danger-soft: #fcebe9;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-surface-subtle text-body font-sans antialiased;
+  }
+
+  /*
+   * Fraunces is a variable font. `font-optical-sizing: auto` lets the browser
+   * pick the correct optical size per point size — at display sizes Fraunces
+   * gets sturdier, at text sizes more delicate. Without this, headings render
+   * noticeably lighter than intended.
+   */
+  .font-display {
+    font-optical-sizing: auto;
+    font-variation-settings: 'SOFT' 0, 'WONK' 0;
+  }
+
+  ::selection {
+    @apply bg-accent-500 text-white;
+  }
+
+  /* Keyboard focus only — avoids a ring on every mouse click. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-accent-500/45 ring-offset-2 ring-offset-surface-subtle;
+  }
+
+  /* Remove the number-input spinners from the rate slider. */
+  input[type='range'] {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    @apply h-4 w-4 cursor-pointer rounded-full border-2 border-white bg-accent-500 shadow-glow;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  input[type='range']:active::-webkit-slider-thumb {
+    transform: scale(1.25);
+  }
+
+  input[type='range']::-moz-range-thumb {
+    @apply h-4 w-4 cursor-pointer rounded-full border-2 border-white bg-accent-500 shadow-glow;
+  }
+}
+
+@layer components {
+  /* Small uppercase label used above section headings. */
+  .eyebrow {
+    @apply font-sans text-eyebrow font-medium uppercase text-subtle;
+  }
+}
+
+/*
+ * Respect the OS setting. Anything decorative stops; content stays visible.
+ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

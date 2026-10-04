@@ -1,65 +1,184 @@
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react'
+import { Link, NavLink, useLocation } from 'react-router-dom'
+import Button from '../ui/Button'
+import Container from '../ui/Container'
+import Avatar from '../ui/Avatar'
+import { useApp } from '../../context/AppContext'
 
-interface NavbarProps {
-  activePage?: 'browse' | 'dashboard' | 'home';
-}
+const navLinks = [
+  { to: '/consultants', label: 'Browse' },
+  { to: '/client/dashboard', label: 'Dashboard' },
+  { to: '/#how-it-works', label: 'How it works' },
+]
 
-export default function Navbar({ activePage = 'home' }: NavbarProps) {
+export default function Navbar() {
+  const [open, setOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const { pathname } = useLocation()
+  const { session, logout } = useApp()
+
+  // Close the mobile sheet whenever the route changes.
+  useEffect(() => setOpen(false), [pathname])
+
+  // The navbar gains a solid background and shadow once content sits behind it.
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   return (
-    <header className="bg-surface border-b border-outline-variant full-width top-0 z-50 sticky">
-      <div className="flex justify-between items-center w-full px-8 h-20 max-w-max-width mx-auto">
-        <div className="flex items-center gap-6">
-          <Link to="/" className="font-headline-lg text-headline-lg font-bold text-primary">
-            ConsultantHub
-          </Link>
-          <div className="relative hidden md:block w-64 ml-4">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">
-              search
+    <header
+      className={`sticky top-0 z-50 transition-all duration-300 ease-smooth ${
+        scrolled
+          ? 'border-b border-line bg-surface/85 shadow-sm backdrop-blur-lg'
+          : 'border-b border-transparent bg-surface-subtle/60 backdrop-blur-sm'
+      }`}
+    >
+      <Container>
+        <div className="flex h-16 items-center justify-between gap-6">
+          <Link to="/" className="group flex items-center gap-2.5">
+            <span className="grid h-8 w-8 place-items-center rounded-full bg-accent-500 text-xs font-semibold text-white transition-transform duration-300 ease-spring group-hover:scale-110">
+              C
             </span>
-            <input
-              className="w-full pl-9 pr-4 py-2 bg-surface-alt border border-outline-variant rounded-full text-label-md font-label-md focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/20 transition-all"
-              placeholder="Search consultants..."
-              type="text"
-            />
+            <span className="text-[15px] font-semibold tracking-tight text-ink-950">
+              ConsultantHub
+            </span>
+          </Link>
+
+          <nav className="hidden items-center gap-1 md:flex">
+            {navLinks.map((link) =>
+              link.to.includes('#') ? (
+                <a
+                  key={link.to}
+                  href={link.to}
+                  className="rounded-full px-3.5 py-2 text-sm text-muted transition-colors hover:bg-ink-100 hover:text-body"
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  className={({ isActive }) =>
+                    `relative rounded-full px-3.5 py-2 text-sm transition-colors ${
+                      isActive
+                        ? 'font-medium text-accent-600'
+                        : 'text-muted hover:bg-ink-100 hover:text-body'
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      {link.label}
+                      {/* Underline that scales in for the active route. */}
+                      <span
+                        className={`absolute inset-x-3 -bottom-0.5 h-px origin-left bg-accent-500 transition-transform duration-300 ease-out ${
+                          isActive ? 'scale-x-100' : 'scale-x-0'
+                        }`}
+                      />
+                    </>
+                  )}
+                </NavLink>
+              ),
+            )}
+          </nav>
+
+          <div className="hidden items-center gap-3 md:flex">
+            {session ? (
+              <>
+                <span className="hidden text-sm text-muted lg:inline">
+                  Hi, <span className="font-medium text-body">{session.name.split(' ')[0]}</span>
+                </span>
+                <Link
+                  to="/client/dashboard"
+                  className="flex items-center gap-2 rounded-full p-0.5 pl-1 transition-colors hover:bg-ink-100"
+                >
+                  <Avatar name={session.name} size="sm" />
+                  <span className="hidden text-sm font-medium text-body lg:inline">
+                    {session.name}
+                  </span>
+                </Link>
+                <Button variant="ghost" size="sm" onClick={logout}>
+                  Log out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button to="/login" variant="ghost" size="sm">
+                  Log in
+                </Button>
+                <Button to="/register" size="sm">
+                  Get started
+                </Button>
+              </>
+            )}
           </div>
-        </div>
-        <nav className="hidden md:flex items-center space-x-8">
-          <Link
-            to="/consultants"
-            className={`font-label-md text-label-md h-20 flex items-center px-2 transition-colors ${
-              activePage === 'browse'
-                ? 'text-secondary font-bold border-b-2 border-secondary'
-                : 'text-on-surface-variant hover:text-secondary hover:bg-surface-container-low'
-            }`}
+
+          <button
+            type="button"
+            onClick={() => setOpen((prev) => !prev)}
+            aria-expanded={open}
+            aria-label="Toggle navigation"
+            className="grid h-9 w-9 place-items-center rounded-full text-body transition-colors hover:bg-ink-100 md:hidden"
           >
-            Browse
-          </Link>
-          <Link
-            to="/client/dashboard"
-            className={`font-label-md text-label-md h-20 flex items-center px-2 transition-colors ${
-              activePage === 'dashboard'
-                ? 'text-secondary font-bold border-b-2 border-secondary'
-                : 'text-on-surface-variant hover:text-secondary hover:bg-surface-container-low'
-            }`}
-          >
-            Dashboard
-          </Link>
-          <a className="text-on-surface-variant hover:text-secondary hover:bg-surface-container-low transition-colors font-label-md text-label-md h-20 flex items-center px-2" href="#">
-            Resources
-          </a>
-        </nav>
-        <div className="flex items-center space-x-4">
-          <Link to="/login" className="font-label-md text-label-md text-secondary border border-secondary px-4 py-2 rounded hover:bg-secondary/5 transition-colors">
-            Log In
-          </Link>
-          <Link to="/register" className="font-label-md text-label-md bg-secondary text-white px-4 py-2 rounded hover:bg-secondary/90 transition-colors shadow-sm">
-            Profile
-          </Link>
+            <svg
+              viewBox="0 0 20 20"
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              {open ? (
+                <path d="M5 5l10 10M15 5L5 15" strokeLinecap="round" />
+              ) : (
+                <path d="M3 6h14M3 10h14M3 14h14" strokeLinecap="round" />
+              )}
+            </svg>
+          </button>
         </div>
-        <button className="md:hidden text-on-surface-variant">
-          <span className="material-symbols-outlined">menu</span>
-        </button>
+      </Container>
+
+      {/* Height animates so the sheet pushes content rather than snapping. */}
+      <div
+        className={`overflow-hidden border-line bg-surface transition-all duration-400 ease-out md:hidden ${
+          open ? 'max-h-80 border-t opacity-100' : 'max-h-0 border-t-0 opacity-0'
+        }`}
+      >
+        <Container className="space-y-1 py-4">
+          {navLinks.map((link) => (
+            <a
+              key={link.to}
+              href={link.to}
+              className="block rounded-xl px-3 py-2.5 text-sm text-body transition-colors hover:bg-accent-50"
+            >
+              {link.label}
+            </a>
+          ))}
+          <div className="flex items-center gap-3 pt-3">
+            {session ? (
+              <>
+                <Button to="/client/dashboard" variant="outline" size="sm" className="flex-1">
+                  Dashboard
+                </Button>
+                <Button variant="outline" size="sm" className="flex-1" onClick={logout}>
+                  Log out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button to="/login" variant="outline" size="sm" className="flex-1">
+                  Log in
+                </Button>
+                <Button to="/register" size="sm" className="flex-1">
+                  Get started
+                </Button>
+              </>
+            )}
+          </div>
+        </Container>
       </div>
     </header>
-  );
+  )
 }

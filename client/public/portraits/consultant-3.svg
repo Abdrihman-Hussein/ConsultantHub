@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="320" height="320" role="img" aria-label="Illustrated portrait">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="36%" r="74%">
+      <stop offset="0%" stop-color="#F7F1E7"/>
+      <stop offset="100%" stop-color="#E4D5C1"/>
+    </radialGradient>
+    <clipPath id="face">
+      <ellipse cx="160" cy="132" rx="52" ry="60"/>
+    </clipPath>
+  </defs>
+
+  <rect width="320" height="320" fill="url(#bg)"/>
+
+  <!-- shirt -->
+  <path d="M20 320C20 254 78 218 160 218s140 36 140 102Z" fill="#3F4A3C"/>
+  <path d="M126 220c10 40 58 40 68 0l22 8c-14 60-98 60-112 0Z" fill="#333D30"/>
+  <circle cx="160" cy="252" r="4.5" fill="#D6C4B2"/>
+  <circle cx="160" cy="286" r="4.5" fill="#D6C4B2"/>
+
+  <!-- neck -->
+  <rect x="139" y="168" width="42" height="70" rx="19" fill="#6B4028"/>
+
+  <!-- ears -->
+  <ellipse cx="108" cy="140" rx="11" ry="14" fill="#7A4B2E"/>
+  <ellipse cx="212" cy="140" rx="11" ry="14" fill="#7A4B2E"/>
+
+  <!-- head -->
+  <ellipse cx="160" cy="132" rx="52" ry="60" fill="#7A4B2E"/>
+
+  <!-- close-cropped hair -->
+  <path d="M107 124c0-44 21-60 53-60s53 16 53 60c-8-22-25-34-53-34s-45 12-53 34Z" fill="#17110D"/>
+
+  <!-- full beard -->
+  <g clip-path="url(#face)">
+    <path d="M103 136c4 62 26 78 57 78s53-16 57-78c-4 34-20 54-57 54s-53-20-57-54Z" fill="#17110D"/>
+    <ellipse cx="160" cy="178" rx="26" ry="14" fill="#7A4B2E"/>
+    <path d="M135 164c11-8 39-8 50 0-8 10-42 10-50 0Z" fill="#17110D"/>
+  </g>
+
+  <!-- brows -->
+  <path d="M125 120c9-7 23-7 30-1" fill="none" stroke="#17110D" stroke-width="6" stroke-linecap="round"/>
+  <path d="M195 120c-9-7-23-7-30-1" fill="none" stroke="#17110D" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- eyes -->
+  <ellipse cx="140" cy="133" rx="7" ry="5.6" fill="#1C1510"/>
+  <ellipse cx="180" cy="133" rx="7" ry="5.6" fill="#1C1510"/>
+  <circle cx="142" cy="131" r="2" fill="#fff" opacity=".9"/>
+  <circle cx="182" cy="131" r="2" fill="#fff" opacity=".9"/>
+
+  <!-- nose and mouth -->
+  <path d="M160 140l-5 20q5 5 12-1" fill="none" stroke="#5F3820" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M148 178c6 6 18 6 24 0" fill="none" stroke="#8A4A3C" stroke-width="4" stroke-linecap="round"/>
+</svg>

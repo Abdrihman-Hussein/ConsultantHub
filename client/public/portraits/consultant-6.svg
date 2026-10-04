@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="320" height="320" role="img" aria-label="Illustrated portrait">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="36%" r="74%">
+      <stop offset="0%" stop-color="#FBF4EA"/>
+      <stop offset="100%" stop-color="#EADDCB"/>
+    </radialGradient>
+    <clipPath id="face">
+      <ellipse cx="160" cy="132" rx="52" ry="60"/>
+    </clipPath>
+  </defs>
+
+  <rect width="320" height="320" fill="url(#bg)"/>
+
+  <!-- dark green shirt -->
+  <path d="M20 320C20 254 78 218 160 218s140 36 140 102Z" fill="#2B3A33"/>
+  <path d="M126 220c10 40 58 40 68 0l22 8c-14 60-98 60-112 0Z" fill="#22302A"/>
+
+  <!-- neck -->
+  <rect x="139" y="168" width="42" height="70" rx="19" fill="#5F3820"/>
+
+  <!-- ears -->
+  <ellipse cx="108" cy="140" rx="11" ry="14" fill="#6E4326"/>
+  <ellipse cx="212" cy="140" rx="11" ry="14" fill="#6E4326"/>
+
+  <!-- head -->
+  <ellipse cx="160" cy="132" rx="52" ry="60" fill="#6E4326"/>
+
+  <!-- hair under the cap -->
+  <path d="M108 130c-2-46 20-62 52-62s54 16 52 62c-8-24-26-36-52-36s-44 12-52 36Z" fill="#120D0A"/>
+
+  <!-- kufi cap -->
+  <path d="M102 92c0-28 26-46 58-46s58 18 58 46c0 6-3 10-10 10H112c-7 0-10-4-10-10Z" fill="#F4EDE2"/>
+  <path d="M102 96h116c0 7-4 11-11 11H113c-7 0-11-4-11-11Z" fill="#DED3C2"/>
+  <path d="M118 84c14-14 40-20 62-8" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" opacity=".7"/>
+
+  <!-- beard -->
+  <g clip-path="url(#face)">
+    <path d="M104 140c4 58 26 74 56 74s52-16 56-74c-4 32-20 52-56 52s-52-20-56-52Z" fill="#120D0A"/>
+    <ellipse cx="160" cy="178" rx="26" ry="14" fill="#6E4326"/>
+    <path d="M135 164c11-8 39-8 50 0-8 10-42 10-50 0Z" fill="#120D0A"/>
+  </g>
+
+  <!-- brows -->
+  <path d="M125 120c9-7 23-7 30-1" fill="none" stroke="#120D0A" stroke-width="6" stroke-linecap="round"/>
+  <path d="M195 120c-9-7-23-7-30-1" fill="none" stroke="#120D0A" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- eyes -->
+  <ellipse cx="140" cy="133" rx="7" ry="5.6" fill="#1C1510"/>
+  <ellipse cx="180" cy="133" rx="7" ry="5.6" fill="#1C1510"/>
+  <circle cx="142" cy="131" r="2" fill="#fff" opacity=".9"/>
+  <circle cx="182" cy="131" r="2" fill="#fff" opacity=".9"/>
+
+  <!-- nose and mouth -->
+  <path d="M160 141l-5 20q5 5 12-1" fill="none" stroke="#54301B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M148 179c6 6 18 6 24 0" fill="none" stroke="#7E4038" stroke-width="4" stroke-linecap="round"/>
+</svg>
