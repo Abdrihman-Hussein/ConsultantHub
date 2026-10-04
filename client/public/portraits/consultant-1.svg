@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="320" height="320" role="img" aria-label="Illustrated portrait">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="38%" r="72%">
+      <stop offset="0%" stop-color="#FBF1E7"/>
+      <stop offset="100%" stop-color="#EAD7C6"/>
+    </radialGradient>
+    <clipPath id="face">
+      <ellipse cx="160" cy="132" rx="52" ry="60"/>
+    </clipPath>
+  </defs>
+
+  <rect width="320" height="320" fill="url(#bg)"/>
+
+  <!-- shirt and shoulders -->
+  <path d="M20 320C20 254 78 218 160 218s140 36 140 102Z" fill="#2F3A4A"/>
+  <path d="M126 220c10 40 58 40 68 0l22 8c-14 60-98 60-112 0Z" fill="#25303E"/>
+  <path d="M160 250l12 9-11 55h-2l-11-55Z" fill="#C2622D"/>
+
+  <!-- neck -->
+  <rect x="139" y="168" width="42" height="70" rx="19" fill="#7A4C31"/>
+
+  <!-- ears -->
+  <ellipse cx="108" cy="140" rx="11" ry="14" fill="#8A5A3B"/>
+  <ellipse cx="212" cy="140" rx="11" ry="14" fill="#8A5A3B"/>
+
+  <!-- head -->
+  <ellipse cx="160" cy="132" rx="52" ry="60" fill="#8A5A3B"/>
+
+  <!-- cropped hair -->
+  <path d="M107 126c0-46 22-62 53-62s53 16 53 62c-8-24-26-36-53-36s-45 12-53 36Z" fill="#1F1713"/>
+
+  <g clip-path="url(#face)">
+    <ellipse cx="160" cy="186" rx="52" ry="34" fill="#7A4C31" opacity=".35"/>
+  </g>
+
+  <!-- brows -->
+  <path d="M125 121c9-7 23-7 30-1" fill="none" stroke="#1F1713" stroke-width="5.5" stroke-linecap="round"/>
+  <path d="M195 121c-9-7-23-7-30-1" fill="none" stroke="#1F1713" stroke-width="5.5" stroke-linecap="round"/>
+
+  <!-- eyes -->
+  <ellipse cx="140" cy="134" rx="7" ry="5.6" fill="#241C16"/>
+  <ellipse cx="180" cy="134" rx="7" ry="5.6" fill="#241C16"/>
+  <circle cx="142" cy="132" r="2" fill="#fff" opacity=".9"/>
+  <circle cx="182" cy="132" r="2" fill="#fff" opacity=".9"/>
+
+  <!-- nose and mouth -->
+  <path d="M160 141l-5 21q5 5 12-1" fill="none" stroke="#6F432A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M146 179c7 8 21 8 28 0" fill="none" stroke="#7A3E33" stroke-width="4.5" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="320" height="320" role="img" aria-label="Illustrated portrait">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="36%" r="74%">
+      <stop offset="0%" stop-color="#F6F8F8"/>
+      <stop offset="100%" stop-color="#DCE6E9"/>
+    </radialGradient>
+    <clipPath id="face">
+      <ellipse cx="160" cy="132" rx="52" ry="60"/>
+    </clipPath>
+  </defs>
+
+  <rect width="320" height="320" fill="url(#bg)"/>
+
+  <!-- shirt, collar and tie -->
+  <path d="M20 320C20 254 78 218 160 218s140 36 140 102Z" fill="#F7F3EC"/>
+  <path d="M124 219c11 42 61 42 72 0l24 8c-15 62-105 62-120 0Z" fill="#E6DED1"/>
+  <path d="M160 250l13 10-12 56h-3l-11-56Z" fill="#C2622D"/>
+  <path d="M147 240h26l-6 18h-14Z" fill="#8A4219"/>
+
+  <!-- neck -->
+  <rect x="139" y="168" width="42" height="70" rx="19" fill="#96653F"/>
+
+  <!-- ears -->
+  <ellipse cx="108" cy="140" rx="11" ry="14" fill="#A9744C"/>
+  <ellipse cx="212" cy="140" rx="11" ry="14" fill="#A9744C"/>
+
+  <!-- head -->
+  <ellipse cx="160" cy="132" rx="52" ry="60" fill="#A9744C"/>
+
+  <!-- short fade -->
+  <path d="M108 128c-2-48 22-64 52-64s54 16 52 64c-6-26-24-40-52-40s-46 14-52 40Z" fill="#241A14"/>
+
+  <!-- trimmed beard -->
+  <g clip-path="url(#face)">
+    <path d="M104 138c6 58 26 74 56 74s50-16 56-74c-4 30-20 50-56 50s-52-20-56-50Z" fill="#241A14" opacity=".92"/>
+    <ellipse cx="160" cy="176" rx="27" ry="15" fill="#A9744C"/>
+    <path d="M134 162c12-8 40-8 52 0-8 10-44 10-52 0Z" fill="#241A14"/>
+  </g>
+
+  <!-- brows -->
+  <path d="M125 120c9-7 23-7 30-1" fill="none" stroke="#241A14" stroke-width="5.5" stroke-linecap="round"/>
+  <path d="M195 120c-9-7-23-7-30-1" fill="none" stroke="#241A14" stroke-width="5.5" stroke-linecap="round"/>
+
+  <!-- eyes -->
+  <ellipse cx="140" cy="133" rx="7" ry="5.6" fill="#241C16"/>
+  <ellipse cx="180" cy="133" rx="7" ry="5.6" fill="#241C16"/>
+  <circle cx="142" cy="131" r="2" fill="#fff" opacity=".9"/>
+  <circle cx="182" cy="131" r="2" fill="#fff" opacity=".9"/>
+
+  <!-- nose and mouth -->
+  <path d="M160 140l-5 21q5 5 12-1" fill="none" stroke="#8C5B37" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M148 177c6 7 18 7 24 0" fill="none" stroke="#8A4A3C" stroke-width="4" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="320" height="320" role="img" aria-label="Illustrated portrait">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="36%" r="74%">
+      <stop offset="0%" stop-color="#FAF1E8"/>
+      <stop offset="100%" stop-color="#E9D8C8"/>
+    </radialGradient>
+    <clipPath id="face">
+      <ellipse cx="160" cy="132" rx="52" ry="60"/>
+    </clipPath>
+  </defs>
+
+  <rect width="320" height="320" fill="url(#bg)"/>
+
+  <!-- terracotta shirt -->
+  <path d="M20 320C20 254 78 218 160 218s140 36 140 102Z" fill="#C2622D"/>
+  <path d="M126 220c10 40 58 40 68 0l22 8c-14 60-98 60-112 0Z" fill="#A9521F"/>
+
+  <!-- neck -->
+  <rect x="139" y="168" width="42" height="70" rx="19" fill="#7E5234"/>
+
+  <!-- ears -->
+  <ellipse cx="108" cy="140" rx="11" ry="14" fill="#8F5F3E"/>
+  <ellipse cx="212" cy="140" rx="11" ry="14" fill="#8F5F3E"/>
+
+  <!-- head -->
+  <ellipse cx="160" cy="132" rx="52" ry="60" fill="#8F5F3E"/>
+
+  <!-- wavy short hair -->
+  <path d="M106 130c-4-50 22-66 54-66s58 16 54 66c-5-16-11-24-18-29-6 8-14 8-20 3-7 7-17 7-24 2-8 6-16 4-21-3-11 8-20 20-25 27Z" fill="#1A120E"/>
+
+  <!-- brows -->
+  <path d="M125 120c9-7 23-7 30-1" fill="none" stroke="#1A120E" stroke-width="5.5" stroke-linecap="round"/>
+  <path d="M195 120c-9-7-23-7-30-1" fill="none" stroke="#1A120E" stroke-width="5.5" stroke-linecap="round"/>
+
+  <!-- eyes -->
+  <ellipse cx="140" cy="133" rx="7" ry="5.6" fill="#241C16"/>
+  <ellipse cx="180" cy="133" rx="7" ry="5.6" fill="#241C16"/>
+  <circle cx="142" cy="131" r="2" fill="#fff" opacity=".9"/>
+  <circle cx="182" cy="131" r="2" fill="#fff" opacity=".9"/>
+
+  <!-- glasses -->
+  <g fill="none" stroke="#3A2E24" stroke-width="3.4">
+    <rect x="122" y="120" width="38" height="27" rx="11"/>
+    <rect x="160" y="120" width="38" height="27" rx="11"/>
+    <path d="M160 133h0M118 128l-12-4M202 128l12-4" stroke-linecap="round"/>
+  </g>
+  <rect x="122" y="120" width="38" height="27" rx="11" fill="#fff" opacity=".1"/>
+  <rect x="160" y="120" width="38" height="27" rx="11" fill="#fff" opacity=".1"/>
+
+  <!-- nose and mouth -->
+  <path d="M160 152l-5 18q5 5 12-1" fill="none" stroke="#734926" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M148 188c6 7 18 7 24 0" fill="none" stroke="#7E3E33" stroke-width="4.5" stroke-linecap="round"/>
+</svg>
