@@ -1,71 +1,85 @@
 import { useMemo, useState } from 'react'
-import { appointments as seedAppointments } from '../../data/appointments'
-import { consultants } from '../../data/consultants'
+import { Link } from 'react-router-dom'
+import { useApp } from '../../context/AppContext'
+import { consultants } from '../../data'
+import { formatDate, relativeDay, todayISO, formatPrice } from '../../lib/format'
 import type { Appointment } from '../../types'
 import Container from '../../components/ui/Container'
 import Button from '../../components/ui/Button'
 import Card from '../../components/ui/Card'
+import Badge from '../../components/ui/Badge'
 import Reveal from '../../components/ui/Reveal'
-import AppointmentCard, { formatDate } from '../../components/appointments/AppointmentCard'
-import { users } from '../../data/users'
-
-const today = new Date().toISOString().slice(0, 10)
+import EmptyState from '../../components/ui/EmptyState'
+import OfferServicesCard from '../../components/consultants/OfferServicesCard'
 
 function isUpcoming(appointment: Appointment) {
   return (
-    appointment.date >= today &&
+    appointment.date >= todayISO() &&
     appointment.status !== 'COMPLETED' &&
     appointment.status !== 'CANCELLED'
   )
 }
 
 export default function ClientDashboard() {
-  const [appointments, setAppointments] = useState<Appointment[]>(seedAppointments)
-  const currentUser = users[0]
+  const { session, myAppointments, cancelAppointment } = useApp()
+  const [cancelling, setCancelling] = useState<string | null>(null)
 
-  const { upcoming, past } = useMemo(
-    () => ({
-      upcoming: appointments
-        .filter(isUpcoming)
-        .sort((a, b) => a.date.localeCompare(b.date)),
-      past: appointments
-        .filter((appointment) => !isUpcoming(appointment))
-        .sort((a, b) => b.date.localeCompare(a.date)),
-    }),
-    [appointments],
-  )
+  const { upcoming, past, spend } = useMemo(() => {
+    const sorted = [...myAppointments]
+    const up = sorted
+      .filter(isUpcoming)
+      .sort((a, b) => (a.date + a.startTime).localeCompare(b.date + b.startTime))
+    const down = sorted
+      .filter((appointment) => !isUpcoming(appointment))
+      .sort((a, b) => (b.date + b.startTime).localeCompare(a.date + a.startTime))
 
-  const cancel = (id: string) =>
-    setAppointments((current) =>
-      current.map((appointment) =>
-        appointment.id === id ? { ...appointment, status: 'CANCELLED' } : appointment,
-      ),
-    )
+    // Spend uses the price snapshotted at booking, so it matches what was charged.
+    const total = sorted
+      .filter((appointment) => appointment.status === 'COMPLETED')
+      .reduce((sum, appointment) => sum + appointment.price, 0)
 
-  /*
-   * Spend on completed sessions only. Uses each consultant's real hourly rate
-   * rather than an invented average, so the figure matches the rest of the app.
-   */
-  const totalSpent = past
-    .filter((appointment) => appointment.status === 'COMPLETED')
-    .reduce((sum, appointment) => {
-      const [startHour] = appointment.startTime.split(':').map(Number)
-      const [endHour] = appointment.endTime.split(':').map(Number)
-      const rate = consultants.find((c) => c.id === appointment.consultantId)?.hourlyRate ?? 0
-      return sum + (endHour - startHour) * rate
-    }, 0)
+    return { upcoming: up, past: down, spend: total }
+  }, [myAppointments])
 
-  const stats = [
-    { label: 'Upcoming sessions', value: String(upcoming.length) },
-    {
-      label: 'Completed',
-      value: String(past.filter((a) => a.status === 'COMPLETED').length),
-    },
-    { label: 'Cancelled', value: String(past.filter((a) => a.status === 'CANCELLED').length) },
-    { label: 'Total invested', value: `$${totalSpent.toLocaleString()}` },
-  ]
+  const confirmCancel = (id: string) => {
+    if (cancelling !== id) {
+      setCancelling(id)
+      return
+    }
+    cancelAppointment(id)
+    setCancelling(null)
+  }
 
   const nextUp = upcoming[0]
+
+  if (!session) {
+    return (
+      <Container className="py-16 lg:py-24">
+        <Reveal>
+          <EmptyState
+            title="Log in to see your dashboard"
+            body="Your bookings, messages, and history live here once you sign in."
+            icon="user"
+            action={
+              <div className="flex flex-wrap justify-center gap-3">
+                <Button to="/login">Log in</Button>
+                <Button to="/register" variant="outline">
+                  Create an account
+                </Button>
+              </div>
+            }
+          />
+        </Reveal>
+      </Container>
+    )
+  }
+
+  const stats = [
+    { label: 'Upcoming', value: String(upcoming.length) },
+    { label: 'Completed', value: String(past.filter((a) => a.status === 'COMPLETED').length) },
+    { label: 'Cancelled', value: String(past.filter((a) => a.status === 'CANCELLED').length) },
+    { label: 'Total spent', value: formatPrice(spend) },
+  ]
 
   return (
     <Container className="py-10 lg:py-14">
@@ -73,10 +87,12 @@ export default function ClientDashboard() {
         <Reveal>
           <p className="eyebrow mb-3">Client portal</p>
           <h1 className="font-display text-display-lg text-ink-950">
-            Welcome back, {currentUser.name}
+            Welcome back, {session.name.split(' ')[0]}
           </h1>
           <p className="mt-3 text-base text-muted">
-            Track your sessions and manage upcoming bookings.
+            {upcoming.length > 0
+              ? `You have ${upcoming.length} upcoming ${upcoming.length === 1 ? 'session' : 'sessions'}.`
+              : 'No sessions booked yet.'}
           </p>
         </Reveal>
         <Reveal delay={80}>
@@ -103,16 +119,20 @@ export default function ClientDashboard() {
         <Reveal delay={140}>
           <div className="mt-10 overflow-hidden rounded-2xl border border-accent-200 bg-accent-50/50 p-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="eyebrow text-accent-600">Next session</p>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="eyebrow text-accent-600">Next session</p>
+                  <Badge tone="accent">{relativeDay(nextUp.date)}</Badge>
+                </div>
                 <p className="mt-2 text-lg font-medium text-ink-950">
                   {nextUp.serviceName} with {nextUp.consultantName}
                 </p>
                 <p className="mt-1 text-sm text-muted">
-                  {formatDate(nextUp.date)} · {nextUp.startTime} – {nextUp.endTime}
+                  {formatDate(nextUp.date)} · {nextUp.startTime} – {nextUp.endTime} ·{' '}
+                  <span className="capitalize">{nextUp.meetingType.replace('-', ' ')}</span>
                 </p>
               </div>
-              <Button to="/client/appointments" variant="outline" size="sm">
+              <Button to="/client/appointments" variant="outline" size="sm" className="shrink-0">
                 Manage booking
               </Button>
             </div>
@@ -124,24 +144,37 @@ export default function ClientDashboard() {
         <Reveal>
           <div className="flex items-baseline justify-between gap-4">
             <h2 className="text-lg font-semibold tracking-tight text-ink-950">Upcoming</h2>
-            <span className="text-sm text-muted">{upcoming.length} scheduled</span>
+            {upcoming.length > 0 && (
+              <Link
+                to="/client/appointments"
+                className="text-sm text-muted transition-colors hover:text-ink-950"
+              >
+                View all
+              </Link>
+            )}
           </div>
         </Reveal>
 
         {upcoming.length === 0 ? (
           <Reveal delay={80}>
-            <Card className="mt-5 p-10 text-center">
-              <p className="text-sm text-muted">You have no upcoming sessions.</p>
-              <Button to="/consultants" size="sm" className="mt-5">
-                Find a consultant
-              </Button>
-            </Card>
+            <div className="mt-5">
+              <EmptyState
+                title="Nothing booked yet"
+                body="Browse the directory and book an intro call — every consultant offers a free one."
+                icon="calendar"
+                action={<Button to="/consultants">Find a consultant</Button>}
+              />
+            </div>
           </Reveal>
         ) : (
           <div className="mt-5 space-y-4">
             {upcoming.map((appointment, index) => (
               <Reveal key={appointment.id} delay={index * 80}>
-                <AppointmentCard appointment={appointment} onCancel={cancel} />
+                <AppointmentRow
+                  appointment={appointment}
+                  cancelling={cancelling === appointment.id}
+                  onCancel={() => confirmCancel(appointment.id)}
+                />
               </Reveal>
             ))}
           </div>
@@ -154,20 +187,87 @@ export default function ClientDashboard() {
         </Reveal>
         {past.length === 0 ? (
           <Reveal delay={80}>
-            <Card className="mt-5 p-10 text-center">
-              <p className="text-sm text-muted">Past sessions will appear here.</p>
-            </Card>
+            <div className="mt-5">
+              <EmptyState title="No past sessions" body="Completed and cancelled bookings appear here." icon="clock" />
+            </div>
           </Reveal>
         ) : (
           <div className="mt-5 space-y-4">
             {past.map((appointment, index) => (
               <Reveal key={appointment.id} delay={index * 60}>
-                <AppointmentCard appointment={appointment} />
+                <AppointmentRow appointment={appointment} />
               </Reveal>
             ))}
           </div>
         )}
       </section>
+
+      {/* Sits after everything else on purpose: booking is the job of this page,
+          offering services is a separate door rather than a competing action. */}
+      <Reveal delay={80}>
+        <OfferServicesCard className="mt-14" />
+      </Reveal>
     </Container>
+  )
+}
+
+interface RowProps {
+  appointment: Appointment
+  cancelling?: boolean
+  onCancel?: () => void
+}
+
+function AppointmentRow({ appointment, cancelling, onCancel }: RowProps) {
+  const statusTone =
+    appointment.status === 'CONFIRMED'
+      ? 'accent'
+      : appointment.status === 'PENDING'
+        ? 'gold'
+        : appointment.status === 'CANCELLED'
+          ? 'danger'
+          : 'muted'
+
+  const consultant = consultants.find((c) => c.id === appointment.consultantId)
+  const canCancel = appointment.status === 'CONFIRMED' || appointment.status === 'PENDING'
+
+  return (
+    <Card className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="font-medium text-ink-950">{appointment.serviceName}</p>
+          <Badge tone={statusTone}>{appointment.status.toLowerCase()}</Badge>
+        </div>
+        <p className="mt-1 text-sm text-muted">
+          with{' '}
+          {consultant ? (
+            <Link
+              to={`/consultants/${consultant.id}`}
+              className="text-body underline underline-offset-2 hover:text-accent-600"
+            >
+              {consultant.name}
+            </Link>
+          ) : (
+            appointment.consultantName
+          )}
+        </p>
+        <p className="mt-1.5 text-sm text-muted">
+          {formatDate(appointment.date)} · {appointment.startTime} – {appointment.endTime}
+        </p>
+      </div>
+
+      {canCancel && onCancel && (
+        <button
+          type="button"
+          onClick={onCancel}
+          className={`shrink-0 self-start rounded-full border px-4 py-2 text-sm transition-all duration-200 sm:self-center ${
+            cancelling
+              ? 'border-danger bg-danger text-white'
+              : 'border-line-strong text-muted hover:border-danger hover:text-danger'
+          }`}
+        >
+          {cancelling ? 'Tap again to confirm' : 'Cancel'}
+        </button>
+      )}
+    </Card>
   )
 }

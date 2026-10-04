@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
-import { consultants } from '../data/consultants'
-import { services } from '../data/services'
+import { getConsultant, getServicesFor } from '../data'
+import { useApp } from '../context/AppContext'
 import Container from '../components/ui/Container'
 import Button from '../components/ui/Button'
 import Badge from '../components/ui/Badge'
@@ -11,8 +11,9 @@ import Reveal from '../components/ui/Reveal'
 import BookingWidget from '../components/consultants/BookingWidget'
 
 export default function ConsultantProfile() {
-  const { id } = useParams<{ id: string }>()
-  const consultant = consultants.find((candidate) => candidate.id === id)
+  const { id } = useParams<{ id: string }>();
+  const consultant = id ? getConsultant(id) : undefined;
+  const { session } = useApp();
 
   if (!consultant) {
     return (
@@ -33,17 +34,19 @@ export default function ConsultantProfile() {
           </Button>
         </Reveal>
       </Container>
-    )
+    );
   }
 
-  const consultantServices = services.filter((service) => service.consultantId === consultant.id)
+  const consultantServices = getServicesFor(consultant.id);
 
   const stats = [
     { label: 'Sessions', value: `${consultant.sessions}+` },
     { label: 'Experience', value: consultant.experience },
     { label: 'Response', value: consultant.responseTime },
     { label: 'Rate', value: `$${consultant.hourlyRate}/hr` },
-  ]
+  ];
+
+  const freeIntro = consultantServices.find((service) => service.isFree);
 
   return (
     <>
@@ -75,7 +78,7 @@ export default function ConsultantProfile() {
           <div className="flex flex-col gap-7 sm:flex-row sm:items-start">
             <Reveal>
               <Avatar
-                src={consultant.avatar}
+                src={consultant.avatar || undefined}
                 name={consultant.name}
                 size="xl"
                 className="ring-4 ring-surface shadow-card"
@@ -96,6 +99,13 @@ export default function ConsultantProfile() {
                     <circle cx="10" cy="8" r="2" />
                   </svg>
                   {consultant.location}
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.4">
+                    <circle cx="10" cy="10" r="7" />
+                    <path d="M10 6v4l2.5 1.5" strokeLinecap="round" />
+                  </svg>
+                  Replies {consultant.responseTime}
                 </span>
               </div>
             </Reveal>
@@ -130,48 +140,51 @@ export default function ConsultantProfile() {
               <section>
                 <h2 className="text-lg font-semibold tracking-tight text-ink-950">Services</h2>
                 <div className="mt-4 space-y-3">
-                  {consultantServices.length === 0 ? (
-                    <p className="text-sm text-muted">No services listed yet.</p>
-                  ) : (
-                    consultantServices.map((service, index) => (
-                      <Card
-                        key={service.id}
-                        className="flex items-start justify-between gap-6 p-5 transition-all duration-300 hover:border-accent-300 hover:shadow-lift"
-                      >
-                        <div className="min-w-0">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <h3 className="font-medium text-ink-950">{service.name}</h3>
-                            {service.isFree && <Badge tone="accent">Free</Badge>}
-                          </div>
-                          <p className="mt-1.5 text-sm leading-relaxed text-muted">
-                            {service.description}
-                          </p>
-                          <p className="mt-2.5 text-xs text-subtle">{service.duration} minutes</p>
+                  {consultantServices.map((service) => (
+                    <Card
+                      key={service.id}
+                      className="flex items-start justify-between gap-6 p-5 transition-all duration-300 hover:border-accent-300 hover:shadow-lift"
+                    >
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="font-medium text-ink-950">{service.name}</h3>
+                          {service.isFree && <Badge tone="accent">Free</Badge>}
                         </div>
-                        <p className="shrink-0 text-lg font-semibold tracking-tight text-ink-950">
-                          {service.isFree ? 'Free' : `$${service.price}`}
+                        <p className="mt-1.5 text-sm leading-relaxed text-muted">
+                          {service.description}
                         </p>
-                      </Card>
-                    ))
-                  )}
+                        <p className="mt-2.5 text-xs text-subtle">
+                          {service.duration} minutes
+                          {service.isFree && ' · no commitment'}
+                        </p>
+                      </div>
+                      <p className="shrink-0 text-lg font-semibold tracking-tight text-ink-950">
+                        {service.isFree ? 'Free' : `$${service.price}`}
+                      </p>
+                    </Card>
+                  ))}
                 </div>
               </section>
             </Reveal>
+
+            {!session && freeIntro && (
+              <Reveal>
+                <Card className="border-accent-200 bg-accent-50/50 p-6">
+                  <p className="text-sm text-accent-900">
+                    {consultant.name} offers a free{' '}
+                    <span className="font-medium">{freeIntro.duration}-minute</span> intro call.
+                    Browsing is free — you only need an account to confirm.
+                  </p>
+                </Card>
+              </Reveal>
+            )}
           </div>
 
           <Reveal delay={120} className="lg:sticky lg:top-24">
-            {consultantServices.length > 0 ? (
-              <BookingWidget services={consultantServices} />
-            ) : (
-              <Card className="p-6">
-                <p className="text-sm text-muted">
-                  This consultant hasn&apos;t published services yet.
-                </p>
-              </Card>
-            )}
+            <BookingWidget consultant={consultant} services={consultantServices} />
           </Reveal>
         </div>
       </Container>
     </>
-  )
+  );
 }
