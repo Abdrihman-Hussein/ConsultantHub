@@ -5,7 +5,8 @@
 import { isSlotTaken, generateSlots, bookedTimes, upcomingDays } from './src/lib/booking'
 import { searchConsultants, defaultFilters, countActiveFilters } from './src/lib/search'
 import { bioLine, featuredOrder, nextIndex } from './src/lib/featured'
-import { consultants } from './src/data'
+import { avgRating, reviewsSummary } from './src/lib/reviews'
+import { consultants, getConsultant, reviews, getReviewsFor } from './src/data'
 
 let failures = 0
 
@@ -259,6 +260,43 @@ check('next wraps to the start', nextIndex(5, 6) === 0);
 check('next advances', nextIndex(0, 6) === 1);
 check('a one-item rotation does not move', nextIndex(0, 1) === 0);
 check('an empty rotation does not move', nextIndex(0, 0) === 0);
+
+console.log('\nreviews');
+check('every seeded review belongs to a real consultant', reviews.every((r) => getConsultant(r.consultantId)));
+check('every seeded review has a rating in range', reviews.every((r) => r.rating >= 1 && r.rating <= 5));
+check('every seeded review has a body', reviews.every((r) => r.body.trim().length > 20));
+check('every consultant has at least one seeded review', consultants.every((c) => getReviewsFor(c.id).length > 0));
+check(
+  'reviews come back newest first',
+  (() => {
+    const dates = getReviewsFor('2').map((r) => r.date);
+    return dates.every((d, i) => i === 0 || dates[i - 1] >= d);
+  })(),
+);
+check(
+  'sample label counts the total, not the sample',
+  reviewsSummary(consultants[0], getReviewsFor(consultants[0].id)) ===
+    `Showing 3 of ${consultants[0].reviewCount} reviews`,
+  reviewsSummary(consultants[0], getReviewsFor(consultants[0].id)),
+);
+check(
+  'a zero review count does not print (0)',
+  reviewsSummary({ ...consultants[0], reviewCount: 0 }, []) === 'No written reviews yet',
+  reviewsSummary({ ...consultants[0], reviewCount: 0 }, []),
+);
+check(
+  'a total without samples does not imply a broken page',
+  reviewsSummary({ ...consultants[0], reviewCount: 40 }, []) === 'Written reviews not shown yet',
+  reviewsSummary({ ...consultants[0], reviewCount: 40 }, []),
+);
+check(
+  'a seeded review average is within its own bounds',
+  (() => {
+    const avg = avgRating(getReviewsFor('2'));
+    return avg === null || (avg >= 1 && avg <= 5);
+  })(),
+);
+check('an empty review list averages to null', avgRating([]) === null);
 
 console.log('\ndesign tokens');
 // Guards the spec's binding decision: terracotta is unreadable on ink, so the

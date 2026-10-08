@@ -58,6 +58,26 @@ export interface Service {
   isFree: boolean;
 }
 
+/**
+ * A written client review.
+ *
+ * Sample content for the MVP, like the rest of the directory: these people are
+ * fictional. Only a handful are seeded per consultant, so
+ * `Consultant.reviewCount` remains the true aggregate and the UI states how
+ * many of the total it is actually showing. Never render a seeded review
+ * without that framing.
+ */
+export interface Review {
+  id: string;
+  consultantId: string;
+  /** Fictional client name. */
+  authorName: string;
+  rating: number;
+  /** ISO date, `YYYY-MM-DD`. */
+  date: string;
+  body: string;
+}
+
 export type AppointmentStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
 
 export type MeetingType = 'video' | 'in-person';
