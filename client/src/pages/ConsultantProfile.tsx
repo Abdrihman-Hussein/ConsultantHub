@@ -9,6 +9,7 @@ import Rating from '../components/ui/Rating'
 import Card from '../components/ui/Card'
 import Reveal from '../components/ui/Reveal'
 import BookingWidget from '../components/consultants/BookingWidget'
+import ReviewList from '../components/consultants/ReviewList'
 
 export default function ConsultantProfile() {
   const { id } = useParams<{ id: string }>();
@@ -50,7 +51,7 @@ export default function ConsultantProfile() {
 
   return (
     <>
-      <section className="relative overflow-hidden border-b border-line bg-surface">
+      <section className="relative overflow-hidden border-b border-line bg-surface-subtle">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full bg-accent-100/40 blur-3xl"
@@ -81,7 +82,7 @@ export default function ConsultantProfile() {
                 src={consultant.avatar || undefined}
                 name={consultant.name}
                 size="xl"
-                className="ring-4 ring-surface shadow-card"
+                className="ring-4 ring-surface-subtle shadow-card"
               />
             </Reveal>
 
@@ -165,6 +166,10 @@ export default function ConsultantProfile() {
                   ))}
                 </div>
               </section>
+            </Reveal>
+
+            <Reveal>
+              <ReviewList consultant={consultant} />
             </Reveal>
 
             {!session && freeIntro && (

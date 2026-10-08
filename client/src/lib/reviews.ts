@@ -8,6 +8,14 @@ import type { Consultant, Review } from '../types';
  * in the UI rather than papering over it.
  */
 
+/**
+ * The ` (12)` suffix a Rating can render next to its number. Empty for a
+ * missing or zero count — a consultant with no reviews must not show `(0)`.
+ */
+export function reviewCountSuffix(count?: number): string {
+  return count !== undefined && count > 0 ? ` (${count})` : '';
+}
+
 /** Mean rating of a set of reviews, or `null` when there are none. */
 export function avgRating(reviews: Review[]): number | null {
   if (reviews.length === 0) return null;

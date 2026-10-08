@@ -5,7 +5,7 @@
 import { isSlotTaken, generateSlots, bookedTimes, upcomingDays } from './src/lib/booking'
 import { searchConsultants, defaultFilters, countActiveFilters } from './src/lib/search'
 import { bioLine, featuredOrder, nextIndex, rowConsultants } from './src/lib/featured'
-import { avgRating, reviewsSummary } from './src/lib/reviews'
+import { avgRating, reviewsSummary, reviewCountSuffix } from './src/lib/reviews'
 import { countLabel, isMdUp } from './src/lib/format'
 import { consultants, getConsultant, reviews, getReviewsFor } from './src/data'
 
@@ -328,6 +328,9 @@ check(
   })(),
 );
 check('an empty review list averages to null', avgRating([]) === null);
+check('a missing review count shows no suffix', reviewCountSuffix(undefined) === '');
+check('a zero review count shows no suffix', reviewCountSuffix(0) === '');
+check('a positive review count prints in parentheses', reviewCountSuffix(128) === ' (128)');
 
 console.log('\ndesign tokens');
 // Guards the spec's binding decision: terracotta is unreadable on ink, so the

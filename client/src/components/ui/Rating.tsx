@@ -1,3 +1,5 @@
+import { reviewCountSuffix } from '../../lib/reviews'
+
 interface RatingProps {
   value: number
   reviewCount?: number
@@ -50,10 +52,9 @@ export default function Rating({
       {!compact && (
         <span className={`font-medium ${onInk ? 'text-on-ink' : 'text-body'}`}>
           {value.toFixed(1)}
-          {reviewCount !== undefined && (
+          {reviewCountSuffix(reviewCount) !== '' && (
             <span className={`font-normal ${onInk ? 'text-on-ink-muted' : 'text-muted'}`}>
-              {' '}
-              ({reviewCount})
+              {reviewCountSuffix(reviewCount)}
             </span>
           )}
         </span>
