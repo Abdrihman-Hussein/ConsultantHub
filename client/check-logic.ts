@@ -6,7 +6,7 @@ import { isSlotTaken, generateSlots, bookedTimes, upcomingDays } from './src/lib
 import { searchConsultants, defaultFilters, countActiveFilters } from './src/lib/search'
 import { bioLine, featuredOrder, nextIndex, rowConsultants } from './src/lib/featured'
 import { avgRating, reviewsSummary } from './src/lib/reviews'
-import { countLabel } from './src/lib/format'
+import { countLabel, isMdUp } from './src/lib/format'
 import { consultants, getConsultant, reviews, getReviewsFor } from './src/data'
 
 let failures = 0
@@ -267,6 +267,11 @@ check('singular', countLabel(1, 'consultant') === '1 consultant');
 check('plural', countLabel(6, 'consultant') === '6 consultants');
 check('zero is plural', countLabel(0, 'review') === '0 reviews');
 check('irregular plural', countLabel(2, 'person', 'people') === '2 people');
+
+console.log('\nformat: isMdUp');
+check('below the md breakpoint is not md-up', isMdUp(767) === false);
+check('md-and-up is md-up', isMdUp(1024) === true);
+check('the boundary is 768', isMdUp(768) === true && isMdUp(767) === false);
 
 console.log('\nfeatured: row');
 const rowOrder = featuredOrder(consultants);

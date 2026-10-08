@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { consultants } from '../data'
 import { useApp } from '../context/AppContext'
-import { countLabel } from '../lib/format'
+import { countLabel, isMdUp } from '../lib/format'
 import {
   countActiveFilters,
   defaultFilters,
@@ -118,6 +118,17 @@ export default function Consultants() {
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
   }, [mobileFiltersOpen])
+
+  /* Close the sheet when the viewport grows to `md` and up. Only fires on a
+   * breakpoint crossing (scroll on a small screen does not trigger it). */
+  useEffect(() => {
+    const media = window.matchMedia('(min-width: 768px)')
+    const onChange = (event: MediaQueryListEvent) => {
+      if (event.matches && isMdUp(window.innerWidth)) setMobileFiltersOpen(false)
+    }
+    media.addEventListener('change', onChange)
+    return () => media.removeEventListener('change', onChange)
+  }, [])
 
   /* Return focus to the trigger button when the sheet closes. */
   useEffect(() => {
@@ -248,6 +259,18 @@ export default function Consultants() {
                   aria-label="Filters"
                   className="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-3xl border-t border-line bg-surface-subtle p-6 shadow-2xl"
                 >
+                  <div className="-mr-2 -mt-2 mb-2 flex justify-end">
+                    <button
+                      type="button"
+                      aria-label="Close filters"
+                      onClick={() => setMobileFiltersOpen(false)}
+                      className="grid h-9 w-9 place-items-center rounded-full text-muted transition-colors hover:bg-ink-100 hover:text-body focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/45"
+                    >
+                      <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+                        <path d="M5.5 5.5l9 9M14.5 5.5l-9 9" strokeLinecap="round" />
+                      </svg>
+                    </button>
+                  </div>
                   <div aria-hidden="true" className="mx-auto mb-5 h-1 w-10 rounded-full bg-ink-200" />
                   <FilterSidebar
                     filters={filters}

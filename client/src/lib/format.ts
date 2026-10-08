@@ -87,6 +87,14 @@ export function initials(name: string): string {
     .slice(0, 2)
 }
 
+/** Tailwind `md` breakpoint in px — the width at which the desktop layout starts. */
+export const mdBreakpointPx = 768;
+
+/** True when the viewport is at or above the `md` breakpoint. */
+export function isMdUp(viewportWidth: number): boolean {
+  return viewportWidth >= mdBreakpointPx;
+}
+
 export function countLabel(count: number, singular: string, plural?: string): string {
   const word = count === 1 ? singular : (plural ?? `${singular}s`);
   return `${count} ${word}`;
