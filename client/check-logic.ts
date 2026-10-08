@@ -6,6 +6,7 @@ import { isSlotTaken, generateSlots, bookedTimes, upcomingDays } from './src/lib
 import { searchConsultants, defaultFilters, countActiveFilters } from './src/lib/search'
 import { bioLine, featuredOrder, nextIndex } from './src/lib/featured'
 import { avgRating, reviewsSummary } from './src/lib/reviews'
+import { countLabel } from './src/lib/format'
 import { consultants, getConsultant, reviews, getReviewsFor } from './src/data'
 
 let failures = 0
@@ -260,6 +261,12 @@ check('next wraps to the start', nextIndex(5, 6) === 0);
 check('next advances', nextIndex(0, 6) === 1);
 check('a one-item rotation does not move', nextIndex(0, 1) === 0);
 check('an empty rotation does not move', nextIndex(0, 0) === 0);
+
+console.log('\nformat: countLabel');
+check('singular', countLabel(1, 'consultant') === '1 consultant');
+check('plural', countLabel(6, 'consultant') === '6 consultants');
+check('zero is plural', countLabel(0, 'review') === '0 reviews');
+check('irregular plural', countLabel(2, 'person', 'people') === '2 people');
 
 console.log('\nreviews');
 check('every seeded review belongs to a real consultant', reviews.every((r) => getConsultant(r.consultantId)));

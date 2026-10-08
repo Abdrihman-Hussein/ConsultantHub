@@ -122,7 +122,7 @@ export default function Home() {
         <div className="py-20 lg:py-28">
           <SectionHeading
             eyebrow="Top rated"
-            title="Consultants clients book again"
+            title="More people worth a call"
             description="Every consultant on ConsultantHub is identity-verified and reviewed by the people they've worked with."
             action={<Button to="/consultants" variant="outline">View all</Button>}
           />

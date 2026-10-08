@@ -87,6 +87,11 @@ export function initials(name: string): string {
     .slice(0, 2)
 }
 
+export function countLabel(count: number, singular: string, plural?: string): string {
+  const word = count === 1 ? singular : (plural ?? `${singular}s`);
+  return `${count} ${word}`;
+}
+
 export function emailIsValid(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim())
 }

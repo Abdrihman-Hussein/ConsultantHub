@@ -31,20 +31,17 @@ export default function HowItWorks() {
           </h2>
         </Reveal>
 
-        <ol className="mt-14 grid gap-8 md:grid-cols-3">
+        <ol className="mt-14 border-t border-line">
           {steps.map((step, index) => (
-            <Reveal as="li" key={step.number} delay={index * 110}>
-              <div className="group relative border-t border-line pt-6">
-                {/* Accent rule that grows in on hover. */}
-                <span className="absolute -top-px left-0 h-px w-0 bg-accent-500 transition-all duration-500 ease-out group-hover:w-full" />
-
+            <Reveal as="li" key={step.number} delay={index * 80}>
+              <div className="group grid gap-2 border-b border-line py-8 md:grid-cols-[6rem_16rem_1fr] md:items-baseline md:gap-10">
                 <span className="font-display text-2xl text-subtle transition-colors duration-300 group-hover:text-accent-500">
                   {step.number}
                 </span>
-                <h3 className="mt-3 text-lg font-semibold tracking-tight text-ink-950">
+                <h3 className="text-lg font-semibold tracking-tight text-ink-950">
                   {step.title}
                 </h3>
-                <p className="mt-2.5 text-sm leading-relaxed text-muted">{step.body}</p>
+                <p className="text-sm leading-relaxed text-muted">{step.body}</p>
               </div>
             </Reveal>
           ))}

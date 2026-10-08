@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import Card from '../ui/Card'
 import Avatar from '../ui/Avatar'
 import Badge from '../ui/Badge'
 import Rating from '../ui/Rating'
@@ -9,60 +8,39 @@ interface ConsultantCardProps {
   consultant: Consultant
 }
 
+/**
+ * Smaller-scale sibling of `FeaturedConsultant` — same portrait-first shape
+ * (portrait, name, credential line, rating, rate), light-surface styling.
+ */
 export default function ConsultantCard({ consultant }: ConsultantCardProps) {
   return (
-    <Card interactive className="group flex h-full flex-col p-6">
+    <article className="group flex h-full flex-col rounded-2xl border border-line bg-surface p-5 transition-colors duration-300 hover:border-line-strong">
       <div className="flex items-start justify-between gap-4">
         <Avatar
           src={consultant.avatar}
           name={consultant.name}
-          size="lg"
+          size="xl"
           className="transition-transform duration-500 ease-spring group-hover:scale-105"
         />
         {consultant.verified && (
-          <Badge tone="accent" className="shrink-0 transition-transform duration-300 group-hover:-translate-y-0.5">
-            <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="currentColor">
-              <path d="M8 1l1.9 1.2 2.2-.3.9 2 1.9 1-.3 2.2 1.2 1.9-1.2 1.9.3 2.2-1.9 1-.9 2-2.2-.3L8 15l-1.9-1.2-2.2.3-.9-2-1.9-1 .3-2.2L1.2 8l1.2-1.9-.3-2.2 1.9-1 .9-2 2.2.3L8 1z" />
-              {/* Knocked out of the seal — stroke matches the badge fill. */}
-              <path
-                d="M5.6 8.1l1.6 1.6 3.3-3.3"
-                stroke="var(--ch-badge-fill)"
-                strokeWidth="1.4"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+          <Badge tone="accent" className="shrink-0">
             Verified
           </Badge>
         )}
       </div>
 
-      <div className="mt-5">
-        <h3 className="text-[17px] font-semibold tracking-tight text-ink-950 transition-colors duration-300 group-hover:text-accent-600">
-          {consultant.name}
-        </h3>
-        <p className="mt-1 text-sm text-muted">{consultant.title}</p>
+      <h3 className="mt-4 font-display text-xl text-ink-950 transition-colors duration-300 group-hover:text-accent-600">
+        {consultant.name}
+      </h3>
+      <p className="mt-1 text-xs leading-relaxed text-muted">
+        {consultant.title} · {consultant.location}
+      </p>
+
+      <div className="mt-3 text-xs text-muted">
+        <Rating value={consultant.rating} reviewCount={consultant.reviewCount} size="sm" />
       </div>
 
-      <div className="mt-4 flex items-center gap-3">
-        <Rating value={consultant.rating} reviewCount={consultant.reviewCount} />
-      </div>
-
-      <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-muted">{consultant.bio}</p>
-
-      <dl className="mt-6 grid grid-cols-2 gap-4 border-t border-line pt-5 text-sm">
-        <div>
-          <dt className="text-xs text-subtle">Experience</dt>
-          <dd className="mt-0.5 font-medium text-body">{consultant.experience}</dd>
-        </div>
-        <div>
-          <dt className="text-xs text-subtle">Sessions</dt>
-          <dd className="mt-0.5 font-medium text-body">{consultant.sessions}+</dd>
-        </div>
-      </dl>
-
-      <div className="mt-6 flex items-end justify-between gap-4 pt-1">
+      <div className="mt-auto flex items-end justify-between gap-4 pt-5">
         <div>
           <span className="text-xl font-semibold tracking-tight text-ink-950">
             ${consultant.hourlyRate}
@@ -76,6 +54,6 @@ export default function ConsultantCard({ consultant }: ConsultantCardProps) {
           View profile
         </Link>
       </div>
-    </Card>
+    </article>
   )
 }
