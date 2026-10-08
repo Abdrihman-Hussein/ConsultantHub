@@ -139,7 +139,11 @@ export default function DashboardLayout() {
           </Container>
         </header>
 
-        <InkBand as="header" flush className="py-10 lg:py-12">
+        {/* Slightly tighter than the old `py-10 lg:py-12`. This band is the page
+            header, and `/client/appointments` continues it immediately with its
+            status tabs — at the previous scale the two pads stacked into ~88px
+            of unbroken ink before any content appeared. */}
+        <InkBand as="header" flush className="py-8 lg:py-10">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <p className="eyebrow text-gold-on-ink">Client portal</p>

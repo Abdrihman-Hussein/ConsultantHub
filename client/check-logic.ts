@@ -6,6 +6,7 @@ import { isSlotTaken, generateSlots, bookedTimes, upcomingDays } from './src/lib
 import { searchConsultants, defaultFilters, countActiveFilters } from './src/lib/search'
 import { bioLine, featuredOrder, nextIndex, rowConsultants } from './src/lib/featured'
 import { avgRating, reviewsSummary, reviewCountSuffix } from './src/lib/reviews'
+import { identityCheckSentence, verifiedCount } from './src/lib/trust'
 import { countLabel, isMdUp } from './src/lib/format'
 import { consultants, getConsultant, reviews, getReviewsFor } from './src/data'
 
@@ -331,6 +332,60 @@ check('an empty review list averages to null', avgRating([]) === null);
 check('a missing review count shows no suffix', reviewCountSuffix(undefined) === '');
 check('a zero review count shows no suffix', reviewCountSuffix(0) === '');
 check('a positive review count prints in parentheses', reviewCountSuffix(128) === ' (128)');
+
+console.log('\ntrust: identity-check copy');
+// The home page used to assert that every consultant was verified. Two of the
+// six seed consultants are not, so the sentence is generated from the
+// directory. These checks pin that it reports the shortfall rather than
+// rounding it up to "everyone".
+const withVerified = (verified: boolean) => ({ ...consultants[0], verified });
+check(
+  'the seed directory is only partly verified',
+  verifiedCount(consultants) === 4 && verifiedCount(consultants) < consultants.length,
+  String(verifiedCount(consultants)),
+);
+check(
+  'a partly verified directory states the shortfall',
+  identityCheckSentence(consultants) === '4 of the 6 listed have completed an identity check.',
+  identityCheckSentence(consultants),
+);
+check(
+  'a fully verified directory does not print a fraction',
+  identityCheckSentence([withVerified(true), withVerified(true), withVerified(true)]) ===
+    'All 3 listed have completed an identity check.',
+  identityCheckSentence([withVerified(true), withVerified(true), withVerified(true)]),
+);
+check(
+  'a partly verified directory counts only the verified',
+  identityCheckSentence([withVerified(false), withVerified(true), withVerified(false)]) ===
+    '1 of the 3 listed have completed an identity check.',
+  identityCheckSentence([withVerified(false), withVerified(true), withVerified(false)]),
+);
+check(
+  'an unverified directory says zero rather than staying silent',
+  identityCheckSentence([withVerified(false), withVerified(false)]) ===
+    '0 of the 2 listed have completed an identity check.',
+  identityCheckSentence([withVerified(false), withVerified(false)]),
+);
+check(
+  'an empty directory prints no figures at all',
+  identityCheckSentence([]) === 'No consultants are listed yet.',
+  identityCheckSentence([]),
+);
+check(
+  'the figure is derived, never hardcoded',
+  (() => {
+    const list = [withVerified(true), withVerified(false), withVerified(true)];
+    return identityCheckSentence(list) ===
+      `${verifiedCount(list)} of the ${list.length} listed have completed an identity check.`;
+  })(),
+);
+check(
+  'every sentence is a finished one',
+  [consultants, [], [withVerified(false)]].every((list) =>
+    identityCheckSentence(list).endsWith('.'),
+  ),
+);
 
 console.log('\ndesign tokens');
 // Guards the spec's binding decision: terracotta is unreadable on ink, so the

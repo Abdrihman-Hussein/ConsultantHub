@@ -59,7 +59,7 @@ export default function AuthShell({ title, subtitle, children, footer }: AuthShe
             </div>
 
             <p className="mt-6 font-display text-2xl leading-snug text-on-ink">
-              A trusted network of verified consultants.
+              Consultants reviewed before they are listed.
             </p>
             <p className="mt-3 max-w-sm text-sm leading-relaxed text-on-ink-muted">
               Find the right person and book a session in minutes.

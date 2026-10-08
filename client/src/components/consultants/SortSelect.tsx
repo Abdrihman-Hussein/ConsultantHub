@@ -4,7 +4,11 @@ import { sortLabels } from '../../lib/search'
 interface SortSelectProps {
   value: SortKey
   onChange: (key: SortKey) => void
-  /** Keeps ids unique when a select also exists inside the sidebar. */
+  /**
+   * Override the `<label>`/`select` id pairing. The default is unique because
+   * this control is the only sort UI on the page — the sidebar's copy was
+   * removed rather than id-suffixed, since two bound selects cannot disagree.
+   */
   id?: string
 }
 

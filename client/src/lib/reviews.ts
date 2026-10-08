@@ -9,8 +9,11 @@ import type { Consultant, Review } from '../types';
  */
 
 /**
- * The ` (12)` suffix a Rating can render next to its number. Empty for a
- * missing or zero count — a consultant with no reviews must not show `(0)`.
+ * The ` (12)` suffix for a review count, formatted once so the idiom cannot
+ * drift. No component renders it any more — `Rating` has no count prop, because
+ * a parenthesised figure beside five stars reads as a written-review count on
+ * surfaces that show no reviews. It is retained as the single definition of
+ * that format, and the logic checks pin its behaviour.
  */
 export function reviewCountSuffix(count?: number): string {
   return count !== undefined && count > 0 ? ` (${count})` : '';

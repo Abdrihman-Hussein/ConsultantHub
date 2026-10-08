@@ -114,7 +114,8 @@ export default function Consultants() {
 
       // If focus is outside the sheet (e.g. a click on the overlay padding
       // made <body> active), or is inside but not on a focusable control
-      // (e.g. the sheet container itself, which is only programmatically
+      // (e.g. the page heading the fallback below returns focus to, which
+      // carries tabIndex={-1} and is therefore only programmatically
       // focusable), wrap unconditionally instead of letting Tab escape
       // into the page behind the dialog.
       if (!insideSheet || !onAFocusable) {
@@ -314,12 +315,11 @@ export default function Consultants() {
                 {results.map(({ consultant }, index) => (
                   <Reveal key={consultant.id} delay={Math.min(index, 6) * 70}>
                     <div className="flex h-full flex-col">
+                      {/* Session volume sits on the card itself now that the
+                          rating no longer carries a review count. */}
                       <div className="min-h-0 flex-1">
                         <ConsultantCard consultant={consultant} />
                       </div>
-                      <p className="mt-2 px-1 text-xs text-subtle">
-                        {countLabel(consultant.sessions, 'session')} completed
-                      </p>
                     </div>
                   </Reveal>
                 ))}

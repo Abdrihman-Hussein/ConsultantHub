@@ -4,6 +4,7 @@ import Avatar from '../ui/Avatar'
 import Rating from '../ui/Rating'
 import Button from '../ui/Button'
 import { bioLine } from '../../lib/featured'
+import { countLabel } from '../../lib/format'
 
 interface FeaturedConsultantProps {
   consultant: Consultant
@@ -17,7 +18,8 @@ interface FeaturedConsultantProps {
  * rather than written (see `lib/featured`). It is deliberately not wrapped in
  * quotation marks: none of these people said it, and implying otherwise would
  * be the same class of dishonesty as the invented figures this redesign
- * removed.
+ * removed. For the same reason the credential line carries delivered sessions
+ * rather than a review count.
  */
 export default function FeaturedConsultant({ consultant }: FeaturedConsultantProps) {
   const firstName = consultant.name.split(' ')[0]
@@ -33,7 +35,9 @@ export default function FeaturedConsultant({ consultant }: FeaturedConsultantPro
             {consultant.title} · {consultant.location}
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-on-ink-muted">
-            <Rating value={consultant.rating} reviewCount={consultant.reviewCount} size="sm" onInk />
+            <Rating value={consultant.rating} size="sm" onInk />
+            <span aria-hidden="true" className="text-ink-line shrink-0">|</span>
+            <span className="truncate">{countLabel(consultant.sessions, 'session')} delivered</span>
             <span aria-hidden="true" className="text-ink-line shrink-0">|</span>
             <span className="truncate">responds {consultant.responseTime}</span>
           </div>

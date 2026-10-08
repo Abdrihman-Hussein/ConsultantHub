@@ -93,7 +93,11 @@ export default function ConsultantProfile() {
               </div>
               <p className="mt-2 text-lg text-muted">{consultant.title}</p>
               <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted">
-                <Rating value={consultant.rating} reviewCount={consultant.reviewCount} />
+                {/* No review count here: this is the one page that shows written reviews, so
+                    it states the real figure itself, qualified, in the list
+                    below. Repeating it unqualified beside the stars is what made
+                    the count look like a plain review tally. */}
+                <Rating value={consultant.rating} />
                 <span className="flex items-center gap-1.5">
                   <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.4">
                     <path d="M10 17.5s6-5.2 6-9.4a6 6 0 1 0-12 0c0 4.2 6 9.4 6 9.4z" />

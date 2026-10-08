@@ -1,7 +1,6 @@
 import Button from '../ui/Button'
 import SearchInput from '../ui/SearchInput'
-import { sortLabels } from '../../lib/search'
-import type { Filters, SortKey } from '../../lib/search'
+import type { Filters } from '../../lib/search'
 
 interface FilterSidebarProps {
   filters: Filters
@@ -173,23 +172,14 @@ export default function FilterSidebar({
         />
       </div>
 
-      <div className="border-t border-line pt-5">
-        <label htmlFor={`${idPrefix}-sort`} className="eyebrow mb-3 block">
-          Sort by
-        </label>
-        <select
-          id={`${idPrefix}-sort`}
-          value={filters.sort}
-          onChange={(event) => set('sort', event.target.value as SortKey)}
-          className="w-full cursor-pointer rounded-xl border border-line-strong bg-surface px-3.5 py-2.5 text-sm transition-all duration-200 hover:border-ink-400 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/20"
-        >
-          {(Object.keys(sortLabels) as SortKey[]).map((key) => (
-            <option key={key} value={key}>
-              {sortLabels[key]}
-            </option>
-          ))}
-        </select>
-      </div>
+      {/* No sort control here. It used to sit at the foot of this panel, which
+          meant desktop browse rendered two live selects bound to the same
+          `filters.sort` state and the mobile sheet rendered a third — two
+          controls that always agree and can never disagree is a defect, not a
+          feature. Sorting is a property of the result set, so it lives once in
+          the results bar (`SortSelect`). `idPrefix` stays: the rate slider and
+          search field below still need unique ids between the inline panel and
+          the sheet copy. */}
     </div>
   )
 }

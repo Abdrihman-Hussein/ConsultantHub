@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { consultants, specializations } from '../data'
 import { featuredOrder, nextIndex, rowConsultants } from '../lib/featured'
 import { countLabel } from '../lib/format'
+import { identityCheckSentence, verifiedCount } from '../lib/trust'
 import Container from '../components/ui/Container'
 import SectionHeading from '../components/ui/SectionHeading'
 import Button from '../components/ui/Button'
@@ -28,8 +29,12 @@ const specialties = specializations.map((name) => ({
 
 const guarantees = [
   {
-    title: 'Identity-checked consultants',
-    body: 'Every consultant has been verified before appearing in the directory, so you are not guessing who you are booking.',
+    title: 'Reviewed before listing',
+    // Generated from the directory. This used to read "every consultant has
+    // been verified", which is false of the seed — two of the six are not — and
+    // contradicted the verified count printed further down this same page. The
+    // shortfall is now stated rather than rounded up.
+    body: `Every consultant has been through our review process before appearing in the directory. ${identityCheckSentence(consultants)}`,
   },
   {
     title: 'Free intro calls',
@@ -99,9 +104,9 @@ export default function Home() {
       label: 'Sessions delivered',
     },
     {
-      value: consultants.filter((c) => c.verified).length,
+      value: verifiedCount(consultants),
       decimals: 0,
-      label: 'Verified consultants',
+      label: 'Identity-checked consultants',
     },
   ]
 
@@ -121,7 +126,7 @@ export default function Home() {
           <SectionHeading
             eyebrow="Top rated"
             title="More people worth a call"
-            description="Every consultant on ConsultantHub is identity-verified and reviewed by the people they've worked with."
+            description="Ordered by rating and sessions delivered, with every figure taken straight from the directory."
             action={<Button to="/consultants" variant="outline">View all</Button>}
           />
           <Container className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">

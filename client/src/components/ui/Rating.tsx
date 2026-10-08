@@ -1,8 +1,5 @@
-import { reviewCountSuffix } from '../../lib/reviews'
-
 interface RatingProps {
   value: number
-  reviewCount?: number
   size?: 'sm' | 'md'
   /** Hide the numeric value and show stars only. */
   compact?: boolean
@@ -19,9 +16,20 @@ const sizes = {
   md: 'text-sm gap-1.5',
 }
 
+/**
+ * A star rating and nothing else.
+ *
+ * This component deliberately has no `reviewCount` prop. It used to render a
+ * bare ` (128)` next to the number, and a parenthesised figure beside five stars
+ * is read as a written-review count everywhere except the one page that
+ * explains it — the profile, whose review list states how many are actually
+ * shown. On a card and on the hero the same number implied 128 written reviews
+ * exist, which they do not. Rather than label the lie, the number is gone:
+ * surfaces without visible reviews show session volume instead, which is real,
+ * and the count is stated once, where it is qualified.
+ */
 export default function Rating({
   value,
-  reviewCount,
   size = 'sm',
   compact = false,
   onInk = false,
@@ -52,11 +60,6 @@ export default function Rating({
       {!compact && (
         <span className={`font-medium ${onInk ? 'text-on-ink' : 'text-body'}`}>
           {value.toFixed(1)}
-          {reviewCountSuffix(reviewCount) !== '' && (
-            <span className={`font-normal ${onInk ? 'text-on-ink-muted' : 'text-muted'}`}>
-              {reviewCountSuffix(reviewCount)}
-            </span>
-          )}
         </span>
       )}
     </div>

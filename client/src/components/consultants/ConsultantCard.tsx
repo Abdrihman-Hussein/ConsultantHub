@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import Avatar from '../ui/Avatar'
 import Badge from '../ui/Badge'
 import Rating from '../ui/Rating'
+import { countLabel } from '../../lib/format'
 import type { Consultant } from '../../types'
 
 interface ConsultantCardProps {
@@ -11,6 +12,11 @@ interface ConsultantCardProps {
 /**
  * Smaller-scale sibling of `FeaturedConsultant` — same portrait-first shape
  * (portrait, name, credential line, rating, rate), light-surface styling.
+ *
+ * The trust signal under the rating is delivered sessions, not a review count.
+ * A bare `(128)` beside the stars implied 128 written reviews, and only three
+ * exist per consultant; the count itself is now stated once, qualified, in the
+ * profile's review list.
  */
 export default function ConsultantCard({ consultant }: ConsultantCardProps) {
   return (
@@ -36,8 +42,10 @@ export default function ConsultantCard({ consultant }: ConsultantCardProps) {
         {consultant.title} · {consultant.location}
       </p>
 
-      <div className="mt-3 text-xs text-muted">
-        <Rating value={consultant.rating} reviewCount={consultant.reviewCount} size="sm" />
+      <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+        <Rating value={consultant.rating} size="sm" />
+        <span aria-hidden="true" className="text-ink-200">·</span>
+        <span>{countLabel(consultant.sessions, 'session')} delivered</span>
       </div>
 
       <div className="mt-auto flex items-end justify-between gap-4 pt-5">

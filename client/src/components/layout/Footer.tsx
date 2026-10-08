@@ -2,32 +2,56 @@ import { Link } from 'react-router-dom'
 import Reveal from '../ui/Reveal'
 import InkBand from '../marketing/InkBand'
 
-const columns = [
+/**
+ * A footer link is either a real destination or a plain label.
+ *
+ * Every entry used to be a `Link`, which meant "Pricing" pointed at a
+ * `/#pricing` anchor that no longer exists, and the two legal rows plus the
+ * social icons pointed at `/#` — so clicking "Privacy policy" silently
+ * navigated to the homepage. A link that lands somewhere other than its label
+ * is worse than no link at all, so unimplemented destinations are modelled as
+ * `href: null` and rendered as non-navigational text.
+ */
+type FooterLink = { label: string; href: string | null }
+
+const columns: { title: string; links: FooterLink[] }[] = [
   {
     title: 'Product',
     links: [
-      { label: 'Browse consultants', to: '/consultants' },
-      { label: 'How it works', to: '/#how-it-works' },
-      { label: 'Pricing', to: '/#pricing' },
+      { label: 'Browse consultants', href: '/consultants' },
+      { label: 'How it works', href: '/#how-it-works' },
+      // Pricing is per-consultant and shown on every card and profile, so
+      // there is no page to link to and no anchor to invent.
+      { label: 'Pricing', href: null },
     ],
   },
   {
     title: 'Company',
     links: [
-      { label: 'Become a consultant', to: '/register' },
-      { label: 'Client dashboard', to: '/client/dashboard' },
-      { label: 'Contact support', to: '/#' },
+      { label: 'Become a consultant', href: '/become-a-consultant' },
+      { label: 'Client dashboard', href: '/client/dashboard' },
+      // No support desk exists in this build, so this is a label, not a link.
+      { label: 'Contact support', href: null },
     ],
   },
   {
     title: 'Legal',
     links: [
-      { label: 'Terms of service', to: '/#' },
-      { label: 'Privacy policy', to: '/#' },
+      // These documents have not been written. Inventing stub pages would be
+      // the same class of fabrication this redesign removed elsewhere.
+      { label: 'Terms of service', href: null },
+      { label: 'Privacy policy', href: null },
     ],
   },
 ]
 
+/**
+ * Brand marks for accounts this project does not have. They were `href="/#"`
+ * anchors, so every one of them navigated to the homepage — a link promising
+ * GitHub that lands on marketing copy. They are rendered as inert marks with
+ * the unavailable state stated, so nothing on the page lies about being
+ * clickable.
+ */
 const socials = [
   {
     label: 'X',
@@ -58,22 +82,29 @@ export default function Footer() {
               </span>
             </Link>
             <p className="mt-4 text-sm leading-relaxed text-on-ink-muted">
-              A trusted network of verified consultants. Find the right person and book a session
-              in minutes.
+              Consultants reviewed before they are listed, with rates and availability
+              published. Find the right person and book a session in minutes.
             </p>
 
+            {/* Rendered inert: no accounts exist to link to, so these carry no href and
+                no hover affordance that would promise a destination. */}
             <div className="mt-6 flex gap-2">
               {socials.map((social) => (
-                <a
+                <span
                   key={social.label}
-                  href="/#"
-                  aria-label={social.label}
-                  className="grid h-9 w-9 place-items-center rounded-full border border-ink-line text-on-ink-muted transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-on-ink hover:bg-ink-line hover:text-on-ink"
+                  title={`${social.label} — not available yet`}
+                  className="grid h-9 w-9 place-items-center rounded-full border border-ink-line/60 text-on-ink-muted/60"
                 >
-                  <svg viewBox="0 0 20 20" className="h-4 w-4" fill="currentColor">
+                  <svg
+                    viewBox="0 0 20 20"
+                    className="h-4 w-4"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
                     <path d={social.path} />
                   </svg>
-                </a>
+                  <span className="sr-only">{social.label} — not available yet</span>
+                </span>
               ))}
             </div>
           </div>
@@ -86,13 +117,21 @@ export default function Footer() {
               <ul className="space-y-2.5">
                 {column.links.map((link) => (
                   <li key={link.label}>
-                    <Link
-                      to={link.to}
-                      className="group inline-flex items-center text-sm text-on-ink-muted transition-colors hover:text-on-ink"
-                    >
-                      <span className="mr-0 h-px w-0 bg-accent-on-ink transition-all duration-300 ease-out group-hover:mr-2 group-hover:w-3" />
-                      {link.label}
-                    </Link>
+                    {link.href === null ? (
+                      // Not a destination, so not a link: no href, no focus
+                      // stop, no hover promise. The label stands for itself.
+                      <span className="inline-flex items-center text-sm text-on-ink-muted/70">
+                        {link.label}
+                      </span>
+                    ) : (
+                      <Link
+                        to={link.href}
+                        className="group inline-flex items-center text-sm text-on-ink-muted transition-colors hover:text-on-ink"
+                      >
+                        <span className="mr-0 h-px w-0 bg-accent-on-ink transition-all duration-300 ease-out group-hover:mr-2 group-hover:w-3" />
+                        {link.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>

@@ -87,7 +87,12 @@ export default function ClientAppointments() {
 
   return (
     <>
-      <InkBand flush noGlow className="pb-10">
+      {/* Continues the layout's ink header rather than starting a new band: this
+          sits directly beneath the page title, so it shares the header's
+          padding scale rather than adding a second `pb-10`. Previously the two
+          stacked into ~88px of unbroken ink between the title and these tabs,
+          roughly twice the density of `/client/dashboard`. */}
+      <InkBand flush noGlow className="pb-6">
         <div
           role="group"
           aria-label="Filter appointments by status"
