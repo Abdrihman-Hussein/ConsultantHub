@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { consultants } from '../data'
 import { useApp } from '../context/AppContext'
+import { countLabel } from '../lib/format'
 import {
   countActiveFilters,
   defaultFilters,
@@ -115,8 +116,7 @@ export default function Consultants() {
           <div>
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-5">
               <p aria-live="polite" className="text-sm text-muted">
-                <span className="font-medium text-body">{results.length}</span>{' '}
-                {results.length === 1 ? 'result' : 'results'}
+                <span className="font-medium text-body">{countLabel(results.length, 'result')}</span>
                 {results.length > 0 && (
                   <span className="text-subtle"> · sorted by {sortLabels[filters.sort].toLowerCase()}</span>
                 )}
@@ -233,7 +233,7 @@ export default function Consultants() {
 
             {/* Surfaced so a demo does not imply bookings are enforced. */}
             <p className="mt-12 text-center text-xs text-subtle">
-              {appointments.length} booking{appointments.length === 1 ? '' : 's'} in this browser ·{' '}
+              {countLabel(appointments.length, 'booking')} in this browser ·{' '}
               <Link to="/login" className="underline underline-offset-4 hover:text-muted">
                 log in to manage yours
               </Link>

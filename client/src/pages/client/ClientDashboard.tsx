@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
 import { consultants } from '../../data'
-import { formatDate, relativeDay, todayISO, formatPrice } from '../../lib/format'
+import { formatDate, relativeDay, todayISO, formatPrice, countLabel } from '../../lib/format'
 import type { Appointment } from '../../types'
 import Container from '../../components/ui/Container'
 import Button from '../../components/ui/Button'
@@ -91,7 +91,7 @@ export default function ClientDashboard() {
           </h1>
           <p className="mt-3 text-base text-muted">
             {upcoming.length > 0
-              ? `You have ${upcoming.length} upcoming ${upcoming.length === 1 ? 'session' : 'sessions'}.`
+              ? `You have ${countLabel(upcoming.length, 'upcoming session')}.`
               : 'No sessions booked yet.'}
           </p>
         </Reveal>

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { consultants, specializations } from '../data'
 import { featuredOrder, nextIndex } from '../lib/featured'
+import { countLabel } from '../lib/format'
 import Container from '../components/ui/Container'
 import SectionHeading from '../components/ui/SectionHeading'
 import Button from '../components/ui/Button'
@@ -160,10 +161,7 @@ export default function Home() {
                   {specialty.name}
                 </span>
                 <span className="flex items-center gap-6 text-sm text-muted">
-                  <span>
-                    {specialty.count}{' '}
-                    {specialty.count === 1 ? 'consultant' : 'consultants'}
-                  </span>
+                  <span>{countLabel(specialty.count, 'consultant')}</span>
                   <svg
                     viewBox="0 0 20 20"
                     className="h-4 w-4 text-accent-600 transition-transform duration-300 ease-spring group-hover:translate-x-1"
