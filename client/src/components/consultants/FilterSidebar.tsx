@@ -10,6 +10,8 @@ interface FilterSidebarProps {
   suggestions: string[]
   onChange: (filters: Filters) => void
   onReset: () => void
+  /** Prefix for control ids so inline and sheet copies never collide. */
+  idPrefix?: string
 }
 
 const rateFloor = 50
@@ -64,6 +66,7 @@ export default function FilterSidebar({
   suggestions,
   onChange,
   onReset,
+  idPrefix = 'filter',
 }: FilterSidebarProps) {
   const set = <K extends keyof Filters>(key: K, value: Filters[K]) =>
     onChange({ ...filters, [key]: value })
@@ -138,7 +141,7 @@ export default function FilterSidebar({
 
       <Section title="Max hourly rate">
         <div className="mb-2 flex items-baseline justify-between">
-          <label htmlFor="filter-rate" className="text-sm text-muted">
+          <label htmlFor={`${idPrefix}-rate`} className="text-sm text-muted">
             Up to
           </label>
           <span className="text-sm font-medium text-body">
@@ -146,7 +149,7 @@ export default function FilterSidebar({
           </span>
         </div>
         <input
-          id="filter-rate"
+          id={`${idPrefix}-rate`}
           type="range"
           min={rateFloor}
           max={rateCeiling}
@@ -171,11 +174,11 @@ export default function FilterSidebar({
       </div>
 
       <div className="border-t border-line pt-5">
-        <label htmlFor="filter-sort" className="eyebrow mb-3 block">
+        <label htmlFor={`${idPrefix}-sort`} className="eyebrow mb-3 block">
           Sort by
         </label>
         <select
-          id="filter-sort"
+          id={`${idPrefix}-sort`}
           value={filters.sort}
           onChange={(event) => set('sort', event.target.value as SortKey)}
           className="w-full cursor-pointer rounded-xl border border-line-strong bg-surface px-3.5 py-2.5 text-sm transition-all duration-200 hover:border-ink-400 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/20"

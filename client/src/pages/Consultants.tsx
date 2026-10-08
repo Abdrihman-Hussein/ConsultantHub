@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { consultants } from '../data'
 import { useApp } from '../context/AppContext'
@@ -17,6 +17,7 @@ import Reveal from '../components/ui/Reveal'
 import EmptyState from '../components/ui/EmptyState'
 import ConsultantCard from '../components/consultants/ConsultantCard'
 import FilterSidebar from '../components/consultants/FilterSidebar'
+import SortSelect from '../components/consultants/SortSelect'
 
 const specialties = Array.from(new Set(consultants.map((c) => c.specialization))).sort()
 
@@ -78,6 +79,54 @@ export default function Consultants() {
     })
   }
 
+  const mobileTriggerRef = useRef<HTMLButtonElement | null>(null)
+  const sheetRef = useRef<HTMLDivElement>(null)
+  /** Tracks whether the sheet was open, so focus only returns on close. */
+  const sheetWasOpen = useRef(false)
+
+  /* Focus trap + Escape while the sheet is open. */
+  useEffect(() => {
+    if (!mobileFiltersOpen) return
+    sheetWasOpen.current = true
+    const sheet = sheetRef.current
+    if (!sheet) return
+
+    const focusableSelector =
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    sheet.querySelector<HTMLElement>(focusableSelector)?.focus()
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        setMobileFiltersOpen(false)
+        return
+      }
+      if (event.key !== 'Tab') return
+      const items = Array.from(sheet.querySelectorAll<HTMLElement>(focusableSelector))
+      if (items.length === 0) return
+      const first = items[0]
+      const last = items[items.length - 1]
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [mobileFiltersOpen])
+
+  /* Return focus to the trigger button when the sheet closes. */
+  useEffect(() => {
+    if (!mobileFiltersOpen && sheetWasOpen.current) {
+      sheetWasOpen.current = false
+      mobileTriggerRef.current?.focus()
+    }
+  }, [mobileFiltersOpen])
+
   const filterPanel = (
     <FilterSidebar
       filters={filters}
@@ -108,45 +157,36 @@ export default function Consultants() {
       </section>
 
       <Container className="py-10 lg:py-12">
-        <div className="lg:grid lg:grid-cols-[264px_1fr] lg:gap-12">
-          <aside className="hidden lg:block">
+        <div className="md:grid md:grid-cols-[264px_1fr] md:gap-12">
+          <aside className="hidden md:block">
             <div className="sticky top-24">{filterPanel}</div>
           </aside>
 
           <div>
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-5">
               <p aria-live="polite" className="text-sm text-muted">
-                <span className="font-medium text-body">{countLabel(results.length, 'result')}</span>
+                <span className="font-medium text-body">
+                  {countLabel(results.length, 'consultant')}
+                </span>
                 {results.length > 0 && (
                   <span className="text-subtle"> · sorted by {sortLabels[filters.sort].toLowerCase()}</span>
                 )}
               </p>
 
               <div className="flex items-center gap-2">
-                {/* Compact sort control for small screens. */}
-                <label htmlFor="sort-compact" className="sr-only">
-                  Sort results
-                </label>
-                <select
-                  id="sort-compact"
+                <SortSelect
                   value={filters.sort}
-                  onChange={(event) =>
-                    setFilters((current) => ({ ...current, sort: event.target.value as Filters['sort'] }))
-                  }
-                  className="cursor-pointer rounded-full border border-line-strong bg-surface px-3.5 py-2 text-xs text-body transition-colors hover:border-accent-400 lg:hidden"
-                >
-                  {Object.entries(sortLabels).map(([key, label]) => (
-                    <option key={key} value={key}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(key) => setFilters((current) => ({ ...current, sort: key }))}
+                />
 
                 <Button
                   variant="outline"
                   size="sm"
-                  className="lg:hidden"
-                  onClick={() => setMobileFiltersOpen((prev) => !prev)}
+                  className="md:hidden"
+                  onClick={(event) => {
+                    mobileTriggerRef.current = event.currentTarget
+                    setMobileFiltersOpen(true)
+                  }}
                   aria-expanded={mobileFiltersOpen}
                 >
                   Filters
@@ -193,21 +233,48 @@ export default function Consultants() {
               </div>
             )}
 
-            {/* Height animates so the panel does not snap the grid around. */}
-            <div
-              className={`grid overflow-hidden transition-all duration-500 ease-out lg:hidden ${
-                mobileFiltersOpen ? 'mt-6 max-h-[2400px] opacity-100' : 'max-h-0 opacity-0'
-              }`}
-            >
-              <div className="rounded-2xl border border-line bg-surface p-6">{filterPanel}</div>
-            </div>
+            {/* Bottom sheet on small screens; inline sidebar above `md`. */}
+            {mobileFiltersOpen && (
+              <div className="fixed inset-0 z-50 md:hidden">
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 bg-ink-950/40 transition-opacity duration-300 ease-out motion-reduce:transition-none"
+                  onClick={() => setMobileFiltersOpen(false)}
+                />
+                <div
+                  ref={sheetRef}
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="Filters"
+                  className="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-3xl border-t border-line bg-surface-subtle p-6 shadow-2xl"
+                >
+                  <div aria-hidden="true" className="mx-auto mb-5 h-1 w-10 rounded-full bg-ink-200" />
+                  <FilterSidebar
+                    filters={filters}
+                    specializations={specialties}
+                    suggestions={suggestions}
+                    onChange={setFilters}
+                    onReset={() => setFilters(defaultFilters)}
+                    idPrefix="sheet"
+                  />
+                  <Button className="mt-6 w-full" onClick={() => setMobileFiltersOpen(false)}>
+                    Show {countLabel(results.length, 'consultant')}
+                  </Button>
+                </div>
+              </div>
+            )}
 
             {results.length > 0 ? (
               <div className="mt-8 grid gap-6 md:grid-cols-2">
                 {results.map(({ consultant }, index) => (
                   <Reveal key={consultant.id} delay={Math.min(index, 6) * 70}>
-                    <div className="h-full">
-                      <ConsultantCard consultant={consultant} />
+                    <div className="flex h-full flex-col">
+                      <div className="min-h-0 flex-1">
+                        <ConsultantCard consultant={consultant} />
+                      </div>
+                      <p className="mt-2 px-1 text-xs text-subtle">
+                        {countLabel(consultant.sessions, 'session')} completed
+                      </p>
                     </div>
                   </Reveal>
                 ))}
