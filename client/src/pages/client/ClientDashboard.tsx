@@ -232,7 +232,7 @@ function AppointmentRow({ appointment, cancelling, onCancel }: RowProps) {
           {consultant ? (
             <Link
               to={`/consultants/${consultant.id}`}
-              className="text-body underline underline-offset-2 hover:text-accent-600"
+              className="text-body underline underline-offset-2 hover:text-accent-600 truncate block"
             >
               {consultant.name}
             </Link>

@@ -29,7 +29,7 @@ export default function ConsultantCard({ consultant }: ConsultantCardProps) {
         )}
       </div>
 
-      <h3 className="mt-4 font-display text-xl text-ink-950 transition-colors duration-300 group-hover:text-accent-600">
+      <h3 className="mt-4 font-display text-xl text-ink-950 truncate transition-colors duration-300 group-hover:text-accent-600">
         {consultant.name}
       </h3>
       <p className="mt-1 text-xs leading-relaxed text-muted">

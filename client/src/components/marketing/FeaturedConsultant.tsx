@@ -29,18 +29,18 @@ export default function FeaturedConsultant({ consultant }: FeaturedConsultantPro
 
         <div className="min-w-0 flex-1">
           <h2 className="truncate font-display text-xl text-on-ink">{consultant.name}</h2>
-          <p className="mt-1 text-xs leading-relaxed text-on-ink-muted">
+          <p className="mt-1 text-xs leading-relaxed text-on-ink-muted truncate">
             {consultant.title} · {consultant.location}
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-on-ink-muted">
             <Rating value={consultant.rating} reviewCount={consultant.reviewCount} size="sm" onInk />
-            <span aria-hidden="true" className="text-ink-line">|</span>
-            <span>responds {consultant.responseTime}</span>
+            <span aria-hidden="true" className="text-ink-line shrink-0">|</span>
+            <span className="truncate">responds {consultant.responseTime}</span>
           </div>
         </div>
       </div>
 
-      <p className="mt-5 border-l-2 border-accent-on-ink pl-4 text-sm leading-relaxed text-on-ink/85">
+      <p className="mt-5 border-l-2 border-accent-on-ink pl-4 text-sm leading-relaxed text-on-ink/85 line-clamp-3">
         {bioLine(consultant.bio, consultant.title)}
       </p>
 

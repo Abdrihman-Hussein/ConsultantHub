@@ -154,7 +154,7 @@ export default function ClientAppointments() {
                           {appointment.status.toLowerCase()}
                         </Badge>
                       </div>
-                      <p className="mt-1 text-sm text-muted">{appointment.consultantName}</p>
+                      <p className="mt-1 text-sm text-muted truncate">{appointment.consultantName}</p>
                       <p className="mt-1.5 text-sm text-muted">
                         {formatDate(appointment.date)} · {appointment.startTime} –{' '}
                         {appointment.endTime} ·{' '}
