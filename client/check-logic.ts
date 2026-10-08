@@ -4,6 +4,7 @@
  */
 import { isSlotTaken, generateSlots, bookedTimes, upcomingDays } from './src/lib/booking'
 import { searchConsultants, defaultFilters, countActiveFilters } from './src/lib/search'
+import { bioLine, featuredOrder, nextIndex } from './src/lib/featured'
 import { consultants } from './src/data'
 
 let failures = 0
@@ -204,6 +205,60 @@ check(
   })(),
 )
 check('active filter count', countActiveFilters({ ...base, verifiedOnly: true, search: 'a' }) === 2)
+
+console.log('\nfeatured: bio line');
+check(
+  'first sentence only',
+  bioLine('Cloud architecture work. Previously led platform teams.', 'x') ===
+    'Cloud architecture work.',
+);
+check(
+  'a bio with no terminator is returned whole',
+  bioLine('Forecasting and valuation for early stage companies', 'x') ===
+    'Forecasting and valuation for early stage companies',
+);
+check('a blank bio falls back', bioLine('   ', 'Systems Engineering') === 'Systems Engineering');
+check('a single-sentence bio is unchanged', bioLine('Only one sentence.', 'x') === 'Only one sentence.');
+check(
+  'a decimal point does not split the sentence',
+  bioLine('Sells at 4.9 average. Second sentence here.', 'x') === 'Sells at 4.9 average.',
+);
+check(
+  'abbreviations do not split the sentence',
+  bioLine('Focused on U.S. tax. Also estates.', 'x') === 'Focused on U.S. tax.',
+);
+
+console.log('\nfeatured: ordering');
+check(
+  'highest rated leads',
+  featuredOrder(consultants)[0].name === 'Omar Nur',
+  featuredOrder(consultants)[0].name,
+);
+check(
+  'rating ties break on sessions',
+  (() => {
+    const tied = [
+      { ...consultants[0], id: 'a', rating: 5, sessions: 10 },
+      { ...consultants[0], id: 'b', rating: 5, sessions: 90 },
+    ];
+    return featuredOrder(tied)[0].id === 'b';
+  })(),
+);
+check(
+  'ordering does not mutate its input',
+  (() => {
+    const before = consultants.map((c) => c.id).join();
+    featuredOrder(consultants);
+    return consultants.map((c) => c.id).join() === before;
+  })(),
+);
+check('a single-consultant directory is returned as-is', featuredOrder([consultants[0]]).length === 1);
+
+console.log('\nfeatured: rotation');
+check('next wraps to the start', nextIndex(5, 6) === 0);
+check('next advances', nextIndex(0, 6) === 1);
+check('a one-item rotation does not move', nextIndex(0, 1) === 0);
+check('an empty rotation does not move', nextIndex(0, 0) === 0);
 
 console.log('\ndesign tokens');
 // Guards the spec's binding decision: terracotta is unreadable on ink, so the
