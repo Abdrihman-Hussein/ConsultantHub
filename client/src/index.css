@@ -47,6 +47,15 @@
     @apply outline-none ring-2 ring-accent-500/45 ring-offset-2 ring-offset-surface-subtle;
   }
 
+  /*
+   * Inside an ink band the cream-tuned ring above is invisible. InkBand adds
+   * the `on-ink` class to its own root, so descendants re-tint the ring and
+   * its offset to the dark palette.
+   */
+  .on-ink :focus-visible {
+    @apply ring-accent-on-ink/70 ring-offset-surface-ink;
+  }
+
   /* Remove the number-input spinners from the rate slider. */
   input[type='range'] {
     -webkit-appearance: none;

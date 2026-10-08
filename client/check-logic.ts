@@ -8,6 +8,34 @@ import { consultants } from './src/data'
 
 let failures = 0
 
+/**
+ * WCAG 2.1 relative luminance. Used to pin the ink-surface palette: the
+ * redesign introduces cream-on-ink typography, and the token values have to
+ * clear AA against the ink background rather than merely looking right.
+ */
+function luminance(hex: string): number {
+  const full = hex.replace('#', '')
+  const value =
+    full.length === 3
+      ? full
+          .split('')
+          .map((c) => c + c)
+          .join('')
+      : full
+
+  const [r, g, b] = [0, 2, 4].map((offset) => {
+    const channel = parseInt(value.slice(offset, offset + 2), 16) / 255
+    return channel <= 0.03928 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4
+  })
+
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b
+}
+
+function contrast(a: string, b: string): number {
+  const [lighter, darker] = [luminance(a), luminance(b)].sort((x, y) => y - x)
+  return (lighter + 0.05) / (darker + 0.05)
+}
+
 function check(name: string, condition: boolean, detail = '') {
   if (condition) {
     console.log(`  PASS  ${name}`)
@@ -176,6 +204,19 @@ check(
   })(),
 )
 check('active filter count', countActiveFilters({ ...base, verifiedOnly: true, search: 'a' }) === 2)
+
+console.log('\ndesign tokens');
+// Guards the spec's binding decision: terracotta is unreadable on ink, so the
+// dark bands need their own accent rather than reusing `accent-500`.
+check(
+  'accent-on-ink clears AA on the ink surface',
+  contrast('#E8A05C', '#2A2118') >= 4.5,
+  contrast('#E8A05C', '#2A2118').toFixed(2),
+);
+check('on-ink clears AA on ink', contrast('#F9F1E8', '#2A2118') >= 4.5);
+check('on-ink-muted clears AA on ink', contrast('#B79E88', '#2A2118') >= 4.5);
+check('gold-on-ink clears AA on ink', contrast('#E8C88A', '#2A2118') >= 4.5);
+check('accent-500 on ink is NOT used', contrast('#C2622D', '#2A2118') < 4.5);
 
 console.log(`\n${failures === 0 ? 'All checks passed.' : `${failures} check(s) failed.`}`)
 if (failures > 0) process.exit(1)
