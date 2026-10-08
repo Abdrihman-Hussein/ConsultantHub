@@ -4,7 +4,7 @@
  */
 import { isSlotTaken, generateSlots, bookedTimes, upcomingDays } from './src/lib/booking'
 import { searchConsultants, defaultFilters, countActiveFilters } from './src/lib/search'
-import { bioLine, featuredOrder, nextIndex } from './src/lib/featured'
+import { bioLine, featuredOrder, nextIndex, rowConsultants } from './src/lib/featured'
 import { avgRating, reviewsSummary } from './src/lib/reviews'
 import { countLabel } from './src/lib/format'
 import { consultants, getConsultant, reviews, getReviewsFor } from './src/data'
@@ -267,6 +267,25 @@ check('singular', countLabel(1, 'consultant') === '1 consultant');
 check('plural', countLabel(6, 'consultant') === '6 consultants');
 check('zero is plural', countLabel(0, 'review') === '0 reviews');
 check('irregular plural', countLabel(2, 'person', 'people') === '2 people');
+
+console.log('\nfeatured: row');
+const rowOrder = featuredOrder(consultants);
+check(
+  'the excluded consultant is absent',
+  rowConsultants(rowOrder, rowOrder[0].id, 3).every((c) => c.id !== rowOrder[0].id),
+);
+check(
+  'result is exactly count long when enough remain',
+  rowConsultants(rowOrder, rowOrder[0].id, 3).length === 3,
+);
+check(
+  'not padded when fewer than count remain',
+  rowConsultants(rowOrder.slice(0, 2), rowOrder[0].id, 3).length === 1,
+);
+check(
+  'order is preserved from the input',
+  rowConsultants(rowOrder, rowOrder[0].id, 3).map((c) => c.id).join(',') === rowOrder.slice(1, 4).map((c) => c.id).join(','),
+);
 
 console.log('\nreviews');
 check('every seeded review belongs to a real consultant', reviews.every((r) => getConsultant(r.consultantId)));

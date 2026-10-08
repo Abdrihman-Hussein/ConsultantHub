@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { consultants, specializations } from '../data'
-import { featuredOrder, nextIndex } from '../lib/featured'
+import { featuredOrder, nextIndex, rowConsultants } from '../lib/featured'
 import { countLabel } from '../lib/format'
 import Container from '../components/ui/Container'
 import SectionHeading from '../components/ui/SectionHeading'
@@ -82,10 +82,7 @@ export default function Home() {
 
   // The row must not show whoever is in the hero right now, or the page reads
   // as a mistake rather than a rotation.
-  const featured = useMemo(() => {
-    const rest = order.filter((consultant) => consultant.id !== current.id)
-    return [...rest.slice(0, 2), ...order.filter((c) => c.id === current.id).slice(0, 1)]
-  }, [order, current])
+  const featured = useMemo(() => rowConsultants(order, current.id, 3), [order, current])
 
   // Derived from the directory so no figure on the page can overstate it.
   const count = Math.max(consultants.length, 1)

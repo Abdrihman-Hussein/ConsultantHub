@@ -57,6 +57,10 @@ export function featuredOrder(consultants: Consultant[]): Consultant[] {
   );
 }
 
+export function rowConsultants(order: Consultant[], excludeId: string, count: number): Consultant[] {
+  return order.filter((consultant) => consultant.id !== excludeId).slice(0, count);
+}
+
 /**
  * The next rotation index. Stays put when there is nothing to rotate to, so a
  * one-consultant directory does not loop and an empty one does not divide by
