@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
-import Container from '../ui/Container'
 import Reveal from '../ui/Reveal'
+import InkBand from '../marketing/InkBand'
 
 const columns = [
   {
@@ -45,72 +45,70 @@ const socials = [
 
 export default function Footer() {
   return (
-    <footer className="border-t border-line bg-surface">
-      <Container className="py-16">
-        <div className="grid gap-12 md:grid-cols-[1.5fr_repeat(3,1fr)]">
-          <Reveal>
-            <div className="max-w-xs">
-              <Link to="/" className="group inline-flex items-center gap-2.5">
-                <span className="grid h-8 w-8 place-items-center rounded-full bg-accent-500 text-xs font-semibold text-white transition-transform duration-300 ease-spring group-hover:scale-110">
-                  C
-                </span>
-                <span className="text-[15px] font-semibold tracking-tight text-ink-950">
-                  ConsultantHub
-                </span>
-              </Link>
-              <p className="mt-4 text-sm leading-relaxed text-muted">
-                A trusted network of verified consultants. Find the right person and book a session
-                in minutes.
-              </p>
-
-              <div className="mt-6 flex gap-2">
-                {socials.map((social) => (
-                  <a
-                    key={social.label}
-                    href="/#"
-                    aria-label={social.label}
-                    className="grid h-9 w-9 place-items-center rounded-full border border-line text-muted transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-500 hover:bg-accent-50 hover:text-accent-600"
-                  >
-                    <svg viewBox="0 0 20 20" className="h-4 w-4" fill="currentColor">
-                      <path d={social.path} />
-                    </svg>
-                  </a>
-                ))}
-              </div>
-            </div>
-          </Reveal>
-
-          {columns.map((column, index) => (
-            <Reveal key={column.title} delay={(index + 1) * 70}>
-              <div>
-                <h3 className="eyebrow mb-4">{column.title}</h3>
-                <ul className="space-y-2.5">
-                  {column.links.map((link) => (
-                    <li key={link.label}>
-                      <Link
-                        to={link.to}
-                        className="group inline-flex items-center text-sm text-muted transition-colors hover:text-ink-950"
-                      >
-                        <span className="mr-0 h-px w-0 bg-accent-500 transition-all duration-300 ease-out group-hover:mr-2 group-hover:w-3" />
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-
-        <Reveal delay={120}>
-          <div className="mt-14 flex flex-col gap-3 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-xs text-subtle">
-              © {new Date().getFullYear()} ConsultantHub. All rights reserved.
+    <InkBand as="footer" className="border-t border-ink-line">
+      <div className="grid gap-12 md:grid-cols-[1.5fr_repeat(3,1fr)]">
+        <Reveal>
+          <div className="max-w-xs">
+            <Link to="/" className="group inline-flex items-center gap-2.5">
+              <span className="grid h-8 w-8 place-items-center rounded-full bg-accent-on-ink text-xs font-semibold text-ink-950 transition-transform duration-300 ease-spring group-hover:scale-110">
+                C
+              </span>
+              <span className="text-[15px] font-semibold tracking-tight text-on-ink">
+                ConsultantHub
+              </span>
+            </Link>
+            <p className="mt-4 text-sm leading-relaxed text-on-ink-muted">
+              A trusted network of verified consultants. Find the right person and book a session
+              in minutes.
             </p>
-            <p className="text-xs text-subtle">MIT licensed.</p>
+
+            <div className="mt-6 flex gap-2">
+              {socials.map((social) => (
+                <a
+                  key={social.label}
+                  href="/#"
+                  aria-label={social.label}
+                  className="grid h-9 w-9 place-items-center rounded-full border border-ink-line text-on-ink-muted transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-on-ink hover:bg-ink-line hover:text-on-ink"
+                >
+                  <svg viewBox="0 0 20 20" className="h-4 w-4" fill="currentColor">
+                    <path d={social.path} />
+                  </svg>
+                </a>
+              ))}
+            </div>
           </div>
         </Reveal>
-      </Container>
-    </footer>
+
+        {columns.map((column, index) => (
+          <Reveal key={column.title} delay={(index + 1) * 70}>
+            <div>
+              <h3 className="eyebrow mb-4 text-on-ink-muted">{column.title}</h3>
+              <ul className="space-y-2.5">
+                {column.links.map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      to={link.to}
+                      className="group inline-flex items-center text-sm text-on-ink-muted transition-colors hover:text-on-ink"
+                    >
+                      <span className="mr-0 h-px w-0 bg-accent-on-ink transition-all duration-300 ease-out group-hover:mr-2 group-hover:w-3" />
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+
+      <Reveal delay={120}>
+        <div className="mt-14 flex flex-col gap-3 border-t border-ink-line pt-8 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-on-ink-muted">
+            © {new Date().getFullYear()} ConsultantHub. All rights reserved.
+          </p>
+          <p className="text-xs text-on-ink-muted">MIT licensed.</p>
+        </div>
+      </Reveal>
+    </InkBand>
   )
 }
