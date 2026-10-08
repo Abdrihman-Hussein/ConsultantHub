@@ -1,101 +1,100 @@
-import type { ReactNode } from 'react'
-import Container from '../ui/Container'
+import Button from '../ui/Button'
 import Reveal from '../ui/Reveal'
-import CountUp from '../ui/CountUp'
-
-interface ProofPoint {
-  value: number
-  suffix?: string
-  label: string
-  decimals?: number
-}
+import InkBand from './InkBand'
+import FeaturedConsultant from './FeaturedConsultant'
+import type { Consultant } from '../../types'
 
 interface HeroProps {
-  eyebrow: string
-  title: ReactNode
-  description: string
-  primaryAction: ReactNode
-  secondaryAction?: ReactNode
-  aside?: ReactNode
-  /**
-   * Figures shown under the hero. Passed in rather than hardcoded so they can be
-   * derived from the directory instead of invented.
-   */
-  proof?: ProofPoint[]
+  /** The consultant currently occupying the band. */
+  consultant: Consultant
+  /** Advance the rotation. Wired to the manual control in `Home`. */
+  onNext: () => void
+  /** Zero-based index of `consultant` within the rotation order. */
+  position: number
+  /** How many consultants are in the rotation. */
+  total: number
 }
 
-export default function Hero({
-  eyebrow,
-  title,
-  description,
-  primaryAction,
-  secondaryAction,
-  aside,
-  proof = [],
-}: HeroProps) {
+/**
+ * The opening band.
+ *
+ * Deliberately holds two things only: the promise, and one person who makes
+ * the promise credible. The `aria-live` region announces each rotation without
+ * moving focus, and the dots expose the same navigation without the interval —
+ * so a keyboard or reduced-motion user reaches every consultant either way.
+ */
+export default function Hero({ consultant, onNext, position, total }: HeroProps) {
   return (
-    <section className="relative overflow-hidden border-b border-line bg-surface">
-      {/* Soft ambient wash — terracotta tint bleeding in from the top right. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -right-32 -top-40 h-[32rem] w-[32rem] rounded-full bg-accent-100/50 blur-3xl"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -left-40 top-1/3 h-96 w-96 animate-blob bg-gold-300/20 blur-3xl"
-      />
-
-      <Container className="relative grid items-center gap-14 py-20 lg:grid-cols-[1.15fr_1fr] lg:py-28">
+    <InkBand className="border-b border-ink-line">
+      <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
         <div>
           <Reveal>
-            <p className="eyebrow mb-5">{eyebrow}</p>
+            <p className="eyebrow text-gold-on-ink">Independent expertise</p>
           </Reveal>
 
           <Reveal delay={80}>
-            <h1 className="font-display text-display-xl text-ink-950">{title}</h1>
+            <h1 className="mt-5 font-display text-display-2xl text-on-ink">
+              Find your person.
+              <br />
+              <span className="text-accent-on-ink">Move forward.</span>
+            </h1>
           </Reveal>
 
           <Reveal delay={160}>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">{description}</p>
+            <p className="mt-7 max-w-xl text-lg leading-relaxed text-on-ink-muted">
+              Good advice changes things. Find a consultant who understands where you
+              are, read what they actually know, and book a clear next step.
+            </p>
           </Reveal>
 
           <Reveal delay={240}>
             <div className="mt-9 flex flex-wrap items-center gap-3">
-              {primaryAction}
-              {secondaryAction}
+              <Button to="/consultants" variant="onInk" size="lg">
+                Explore consultants
+              </Button>
+              <Button to="/become-a-consultant" variant="onInkOutline" size="lg">
+                For consultants
+              </Button>
             </div>
           </Reveal>
-
-          {proof.length > 0 && (
-            <Reveal delay={320}>
-              <dl
-                className={`mt-12 grid gap-6 border-t border-line pt-8 ${
-                  proof.length === 3 ? 'max-w-lg grid-cols-3' : 'grid-cols-2'
-                }`}
-              >
-                {proof.map((stat) => (
-                  <div key={stat.label}>
-                    <dd className="font-display text-2xl text-ink-950">
-                      <CountUp
-                        value={stat.value}
-                        suffix={stat.suffix}
-                        decimals={stat.decimals ?? 0}
-                      />
-                    </dd>
-                    <dt className="mt-1 text-xs leading-snug text-muted">{stat.label}</dt>
-                  </div>
-                ))}
-              </dl>
-            </Reveal>
-          )}
         </div>
 
-        {aside && (
-          <Reveal delay={200} distance={24}>
-            {aside}
-          </Reveal>
-        )}
-      </Container>
-    </section>
+        <Reveal delay={200} distance={24}>
+          {/*
+            Everything below changes as the rotation advances. `aria-live`
+            announces it; `aria-atomic` means the whole card is read as one
+            update rather than three disconnected fragments.
+          */}
+          <div aria-live="polite" aria-atomic="true">
+            <FeaturedConsultant consultant={consultant} />
+          </div>
+
+          <div className="mt-6 flex items-center gap-4">
+            <div className="flex items-center gap-2" role="group" aria-label="Featured consultant">
+              {Array.from({ length: total }, (_, index) => (
+                <span
+                  key={index}
+                  aria-current={index === position}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    index === position ? 'w-6 bg-accent-on-ink' : 'w-1.5 bg-on-ink/25'
+                  }`}
+                />
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={onNext}
+              className="text-xs font-medium text-on-ink-muted underline-offset-4 transition-colors hover:text-on-ink hover:underline"
+            >
+              Next consultant
+              <span className="sr-only">
+                {` (${position + 1} of ${total} featured)`}
+              </span>
+            </button>
+          </div>
+        </Reveal>
+      </div>
+    </InkBand>
   )
 }
