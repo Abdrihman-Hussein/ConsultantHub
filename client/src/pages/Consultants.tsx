@@ -81,6 +81,8 @@ export default function Consultants() {
 
   const mobileTriggerRef = useRef<HTMLButtonElement | null>(null)
   const sheetRef = useRef<HTMLDivElement>(null)
+  /** Fallback focus target when the trigger is hidden (viewport ≥ md). */
+  const headingRef = useRef<HTMLHeadingElement>(null)
   /** Tracks whether the sheet was open, so focus only returns on close. */
   const sheetWasOpen = useRef(false)
 
@@ -106,10 +108,22 @@ export default function Consultants() {
       if (items.length === 0) return
       const first = items[0]
       const last = items[items.length - 1]
-      if (event.shiftKey && document.activeElement === first) {
+      const activeEl = document.activeElement as HTMLElement | null
+      const insideSheet = activeEl !== null && sheet.contains(activeEl)
+      const onAFocusable = activeEl !== null && items.includes(activeEl)
+
+      // If focus is outside the sheet (e.g. a click on the overlay padding
+      // made <body> active), or is inside but not on a focusable control
+      // (e.g. the sheet container itself, which is only programmatically
+      // focusable), wrap unconditionally instead of letting Tab escape
+      // into the page behind the dialog.
+      if (!insideSheet || !onAFocusable) {
+        event.preventDefault()
+        ;(event.shiftKey ? last : first).focus()
+      } else if (event.shiftKey && activeEl === first) {
         event.preventDefault()
         last.focus()
-      } else if (!event.shiftKey && document.activeElement === last) {
+      } else if (!event.shiftKey && activeEl === last) {
         event.preventDefault()
         first.focus()
       }
@@ -130,11 +144,19 @@ export default function Consultants() {
     return () => media.removeEventListener('change', onChange)
   }, [])
 
-  /* Return focus to the trigger button when the sheet closes. */
+  /* Return focus to the trigger button when the sheet closes. The trigger is
+   * md:hidden, so when the sheet was closed by the desktop-resize reset it is
+   * display:none — focusing it would silently no-op and strand keyboard users
+   * at <body>. Guard for visibility and fall back to the page heading. */
   useEffect(() => {
     if (!mobileFiltersOpen && sheetWasOpen.current) {
       sheetWasOpen.current = false
-      mobileTriggerRef.current?.focus()
+      const trigger = mobileTriggerRef.current
+      if (trigger && trigger.offsetParent !== null) {
+        trigger.focus()
+      } else {
+        headingRef.current?.focus()
+      }
     }
   }, [mobileFiltersOpen])
 
@@ -158,7 +180,7 @@ export default function Consultants() {
         <Container className="relative py-14">
           <Reveal>
             <p className="eyebrow mb-3">Directory</p>
-            <h1 className="font-display text-display-lg text-ink-950">Browse consultants</h1>
+            <h1 ref={headingRef} tabIndex={-1} className="font-display text-display-lg text-ink-950 focus:outline-none">Browse consultants</h1>
             <p className="mt-4 max-w-xl text-base leading-relaxed text-muted">
               {consultants.length} consultants across {specialties.length} specialties. Search by
               name, expertise, or city.
