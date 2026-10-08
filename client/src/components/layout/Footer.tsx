@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom'
+import { consultants } from '../../data'
+import { identityCheckSentence } from '../../lib/trust'
 import Reveal from '../ui/Reveal'
 import InkBand from '../marketing/InkBand'
 
@@ -82,8 +84,8 @@ export default function Footer() {
               </span>
             </Link>
             <p className="mt-4 text-sm leading-relaxed text-on-ink-muted">
-              Consultants reviewed before they are listed, with rates and availability
-              published. Find the right person and book a session in minutes.
+              {identityCheckSentence(consultants)} Rates and availability are published for
+              every listing. Find the right person and book a session in minutes.
             </p>
 
             {/* Rendered inert: no accounts exist to link to, so these carry no href and
@@ -93,7 +95,7 @@ export default function Footer() {
                 <span
                   key={social.label}
                   title={`${social.label} — not available yet`}
-                  className="grid h-9 w-9 place-items-center rounded-full border border-ink-line/60 text-on-ink-muted/60"
+                  className="grid h-9 w-9 place-items-center rounded-full border border-ink-line text-on-ink-muted"
                 >
                   <svg
                     viewBox="0 0 20 20"
@@ -120,7 +122,7 @@ export default function Footer() {
                     {link.href === null ? (
                       // Not a destination, so not a link: no href, no focus
                       // stop, no hover promise. The label stands for itself.
-                      <span className="inline-flex items-center text-sm text-on-ink-muted/70">
+                      <span className="inline-flex items-center text-sm text-on-ink-muted">
                         {link.label}
                       </span>
                     ) : (

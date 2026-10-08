@@ -400,5 +400,226 @@ check('on-ink-muted clears AA on ink', contrast('#B79E88', '#2A2118') >= 4.5);
 check('gold-on-ink clears AA on ink', contrast('#E8C88A', '#2A2118') >= 4.5);
 check('accent-500 on ink is NOT used', contrast('#C2622D', '#2A2118') < 4.5);
 
+/* -------------------------------------------------------------------------- *
+ * Ink surfaces: opacity-modified colours, composited before they are measured.
+ *
+ * Tailwind's `/NN` modifier REPLACES a token's own alpha instead of multiplying
+ * it, so `text-on-ink-muted/70` compiles to rgba(183, 158, 136, 0.7) — not to
+ * #B79E88 dimmed by thirty percent. Every check above that pins a full-opacity
+ * token is therefore blind to the whole family, which is how a 3.8:1 footer
+ * label and a "dimmed" divider that was four times brighter than intended both
+ * shipped green. So rather than trusting the class name, the components are read
+ * from disk, each ink-tier colour is composited over the surface it is actually
+ * rendered on, and the result is measured.
+ */
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
+import { dirname, join, resolve } from 'node:path'
+
+/** Alpha-composites `fg` over `bg` and returns the flattened colour. */
+function composite(fg: string, alpha: number, bg: string): string {
+  const f = fg.replace('#', '')
+  const b = bg.replace('#', '')
+  return (
+    '#' +
+    [0, 2, 4]
+      .map((o) =>
+        Math.round(
+          parseInt(f.slice(o, o + 2), 16) * alpha +
+            parseInt(b.slice(o, o + 2), 16) *
+              (1 - alpha),
+        )
+          .toString(16)
+          .padStart(2, '0'),
+      )
+      .join('')
+  )
+}
+
+function contrastOver(fg: string, alpha: number, bg: string): number {
+  return contrast(composite(fg, alpha, bg), bg)
+}
+
+/** Locate the client root, whether run from `client/` or from the repo root. */
+function clientRoot(): string {
+  let dir = process.cwd()
+  for (let hop = 0; hop < 6; hop += 1) {
+    if (existsSync(join(dir, 'src', 'components'))) return dir
+    if (existsSync(join(dir, 'client', 'src', 'components'))) return join(dir, 'client')
+    dir = dirname(dir)
+  }
+  return process.cwd()
+}
+
+const root = clientRoot()
+const srcDir = join(root, 'src')
+const config = readFileSync(join(root, 'tailwind.config.js'), 'utf8')
+
+/** The ink surface, its lifted soft variant, and the featured card's own fill. */
+const INK = '#2A2118'
+const INK_SOFT = '#3D3229'
+const INK_CARD = composite('#FFFFFF', 0.07, INK)
+
+/** Reads a colour out of tailwind.config.js so the harness cannot drift from it. */
+function token(name: string): string {
+  const match = new RegExp(`'(?:${name})':\\s*'([^']+)'`).exec(config)
+  if (!match) throw new Error(`tailwind.config.js has no '${name}' colour`)
+  return match[1]
+}
+
+/** The alpha baked into an rgba() token, or 1 for an opaque hex. */
+function tokenAlpha(value: string): number {
+  const rgba = /^rgba\(\s*[\d.]+\s*,\s*[\d.]+\s*,\s*[\d.]+\s*,\s*([\d.]+)\s*\)$/.exec(value)
+  return rgba ? Number(rgba[1]) : 1
+}
+
+const INK_TOKENS = ['on-ink', 'on-ink-muted', 'accent-on-ink', 'gold-on-ink', 'ink-line'] as const
+
+/**
+ * The surface a file's ink content is rendered on. Anything not listed sits
+ * directly on the ink surface; the two exceptions lighten their own background
+ * and are therefore measured against the harder background.
+ */
+const LIFTED_SURFACE: Record<string, string> = {
+  'components/marketing/FeaturedConsultant.tsx': INK_CARD,
+  'pages/client/ClientAppointments.tsx': INK_SOFT,
+}
+
+function sourceFiles(dir: string, found: string[] = []): string[] {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name)
+    if (entry.isDirectory()) sourceFiles(full, found)
+    else if (/\.(tsx|css)$/.test(entry.name)) found.push(full)
+  }
+  return found
+}
+
+const posix = (path: string) => path.replace(/\\/g, '/')
+const files = sourceFiles(srcDir).map((path) => ({
+  path,
+  key: posix(path.slice(srcDir.length + 1)),
+  source: readFileSync(path, 'utf8'),
+}))
+
+const INK_CLASS = new RegExp(
+  `(?:^|[^\\w-])((?:[a-z-]+:)*(text|bg|border|ring)-(${INK_TOKENS.join('|')})(?:/(\\d{1,3}))?)(?![\\w/-])`,
+  'g',
+)
+
+type InkUse = { file: string; cls: string; prop: string; token: string; alpha: number; bg: string }
+
+const inkUses: InkUse[] = []
+for (const file of files) {
+  const bg = LIFTED_SURFACE[file.key] ?? INK
+  for (const match of file.source.matchAll(INK_CLASS)) {
+    const alpha = match[4] === undefined ? tokenAlpha(token(match[3])) : Number(match[4]) / 100
+    inkUses.push({
+      file: file.key,
+      cls: match[1],
+      prop: match[2],
+      token: match[3],
+      alpha,
+      bg,
+    })
+  }
+}
+
+const describe = (use: InkUse) => {
+  const hex = token(use.token)
+  const flat = composite(hex, use.alpha, use.bg)
+  return `${use.cls} in ${use.file} → ${flat} on ${use.bg} = ${contrastOver(hex, use.alpha, use.bg).toFixed(2)}:1`
+}
+
+/**
+ * Exceptions, each pinned: the check re-measures them and fails if the class
+ * disappears or its value moves, so an exemption cannot quietly become a hole.
+ */
+const EXEMPT: Array<{ file: string; cls: string; min: number; ratio: number; why: string }> = [
+  {
+    file: 'components/ui/Rating.tsx',
+    cls: 'text-on-ink/25',
+    min: 4.5,
+    ratio: 2.17,
+    why: 'the unfilled star glyph — decorative and fully redundant with the numeric rating printed beside it, and frozen as correct by the last review',
+  },
+  {
+    file: 'pages/client/ClientAppointments.tsx',
+    cls: 'bg-on-ink/15',
+    min: 3,
+    ratio: 1.56,
+    why: 'the fill behind a tab count; the count itself is text-on-ink, which clears AA over the filled result',
+  },
+]
+
+const exempt = (use: InkUse) =>
+  EXEMPT.find((e) => e.file === use.file && e.cls === use.cls) ?? null
+
+console.log('\nink surfaces: the scanner sees what the palette checks cannot')
+check(
+  'every ink-tier class in src/ is reached by the scanner',
+  inkUses.length > 20,
+  `${inkUses.length} occurrences`,
+)
+check(
+  'every file that lightens its own ink background is measured against it',
+  files.every((f) => !/bg-white\/\[0\./.test(f.source) || f.key in LIFTED_SURFACE),
+)
+check(
+  'a new ink-tier token cannot appear undocumented',
+  INK_TOKENS.every((name) => token(name) !== ''),
+)
+
+console.log('\nink surfaces: text colours are measured after compositing')
+// `ink-line` is a divider, not a type tier: it is intentionally too dim to read
+// and is only ever painted as a hairline or an aria-hidden separator glyph. Its
+// own rule below covers it, so it is skipped rather than ratio-tested here.
+for (const use of inkUses.filter((u) => u.prop === 'text' && u.token !== 'ink-line')) {
+  const hex = token(use.token)
+  const ratio = contrastOver(hex, use.alpha, use.bg)
+  const allowed = exempt(use)
+  if (allowed) {
+    check(
+      `exempt text colour is unchanged — ${use.cls} in ${use.file}`,
+      Math.abs(ratio - allowed.ratio) < 0.01,
+      `${ratio.toFixed(2)}:1, pinned at ${allowed.ratio}:1`,
+    )
+    continue
+  }
+  check(`AA on ${use.bg} — ${use.cls} in ${use.file}`, ratio >= 4.5, describe(use))
+}
+
+console.log('\nink surfaces: non-text ink colours are measured after compositing')
+for (const use of inkUses.filter((u) => u.prop !== 'text' && u.token !== 'ink-line')) {
+  const hex = token(use.token)
+  const ratio = contrastOver(hex, use.alpha, use.bg)
+  const allowed = exempt(use)
+  if (allowed) {
+    check(
+      `exempt fill is unchanged — ${use.cls} in ${use.file}`,
+      Math.abs(ratio - allowed.ratio) < 0.01,
+      `${ratio.toFixed(2)}:1, pinned at ${allowed.ratio}:1`,
+    )
+    continue
+  }
+  check(`3:1 on ${use.bg} — ${use.cls} in ${use.file}`, ratio >= 3, describe(use))
+}
+
+console.log('\nink surfaces: ink-line carries its own alpha and may not be re-scaled')
+check(
+  'ink-line is defined dimmer than its opaque form',
+  tokenAlpha(token('ink-line')) <= 0.2,
+  token('ink-line'),
+)
+for (const use of inkUses.filter((u) => u.token === 'ink-line')) {
+  const modifier = use.cls.includes('/')
+  const matchesToken = Math.abs(use.alpha - tokenAlpha(token('ink-line'))) < 0.001
+  check(
+    `no opacity modifier on ${use.cls} in ${use.file}`,
+    !modifier && matchesToken,
+    modifier
+      ? `${use.cls} compiles to rgba(249, 241, 232, ${use.alpha}) — brighter than the token's own 0.14, not dimmer`
+      : '',
+  )
+}
+
 console.log(`\n${failures === 0 ? 'All checks passed.' : `${failures} check(s) failed.`}`)
 if (failures > 0) process.exit(1)

@@ -29,12 +29,16 @@ const specialties = specializations.map((name) => ({
 
 const guarantees = [
   {
-    title: 'Reviewed before listing',
-    // Generated from the directory. This used to read "every consultant has
-    // been verified", which is false of the seed — two of the six are not — and
-    // contradicted the verified count printed further down this same page. The
-    // shortfall is now stated rather than rounded up.
-    body: `Every consultant has been through our review process before appearing in the directory. ${identityCheckSentence(consultants)}`,
+    title: 'Identity checks, counted',
+    // Generated from the directory. This used to assert that every consultant
+    // had been verified, which is false of the seed — two of the six are not —
+    // and then, once that was fixed, swapped the quantified falsehood for an
+    // equally unbacked one: that every consultant had been "through our review
+    // process". No field on a Consultant records a review, so directory
+    // membership says nothing about one. Only the measurable claim survives —
+    // how many of the listed have completed an identity check — and it is
+    // derived, so it cannot drift from the data it describes.
+    body: `${identityCheckSentence(consultants)} Ratings, rates and availability are published for every listing.`,
   },
   {
     title: 'Free intro calls',

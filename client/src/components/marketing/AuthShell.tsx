@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react'
+import { consultants } from '../../data'
+import { identityCheckSentence } from '../../lib/trust'
 import Button from '../ui/Button'
 import Reveal from '../ui/Reveal'
 import InkBand from './InkBand'
@@ -59,7 +61,7 @@ export default function AuthShell({ title, subtitle, children, footer }: AuthShe
             </div>
 
             <p className="mt-6 font-display text-2xl leading-snug text-on-ink">
-              Consultants reviewed before they are listed.
+              {identityCheckSentence(consultants)}
             </p>
             <p className="mt-3 max-w-sm text-sm leading-relaxed text-on-ink-muted">
               Find the right person and book a session in minutes.

@@ -76,7 +76,7 @@ export default function Hero({ consultant, onNext, position, total }: HeroProps)
                   key={index}
                   aria-current={index === position}
                   className={`h-1.5 rounded-full transition-all duration-300 ${
-                    index === position ? 'w-6 bg-accent-on-ink' : 'w-1.5 bg-on-ink/25'
+                    index === position ? 'w-6 bg-accent-on-ink' : 'w-1.5 bg-on-ink/40'
                   }`}
                 />
               ))}
