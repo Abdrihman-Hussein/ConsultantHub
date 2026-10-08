@@ -2,6 +2,7 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import Container from '../ui/Container'
 import Avatar from '../ui/Avatar'
 import Button from '../ui/Button'
+import InkBand from '../marketing/InkBand'
 import { useApp } from '../../context/AppContext'
 
 const navItems = [
@@ -65,6 +66,19 @@ export default function DashboardLayout() {
   const { session, logout } = useApp()
   const { pathname } = useLocation()
 
+  const titles: Record<string, string> = {
+    '/client/dashboard': session
+      ? `Welcome back, ${session.name.split(' ')[0]}`
+      : 'Dashboard',
+    '/client/appointments': 'Appointments',
+  }
+  const subtitles: Record<string, string> = {
+    '/client/dashboard': 'Your upcoming sessions and history at a glance.',
+    '/client/appointments': 'Every session you have booked.',
+  }
+  const title = titles[pathname] ?? 'Client portal'
+  const subtitle = subtitles[pathname] ?? ''
+
   return (
     <div className="flex min-h-screen bg-surface-subtle">
       <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-line bg-surface px-4 py-6 lg:flex">
@@ -101,32 +115,6 @@ export default function DashboardLayout() {
           ))}
         </nav>
 
-        <div className="border-t border-line pt-4">
-          {session ? (
-            <>
-              <div className="flex items-center gap-3 rounded-xl px-2 py-1.5 transition-colors hover:bg-ink-100/60">
-                <Avatar name={session.name} size="sm" />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-body">{session.name}</p>
-                  <p className="truncate text-xs text-muted">{session.email}</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={logout}
-                className="mt-1 w-full rounded-xl px-2 py-1.5 text-left text-sm text-muted transition-colors hover:bg-ink-100/60 hover:text-danger"
-              >
-                Log out
-              </button>
-            </>
-          ) : (
-            <div className="px-2">
-              <Button to="/login" variant="outline" size="sm" className="w-full">
-                Log in
-              </Button>
-            </div>
-          )}
-        </div>
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
@@ -150,6 +138,43 @@ export default function DashboardLayout() {
             </nav>
           </Container>
         </header>
+
+        <InkBand as="header" flush className="py-10 lg:py-12">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <p className="eyebrow text-gold-on-ink">Client portal</p>
+              <h1 className="mt-3 font-display text-display-lg text-on-ink">{title}</h1>
+              {subtitle && (
+                <p className="mt-2 text-base text-on-ink-muted">{subtitle}</p>
+              )}
+            </div>
+            <div className="flex shrink-0 items-center gap-4">
+              {session ? (
+                <>
+                  <div className="flex min-w-0 items-center gap-3">
+                    <Avatar name={session.name} size="sm" />
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-on-ink">{session.name}</p>
+                      <p className="truncate text-xs text-on-ink-muted">{session.email}</p>
+                    </div>
+                  </div>
+                  <Button type="button" variant="onInkOutline" size="sm" onClick={logout}>
+                    Log out
+                  </Button>
+                </>
+              ) : (
+                <div className="flex flex-wrap gap-3">
+                  <Button to="/login" variant="onInk" size="sm">
+                    Log in
+                  </Button>
+                  <Button to="/register" variant="onInkOutline" size="sm">
+                    Create account
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        </InkBand>
 
         <main key={pathname} className="flex-1 animate-fade-in">
           <Outlet />

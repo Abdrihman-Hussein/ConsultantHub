@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
 import { consultants } from '../../data'
-import { formatDate, relativeDay, todayISO, formatPrice, countLabel } from '../../lib/format'
+import { formatDate, relativeDay, todayISO, formatPrice } from '../../lib/format'
 import type { Appointment } from '../../types'
 import Container from '../../components/ui/Container'
 import Button from '../../components/ui/Button'
@@ -83,24 +83,39 @@ export default function ClientDashboard() {
 
   return (
     <Container className="py-10 lg:py-14">
-      <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex justify-end">
         <Reveal>
-          <p className="eyebrow mb-3">Client portal</p>
-          <h1 className="font-display text-display-lg text-ink-950">
-            Welcome back, {session.name.split(' ')[0]}
-          </h1>
-          <p className="mt-3 text-base text-muted">
-            {upcoming.length > 0
-              ? `You have ${countLabel(upcoming.length, 'upcoming session')}.`
-              : 'No sessions booked yet.'}
-          </p>
-        </Reveal>
-        <Reveal delay={80}>
-          <Button to="/consultants" variant="dark">
+          <Button to="/consultants" variant="dark" size="sm">
             Book a new consultant
           </Button>
         </Reveal>
       </div>
+
+      {nextUp && (
+        <Reveal className="mt-8">
+          <div className="overflow-hidden rounded-3xl border border-accent-300 bg-accent-50/70 p-6 shadow-card sm:p-10">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="eyebrow text-accent-600">Next session</p>
+                  <Badge tone="accent">{relativeDay(nextUp.date)}</Badge>
+                </div>
+                <p className="mt-3 font-display text-display-md text-ink-950">
+                  {nextUp.serviceName}
+                </p>
+                <p className="mt-1 text-base text-body">with {nextUp.consultantName}</p>
+                <p className="mt-3 text-sm text-muted">
+                  {formatDate(nextUp.date)} · {nextUp.startTime} – {nextUp.endTime} ·{' '}
+                  <span className="capitalize">{nextUp.meetingType.replace('-', ' ')}</span>
+                </p>
+              </div>
+              <Button to="/client/appointments" variant="primary" className="shrink-0">
+                Manage booking
+              </Button>
+            </div>
+          </div>
+        </Reveal>
+      )}
 
       <dl className="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line lg:grid-cols-4">
         {stats.map((stat, index) => (
@@ -114,31 +129,6 @@ export default function ClientDashboard() {
           </Reveal>
         ))}
       </dl>
-
-      {nextUp && (
-        <Reveal delay={140}>
-          <div className="mt-10 overflow-hidden rounded-2xl border border-accent-200 bg-accent-50/50 p-6">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="eyebrow text-accent-600">Next session</p>
-                  <Badge tone="accent">{relativeDay(nextUp.date)}</Badge>
-                </div>
-                <p className="mt-2 text-lg font-medium text-ink-950">
-                  {nextUp.serviceName} with {nextUp.consultantName}
-                </p>
-                <p className="mt-1 text-sm text-muted">
-                  {formatDate(nextUp.date)} · {nextUp.startTime} – {nextUp.endTime} ·{' '}
-                  <span className="capitalize">{nextUp.meetingType.replace('-', ' ')}</span>
-                </p>
-              </div>
-              <Button to="/client/appointments" variant="outline" size="sm" className="shrink-0">
-                Manage booking
-              </Button>
-            </div>
-          </div>
-        </Reveal>
-      )}
 
       <section className="mt-14">
         <Reveal>

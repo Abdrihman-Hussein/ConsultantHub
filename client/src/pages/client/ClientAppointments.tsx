@@ -9,6 +9,7 @@ import Card from '../../components/ui/Card'
 import Badge from '../../components/ui/Badge'
 import Reveal from '../../components/ui/Reveal'
 import EmptyState from '../../components/ui/EmptyState'
+import InkBand from '../../components/marketing/InkBand'
 
 type Tab = 'ALL' | AppointmentStatus
 
@@ -85,38 +86,44 @@ export default function ClientAppointments() {
   }
 
   return (
-    <Container className="py-10 lg:py-14">
-      <Reveal>
-        <p className="eyebrow mb-3">Client portal</p>
-        <h1 className="font-display text-display-lg text-ink-950">Appointments</h1>
-        <p className="mt-3 text-base text-muted">Every session you have booked.</p>
-      </Reveal>
+    <>
+      <InkBand flush noGlow className="pb-10">
+        <div
+          role="group"
+          aria-label="Filter appointments by status"
+          className="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full border border-ink-line p-1"
+        >
+          {tabs.map((option) => {
+            const active = tab === option.value
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setTab(option.value)}
+                aria-pressed={active}
+                aria-label={`${option.label}: ${counts[option.value]}`}
+                className={`rounded-full px-4 py-2 text-sm transition-all duration-200 ease-out ${
+                  active
+                    ? 'bg-surface-ink-soft font-semibold text-on-ink'
+                    : 'text-on-ink-muted hover:bg-ink-line hover:text-on-ink'
+                }`}
+              >
+                {option.label}
+                <span
+                  aria-hidden="true"
+                  className={`ml-1.5 rounded-full px-1.5 text-xs transition-colors ${
+                    active ? 'bg-on-ink/15 text-on-ink' : 'text-on-ink-muted'
+                  }`}
+                >
+                  {counts[option.value]}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      </InkBand>
 
-      <div className="mt-8 flex flex-wrap gap-2 border-b border-line pb-5">
-        {tabs.map((option) => (
-          <button
-            key={option.value}
-            type="button"
-            onClick={() => setTab(option.value)}
-            aria-pressed={tab === option.value}
-            className={`rounded-full px-4 py-2 text-sm transition-all duration-200 ease-out ${
-              tab === option.value
-                ? 'bg-accent-500 text-white shadow-glow'
-                : 'border border-line-strong text-muted hover:border-accent-400 hover:text-body'
-            }`}
-          >
-            {option.label}
-            <span
-              className={`ml-1.5 transition-colors ${
-                tab === option.value ? 'text-white/70' : 'text-subtle'
-              }`}
-            >
-              {counts[option.value]}
-            </span>
-          </button>
-        ))}
-      </div>
-
+      <Container className="py-10 lg:py-14">
       <div key={tab} className="animate-fade-in">
         {visible.length === 0 ? (
           <div className="mt-8">
@@ -189,6 +196,7 @@ export default function ClientAppointments() {
           </div>
         )}
       </div>
-    </Container>
+      </Container>
+    </>
   )
 }
