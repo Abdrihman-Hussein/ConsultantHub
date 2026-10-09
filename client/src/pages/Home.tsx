@@ -11,7 +11,7 @@ import Reveal from '../components/ui/Reveal'
 import CountUp from '../components/ui/CountUp'
 import ConsultantCard from '../components/consultants/ConsultantCard'
 import Hero from '../components/marketing/Hero'
-import InkBand from '../components/marketing/InkBand'
+import CreamBand from '../components/marketing/CreamBand'
 import HowItWorks from '../components/marketing/HowItWorks'
 
 /**
@@ -210,17 +210,21 @@ export default function Home() {
         </Container>
       </section>
 
-      {/* Closing band — mirrors the hero so the page opens and lands on ink. */}
-      <InkBand>
+      {/*
+        Closing band. It used to mirror the hero in ink so the page opened and
+        landed on a dark surface. The hero is cream now, so this is too and the
+        only dark surface left on the page is the site footer below it.
+      */}
+      <CreamBand surface="subtle" className="border-t border-line">
         <div className="mx-auto max-w-2xl text-center">
           <Reveal>
-            <h2 className="font-display text-display-lg text-on-ink">
+            <h2 className="font-display text-display-lg text-ink-950">
               Not sure who to book? Start with a free intro call.
             </h2>
           </Reveal>
 
           <Reveal delay={90}>
-            <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-on-ink-muted">
+            <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-muted">
               Every consultant offers a complimentary intro call. Low commitment, and it takes
               one click to book.
             </p>
@@ -228,10 +232,10 @@ export default function Home() {
 
           <Reveal delay={160}>
             <div className="mt-9 flex flex-wrap justify-center gap-3">
-              <Button to="/consultants" variant="onInk" size="lg">
+              <Button to="/consultants" variant="primary" size="lg">
                 Hire a consultant
               </Button>
-              <Button to="/become-a-consultant" variant="onInkOutline" size="lg">
+              <Button to="/become-a-consultant" variant="outline" size="lg">
                 Become a consultant
               </Button>
             </div>
@@ -239,23 +243,23 @@ export default function Home() {
 
           {/* Every figure computed from the directory — nothing literal. */}
           <Reveal delay={230}>
-            <dl className="mx-auto mt-14 grid max-w-xl grid-cols-3 gap-6 border-t border-ink-line pt-8">
+            <dl className="mx-auto mt-14 grid max-w-xl grid-cols-3 gap-6 border-t border-line-strong pt-8">
               {proof.map((stat) => (
                 <div key={stat.label}>
-                  <dd className="font-display text-2xl text-gold-on-ink">
+                  <dd className="font-display text-2xl text-ink-950">
                     <CountUp
                       value={stat.value}
                       suffix={stat.suffix}
                       decimals={stat.decimals}
                     />
                   </dd>
-                  <dt className="mt-1 text-xs leading-snug text-on-ink-muted">{stat.label}</dt>
+                  <dt className="mt-1 text-xs leading-snug text-muted">{stat.label}</dt>
                 </div>
               ))}
             </dl>
           </Reveal>
         </div>
-      </InkBand>
+      </CreamBand>
     </>
   )
 }
