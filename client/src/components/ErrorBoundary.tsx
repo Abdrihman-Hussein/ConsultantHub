@@ -1,6 +1,26 @@
 import { Component } from 'react'
 import type { ErrorInfo, ReactNode } from 'react'
+import { isLang, LANG_STORAGE_KEY, translateIn } from '../i18n/strings'
+import type { Lang, MessageKey } from '../i18n/strings'
 import Button from './ui/Button'
+
+/**
+ * The active language, read outside React.
+ *
+ * A class component cannot call a hook, and this boundary is the one place that
+ * has to render even when the tree below it is broken. Reading storage directly
+ * keeps the recovery message in the reader's language without depending on a
+ * provider that may itself be part of what failed.
+ */
+function currentLang(): Lang {
+  if (typeof window === 'undefined') return 'en'
+  try {
+    const stored = window.localStorage.getItem(LANG_STORAGE_KEY)
+    return isLang(stored) ? stored : 'en'
+  } catch {
+    return 'en'
+  }
+}
 
 interface Props {
   children: ReactNode
@@ -40,6 +60,8 @@ export default class ErrorBoundary extends Component<Props, State> {
 
     if (!error) return this.props.children
 
+    const t = (key: MessageKey) => translateIn(currentLang(), key)
+
     return (
       <div className="flex min-h-screen items-center justify-center bg-surface-subtle px-5 py-16">
         <div className="w-full max-w-md rounded-2xl border border-line bg-surface p-8 text-center shadow-lift">
@@ -49,9 +71,11 @@ export default class ErrorBoundary extends Component<Props, State> {
             </svg>
           </span>
 
-          <h1 className="mt-5 font-display text-display-md text-ink-950">Something broke</h1>
+          <h1 className="mt-5 font-display text-display-md text-ink-950">
+            {t('error.title')}
+          </h1>
           <p className="mt-3 text-sm leading-relaxed text-muted">
-            An unexpected error stopped the page from rendering. Reloading usually fixes it.
+            {t('error.body')}
           </p>
 
           <pre className="mt-5 max-h-32 overflow-auto rounded-xl bg-surface-muted p-3 text-left text-xs text-muted">
@@ -60,10 +84,10 @@ export default class ErrorBoundary extends Component<Props, State> {
 
           <div className="mt-6 flex gap-3">
             <Button variant="outline" className="flex-1" onClick={this.handleReset}>
-              Try again
+              {t('error.try_again')}
             </Button>
             <Button className="flex-1" onClick={this.handleReload}>
-              Reload
+              {t('error.reload')}
             </Button>
           </div>
         </div>

@@ -1,3 +1,5 @@
+import { useTranslation } from '../../i18n/LanguageContext'
+
 interface RatingProps {
   value: number
   size?: 'sm' | 'md'
@@ -34,6 +36,8 @@ export default function Rating({
   compact = false,
   onInk = false,
 }: RatingProps) {
+  const { t } = useTranslation()
+
   return (
     <div className={`flex items-center ${sizes[size]}`}>
       <span className="flex items-center gap-0.5" aria-hidden="true">
@@ -56,7 +60,7 @@ export default function Rating({
           </svg>
         ))}
       </span>
-      <span className="sr-only">Rated {value} out of 5</span>
+      <span className="sr-only">{t('rating.sr_value', { value })}</span>
       {!compact && (
         <span className={`font-medium ${onInk ? 'text-on-ink' : 'text-body'}`}>
           {value.toFixed(1)}

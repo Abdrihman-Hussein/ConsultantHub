@@ -1,6 +1,8 @@
 import Button from '../ui/Button'
 import SearchInput from '../ui/SearchInput'
 import type { Filters } from '../../lib/search'
+import { useTranslation } from '../../i18n/LanguageContext'
+import type { MessageKey } from '../../i18n/strings'
 
 interface FilterSidebarProps {
   filters: Filters
@@ -67,15 +69,18 @@ export default function FilterSidebar({
   onReset,
   idPrefix = 'filter',
 }: FilterSidebarProps) {
+  const { t } = useTranslation()
   const set = <K extends keyof Filters>(key: K, value: Filters[K]) =>
     onChange({ ...filters, [key]: value })
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-base font-semibold tracking-tight text-ink-950">Filters</h2>
+        <h2 className="text-base font-semibold tracking-tight text-ink-950">
+          {t('filters.title')}
+        </h2>
         <Button variant="ghost" size="sm" onClick={onReset} className="-mr-3 -ml-2">
-          Reset
+          {t('filters.reset')}
         </Button>
       </div>
 
@@ -83,10 +88,11 @@ export default function FilterSidebar({
         value={filters.search}
         onChange={(value) => set('search', value)}
         suggestions={suggestions}
-        placeholder="Name, expertise, or city"
+        placeholder={t('filters.search_placeholder')}
+        label={t('filters.search_label')}
       />
 
-      <Section title="Specialty">
+      <Section title={t('filters.specialty')}>
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
@@ -98,7 +104,7 @@ export default function FilterSidebar({
                 : 'border-line-strong text-muted hover:border-accent-400 hover:text-body'
             }`}
           >
-            All
+            {t('filters.all')}
           </button>
           {specializations.map((specialization) => (
             <button
@@ -118,7 +124,7 @@ export default function FilterSidebar({
         </div>
       </Section>
 
-      <Section title="Minimum rating">
+      <Section title={t('filters.min_rating')}>
         <div className="flex flex-wrap gap-2">
           {ratingOptions.map((rating) => (
             <button
@@ -132,16 +138,16 @@ export default function FilterSidebar({
                   : 'border-line-strong text-muted hover:border-accent-400 hover:text-body'
               }`}
             >
-              {rating === 0 ? 'Any' : `${rating}+`}
+              {rating === 0 ? t('filters.any') : `${rating}+`}
             </button>
           ))}
         </div>
       </Section>
 
-      <Section title="Max hourly rate">
+      <Section title={t('filters.max_rate')}>
         <div className="mb-2 flex items-baseline justify-between">
           <label htmlFor={`${idPrefix}-rate`} className="text-sm text-muted">
-            Up to
+            {t('filters.up_to')}
           </label>
           <span className="text-sm font-medium text-body">
             {filters.maxRate >= rateCeiling ? `$${rateCeiling}+` : `$${filters.maxRate}`}
@@ -155,7 +161,7 @@ export default function FilterSidebar({
           step={10}
           value={filters.maxRate}
           onChange={(event) => set('maxRate', Number(event.target.value))}
-          aria-valuetext={`Up to $${filters.maxRate} per hour`}
+          aria-valuetext={t('filters.up_to_aria', { rate: `$${filters.maxRate}` })}
           className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-ink-200"
         />
         <div className="mt-1 flex justify-between text-xs text-subtle">
@@ -168,7 +174,7 @@ export default function FilterSidebar({
         <Toggle
           checked={filters.verifiedOnly}
           onChange={(checked) => set('verifiedOnly', checked)}
-          label="Verified only"
+          label={t('filters.verified_only')}
         />
       </div>
 

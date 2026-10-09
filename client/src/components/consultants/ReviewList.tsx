@@ -2,6 +2,7 @@ import type { Consultant } from '../../types'
 import { getReviewsFor } from '../../data'
 import { reviewsSummary } from '../../lib/reviews'
 import { formatDate } from '../../lib/format'
+import { useTranslation } from '../../i18n/LanguageContext'
 import Avatar from '../ui/Avatar'
 import Rating from '../ui/Rating'
 
@@ -16,16 +17,17 @@ interface ReviewListProps {
  * should read as a real testimonial.
  */
 export default function ReviewList({ consultant }: ReviewListProps) {
+  const { t } = useTranslation()
   const sample = getReviewsFor(consultant.id)
 
   return (
     <section aria-labelledby="reviews-heading">
       <h2 id="reviews-heading" className="text-lg font-semibold tracking-tight text-ink-950">
-        Reviews
+        {t('profile.reviews_heading')}
       </h2>
 
       {sample.length === 0 ? (
-        <p className="mt-4 text-sm text-muted">{reviewsSummary(consultant, sample)}</p>
+        <p className="mt-4 text-sm text-muted">{reviewsSummary(consultant, sample, t)}</p>
       ) : (
         <ol className="mt-2 divide-y divide-line">
           {sample.map((review) => (
@@ -50,7 +52,7 @@ export default function ReviewList({ consultant }: ReviewListProps) {
 
       {sample.length > 0 && (
         <p className="mt-4 border-t border-line pt-4 text-xs text-subtle">
-          {reviewsSummary(consultant, sample)}
+          {reviewsSummary(consultant, sample, t)}
         </p>
       )}
     </section>

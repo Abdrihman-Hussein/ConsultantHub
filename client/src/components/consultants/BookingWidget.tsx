@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
 import { addMinutes, formatPrice } from '../../lib/format'
 import { bookedTimes, generateSlots, isSlotTaken, upcomingDays } from '../../lib/booking'
+import { useTranslation } from '../../i18n/LanguageContext'
+import type { MessageKey } from '../../i18n/strings'
 import type { Consultant, MeetingType, Service } from '../../types'
 import Badge from '../ui/Badge'
 import Button from '../ui/Button'
@@ -22,6 +24,7 @@ type Stage = 'select' | 'confirm' | 'done'
 export default function BookingWidget({ consultant, services }: BookingWidgetProps) {
   const { session, appointments, bookSession, isPersistent } = useApp();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [serviceId, setServiceId] = useState(services[0]?.id ?? '');
   const [days, setDays] = useState(() => upcomingDays(5));
@@ -29,7 +32,12 @@ export default function BookingWidget({ consultant, services }: BookingWidgetPro
   const [time, setTime] = useState<string | null>(null);
   const [meetingType, setMeetingType] = useState<MeetingType>('video');
   const [stage, setStage] = useState<Stage>('select');
-  const [error, setError] = useState<string | null>(null);
+  /**
+   * Stored as a dictionary key rather than a rendered sentence, so switching
+   * language re-renders the message in the new one. A string captured at the
+   * moment of failure would stay in whichever language was active then.
+   */
+  const [error, setError] = useState<MessageKey | null>(null);
 
   const service = useMemo(
     () => services.find((candidate) => candidate.id === serviceId),
@@ -61,7 +69,7 @@ export default function BookingWidget({ consultant, services }: BookingWidgetPro
   if (services.length === 0) {
     return (
       <div className="rounded-2xl border border-line bg-surface p-6 shadow-card">
-        <p className="text-sm text-muted">This consultant hasn&apos;t published services yet.</p>
+        <p className="text-sm text-muted">{t('booking.no_services')}</p>
       </div>
     );
   }
@@ -74,7 +82,7 @@ export default function BookingWidget({ consultant, services }: BookingWidgetPro
       return;
     }
     if (!service || !time || !endTime) {
-      setError('Choose a service and a time first.');
+      setError('booking.error_choose');
       return;
     }
 
@@ -87,7 +95,7 @@ export default function BookingWidget({ consultant, services }: BookingWidgetPro
         endTime,
       })
     ) {
-      setError('That slot was just taken. Pick another time.');
+      setError('booking.error_taken');
       setTime(null);
       setStage('select');
       return;
@@ -105,7 +113,7 @@ export default function BookingWidget({ consultant, services }: BookingWidgetPro
     });
 
     if (!created) {
-      setError('Something went wrong saving that booking.');
+      setError('booking.error_save');
       return;
     }
 
@@ -139,7 +147,7 @@ export default function BookingWidget({ consultant, services }: BookingWidgetPro
         time={time}
         endTime={endTime}
         meetingType={meetingType}
-        error={error}
+        error={error ? t(error) : null}
         onBack={() => {
           setStage('select');
           setError(null);
@@ -152,8 +160,8 @@ export default function BookingWidget({ consultant, services }: BookingWidgetPro
   return (
     <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
       <div className="border-b border-line bg-accent-50/50 px-6 py-5">
-        <h2 className="text-lg font-semibold tracking-tight text-ink-950">Book a session</h2>
-        <p className="mt-1 text-xs text-muted">Pick a service, a date and a time.</p>
+        <h2 className="text-lg font-semibold tracking-tight text-ink-950">{t('booking.title')}</h2>
+        <p className="mt-1 text-xs text-muted">{t('booking.subtitle')}</p>
       </div>
 
       <div className="space-y-6 p-6">
@@ -185,16 +193,24 @@ export default function BookingWidget({ consultant, services }: BookingWidgetPro
         <div className="flex items-center justify-between border-t border-line pt-5">
           <div>
             <span className="text-xl font-semibold tracking-tight text-ink-950">
-              {service ? (service.isFree ? 'Free' : formatPrice(service.price)) : '—'}
+              {service
+                ? service.isFree
+                  ? t('common.free')
+                  : formatPrice(service.price)
+                : '—'}
             </span>
-            {service && <span className="text-sm text-subtle"> · {service.duration} min</span>}
+            {service && (
+              <span className="text-sm text-subtle">
+                {t('booking.price_row', { duration: service.duration })}
+              </span>
+            )}
           </div>
-          {service?.isFree && <Badge tone="accent">Intro call</Badge>}
+          {service?.isFree && <Badge tone="accent">{t('booking.intro_badge')}</Badge>}
         </div>
 
         {error && (
           <p role="alert" className="rounded-xl bg-danger-soft px-4 py-3 text-sm text-danger">
-            {error}
+            {t(error)}
           </p>
         )}
 
@@ -206,14 +222,14 @@ export default function BookingWidget({ consultant, services }: BookingWidgetPro
             setStage('confirm');
           }}
         >
-          {session ? 'Continue' : 'Log in to book'}
+          {session ? t('booking.continue') : t('booking.log_in_to_book')}
         </Button>
 
         {!session && (
           <p className="text-center text-xs text-muted">
-            You can browse freely — an account is only needed to book.{' '}
+            {t('booking.browse_note')}{' '}
             <Link to="/register" className="underline underline-offset-4 hover:text-ink-950">
-              Create one
+              {t('booking.create_one')}
             </Link>
           </p>
         )}

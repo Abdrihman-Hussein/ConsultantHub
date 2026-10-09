@@ -1,6 +1,7 @@
 import { hashPassword, createSalt } from './crypto';
 import { createId } from './format';
 import type { AuthResult, Session, User, UserRole } from '../types';
+import type { MessageKey } from '../i18n/strings';
 
 export interface RegisterInput {
   name: string;
@@ -11,6 +12,34 @@ export interface RegisterInput {
 export interface LoginInput {
   email: string;
   password: string;
+}
+
+/**
+ * A failure reason, as a dictionary key rather than a sentence.
+ *
+ * These strings used to be English literals baked into the module, which meant
+ * a Somali user saw an English error on a Somali form. Returning a key keeps
+ * the wording in one place and lets the calling component render it in the
+ * active language — and because the keys are `MessageKey`, a rename cannot
+ * leave a dangling reference behind.
+ */
+/**
+ * The keys this module can produce. Narrower than `MessageKey` on purpose: a
+ * typo in one of these literals is a compile error here rather than a key that
+ * resolves to nothing at runtime.
+ */
+export type AuthErrorKey = Extract<
+  MessageKey,
+  `auth.${string}` | 'register.error_name' | 'register.error_email_exists'
+>;
+
+/**
+ * What the functions below actually return — the full `MessageKey` union, since
+ * `AuthResult.error` carries `MessageKey`. The `AuthErrorKey` literals above
+ * are what keeps the *construction* sites honest.
+ */
+export interface AuthFailure {
+  key: MessageKey;
 }
 
 /**
@@ -36,6 +65,14 @@ function toSession(user: User): Session {
 }
 
 /**
+ * Builds a failure. Typed to `AuthErrorKey`, so every key this module can emit
+ * is checked against the dictionary at the call site.
+ */
+function fail(key: AuthErrorKey): { ok: false; error: { key: MessageKey } } {
+  return { ok: false, error: { key } };
+}
+
+/**
  * Creates an account. Returns a session so the caller can sign in directly.
  *
  * Registration is deliberately role-free: everyone signs up the same way and
@@ -51,10 +88,10 @@ export async function register(
   const name = input.name.trim();
 
   if (name.length < 2) {
-    return { result: { ok: false, error: 'Enter your full name.' }, users };
+    return { result: fail('register.error_name'), users };
   }
   if (findByEmail(users, email)) {
-    return { result: { ok: false, error: 'An account with that email already exists.' }, users };
+    return { result: fail('register.error_email_exists'), users };
   }
 
   const salt = createSalt();
@@ -98,7 +135,7 @@ export async function login(
   const candidate = await hashPassword(input.password, salt);
 
   if (!user || user.passwordHash !== `${salt}:${candidate}`) {
-    return { ok: false, error: 'That email and password combination is not recognised.' };
+    return fail('auth.invalid_credentials');
   }
 
   return { ok: true, session: toSession(user) };

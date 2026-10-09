@@ -1,4 +1,6 @@
 import type { Consultant, Review } from '../types';
+import { translateEn } from '../i18n/strings';
+import type { Translate } from '../i18n/strings';
 
 /**
  * Presentation helpers for the reviews section.
@@ -31,9 +33,22 @@ export function avgRating(reviews: Review[]): number | null {
  *
  * Three distinct cases, because collapsing them would each mislead: no reviews
  * at all, a total with nothing seeded, and the normal case.
+ *
+ * `sample.length` and `consultant.reviewCount` are passed through as parameters
+ * rather than written into the sentence, so the Somali wording cannot drift
+ * into reporting the sample as the total — the exact failure the checks below
+ * exist to catch. Both figures are interpolated in whatever word order the
+ * chosen language needs.
  */
-export function reviewsSummary(consultant: Consultant, sample: Review[]): string {
-  if (consultant.reviewCount === 0) return 'No written reviews yet';
-  if (sample.length === 0) return 'Written reviews not shown yet';
-  return `Showing ${sample.length} of ${consultant.reviewCount} reviews`;
+export function reviewsSummary(
+  consultant: Consultant,
+  sample: Review[],
+  t: Translate = translateEn,
+): string {
+  if (consultant.reviewCount === 0) return t('reviews.summary.none');
+  if (sample.length === 0) return t('reviews.summary.unshown');
+  return t('reviews.summary.showing', {
+    count: sample.length,
+    total: consultant.reviewCount,
+  });
 }

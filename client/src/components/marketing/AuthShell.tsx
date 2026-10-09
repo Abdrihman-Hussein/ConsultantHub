@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { consultants } from '../../data'
 import { identityCheckSentence } from '../../lib/trust'
+import { useTranslation } from '../../i18n/LanguageContext'
 import Button from '../ui/Button'
 import Reveal from '../ui/Reveal'
 import InkBand from './InkBand'
@@ -20,6 +21,8 @@ interface AuthShellProps {
  * goes dark. This is the last page permitted to use ink.
  */
 export default function AuthShell({ title, subtitle, children, footer }: AuthShellProps) {
+  const { t } = useTranslation()
+
   return (
     <div className="relative flex min-h-full items-center overflow-hidden">
       <div
@@ -61,15 +64,15 @@ export default function AuthShell({ title, subtitle, children, footer }: AuthShe
             </div>
 
             <p className="mt-6 font-display text-2xl leading-snug text-on-ink">
-              {identityCheckSentence(consultants)}
+              {identityCheckSentence(consultants, t)}
             </p>
             <p className="mt-3 max-w-sm text-sm leading-relaxed text-on-ink-muted">
-              Find the right person and book a session in minutes.
+              {t('aside.find_person')}
             </p>
 
             <div className="mt-8">
               <Button to="/become-a-consultant" variant="onInkOutline">
-                Become a consultant
+                {t('footer.become_consultant')}
               </Button>
             </div>
           </Reveal>

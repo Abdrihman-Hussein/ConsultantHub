@@ -3,12 +3,15 @@ import { Link, NavLink, useLocation } from 'react-router-dom'
 import Button from '../ui/Button'
 import Container from '../ui/Container'
 import Avatar from '../ui/Avatar'
+import LanguageToggle from '../ui/LanguageToggle'
 import { useApp } from '../../context/AppContext'
+import { useTranslation } from '../../i18n/LanguageContext'
+import type { MessageKey } from '../../i18n/strings'
 
-const navLinks = [
-  { to: '/consultants', label: 'Browse' },
-  { to: '/client/dashboard', label: 'Dashboard' },
-  { to: '/#how-it-works', label: 'How it works' },
+const navLinks: { to: string; labelKey: MessageKey }[] = [
+  { to: '/consultants', labelKey: 'nav.browse' },
+  { to: '/client/dashboard', labelKey: 'common.dashboard' },
+  { to: '/#how-it-works', labelKey: 'nav.how_it_works' },
 ]
 
 export default function Navbar() {
@@ -16,6 +19,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const { pathname } = useLocation()
   const { session, logout } = useApp()
+  const { t } = useTranslation()
 
   // Close the mobile sheet whenever the route changes.
   useEffect(() => setOpen(false), [pathname])
@@ -55,7 +59,7 @@ export default function Navbar() {
                   href={link.to}
                   className="rounded-full px-3.5 py-2 text-sm text-muted transition-colors hover:bg-ink-100 hover:text-body"
                 >
-                  {link.label}
+                  {t(link.labelKey)}
                 </a>
               ) : (
                 <NavLink
@@ -71,7 +75,7 @@ export default function Navbar() {
                 >
                   {({ isActive }) => (
                     <>
-                      {link.label}
+                      {t(link.labelKey)}
                       {/* Underline that scales in for the active route. */}
                       <span
                         className={`absolute inset-x-3 -bottom-0.5 h-px origin-left bg-accent-500 transition-transform duration-300 ease-out ${
@@ -86,10 +90,15 @@ export default function Navbar() {
           </nav>
 
           <div className="hidden items-center gap-3 md:flex">
+            {/* Sits with the auth controls rather than in the nav: it changes the
+                whole page, not where you are, so it belongs beside the other
+                page-level settings. */}
+            <LanguageToggle />
             {session ? (
               <>
                 <span className="hidden text-sm text-muted lg:inline">
-                  Hi, <span className="font-medium text-body">{session.name.split(' ')[0]}</span>
+                  {t('common.hi')}{' '}
+                  <span className="font-medium text-body">{session.name.split(' ')[0]}</span>
                 </span>
                 <Link
                   to="/client/dashboard"
@@ -101,16 +110,16 @@ export default function Navbar() {
                   </span>
                 </Link>
                 <Button variant="ghost" size="sm" onClick={logout}>
-                  Log out
+                  {t('common.log_out')}
                 </Button>
               </>
             ) : (
               <>
                 <Button to="/login" variant="ghost" size="sm">
-                  Log in
+                  {t('common.log_in')}
                 </Button>
                 <Button to="/register" size="sm">
-                  Get started
+                  {t('common.get_started')}
                 </Button>
               </>
             )}
@@ -120,7 +129,7 @@ export default function Navbar() {
             type="button"
             onClick={() => setOpen((prev) => !prev)}
             aria-expanded={open}
-            aria-label="Toggle navigation"
+            aria-label={t('nav.toggle_navigation')}
             className="grid h-9 w-9 place-items-center rounded-full text-body transition-colors hover:bg-ink-100 md:hidden"
           >
             <svg
@@ -153,26 +162,32 @@ export default function Navbar() {
               href={link.to}
               className="block rounded-xl px-3 py-2.5 text-sm text-body transition-colors hover:bg-accent-50"
             >
-              {link.label}
+              {t(link.labelKey)}
             </a>
           ))}
-          <div className="flex items-center gap-3 pt-3">
+          {/* In the sheet the toggle has its own row: it is not a navigation
+              link, and putting it in the link list would say it is one. */}
+          <div className="flex items-center justify-between gap-3 border-t border-line pt-3">
+            <LanguageToggle />
+            <span className="text-xs text-subtle">{t('lang.label')}</span>
+          </div>
+          <div className="flex items-center gap-3 pt-1">
             {session ? (
               <>
                 <Button to="/client/dashboard" variant="outline" size="sm" className="flex-1">
-                  Dashboard
+                  {t('common.dashboard')}
                 </Button>
                 <Button variant="outline" size="sm" className="flex-1" onClick={logout}>
-                  Log out
+                  {t('common.log_out')}
                 </Button>
               </>
             ) : (
               <>
                 <Button to="/login" variant="outline" size="sm" className="flex-1">
-                  Log in
+                  {t('common.log_in')}
                 </Button>
                 <Button to="/register" size="sm" className="flex-1">
-                  Get started
+                  {t('common.get_started')}
                 </Button>
               </>
             )}

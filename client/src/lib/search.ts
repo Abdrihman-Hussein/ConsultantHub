@@ -1,4 +1,5 @@
 import type { Consultant } from '../types';
+import type { MessageKey } from '../i18n/strings';
 
 /**
  * Search and filter logic for the directory, kept out of the component so it
@@ -16,12 +17,23 @@ export interface Filters {
 
 export type SortKey = 'recommended' | 'rating' | 'rate-low' | 'rate-high' | 'sessions';
 
-export const sortLabels: Record<SortKey, string> = {
-  recommended: 'Recommended',
-  rating: 'Highest rated',
-  'rate-low': 'Rate: low to high',
-  'rate-high': 'Rate: high to low',
-  sessions: 'Most sessions',
+/** Render order of the sort control. */
+export const sortKeys: SortKey[] = ['recommended', 'rating', 'rate-low', 'rate-high', 'sessions'];
+
+/**
+ * Sort option labels, as dictionary keys rather than English strings.
+ *
+ * A specialty's own name (`consultant.specialization`) is seeded data and is
+ * deliberately NOT translated — it is the same value used as the filter, so
+ * translating the label while the value stayed English would make the control
+ * unmatchable.
+ */
+export const sortLabelKeys: Record<SortKey, MessageKey> = {
+  recommended: 'sort.recommended',
+  rating: 'sort.rating',
+  'rate-low': 'sort.rate-low',
+  'rate-high': 'sort.rate-high',
+  sessions: 'sort.sessions',
 };
 
 export const defaultFilters: Filters = {
@@ -149,27 +161,41 @@ export function countActiveFilters(filters: Filters): number {
   );
 }
 
-/** Human-readable chips describing the filters in play, for the results bar. */
+/**
+ * Chips describing the filters in play, for the results bar.
+ *
+ * Each chip is a dictionary key plus its parameters, not a finished string, so
+ * the surrounding words are translated while the values inside them — the
+ * search text, the specialty, the rate, the rating — are rendered exactly as
+ * they are stored. `value` is passed as a parameter rather than concatenated so
+ * a value containing a placeholder-shaped substring cannot be misread.
+ */
 export function describeFilters(
   filters: Filters,
   specializations: string[],
-): { key: string; label: string }[] {
-  const chips: { key: string; label: string }[] = [];
+): { key: string; labelKey: MessageKey; value?: string }[] {
+  const chips: { key: string; labelKey: MessageKey; value?: string }[] = [];
 
-  if (filters.search.trim()) chips.push({ key: 'search', label: `"${filters.search.trim()}"` });
+  if (filters.search.trim()) {
+    // The typed text, quoted — the quotes are the chip's own, not the value's.
+    chips.push({ key: 'search', labelKey: 'chip.search', value: filters.search.trim() });
+  }
   if (filters.specialization) {
     // Only label it if it is a real specialty rather than free text.
     const known = specializations.includes(filters.specialization);
-    chips.push({
-      key: 'specialization',
-      label: known ? filters.specialization : `Specialty: ${filters.specialization}`,
-    });
+    chips.push(
+      known
+        ? { key: 'specialization', labelKey: 'chip.specialty_value', value: filters.specialization }
+        : { key: 'specialization', labelKey: 'chip.specialty', value: filters.specialization },
+    );
   }
-  if (filters.minRating > 0) chips.push({ key: 'minRating', label: `${filters.minRating}+ rating` });
+  if (filters.minRating > 0) {
+    chips.push({ key: 'minRating', labelKey: 'chip.min_rating', value: String(filters.minRating) });
+  }
   if (filters.maxRate < defaultFilters.maxRate) {
-    chips.push({ key: 'maxRate', label: `Under $${filters.maxRate}/hr` });
+    chips.push({ key: 'maxRate', labelKey: 'chip.max_rate', value: `$${filters.maxRate}` });
   }
-  if (filters.verifiedOnly) chips.push({ key: 'verifiedOnly', label: 'Verified only' });
+  if (filters.verifiedOnly) chips.push({ key: 'verifiedOnly', labelKey: 'chip.verified_only' });
 
   return chips;
 }

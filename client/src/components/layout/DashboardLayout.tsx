@@ -1,21 +1,25 @@
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
+import type { ReactNode } from 'react'
 import Container from '../ui/Container'
 import Avatar from '../ui/Avatar'
 import Button from '../ui/Button'
 import InkBand from '../marketing/InkBand'
+import LanguageToggle from '../ui/LanguageToggle'
 import { useApp } from '../../context/AppContext'
+import { useTranslation } from '../../i18n/LanguageContext'
+import type { MessageKey } from '../../i18n/strings'
 
-const navItems = [
+const navItems: { to: string; labelKey: MessageKey; icon: ReactNode }[] = [
   {
     to: '/client/dashboard',
-    label: 'Overview',
+    labelKey: 'dash.nav_overview',
     icon: (
       <path d="M3 10.5 10 4l7 6.5M5 9.5V16h10V9.5" strokeLinecap="round" strokeLinejoin="round" />
     ),
   },
   {
     to: '/client/appointments',
-    label: 'Appointments',
+    labelKey: 'dash.nav_appointments',
     icon: (
       <>
         <rect x="3.5" y="5" width="13" height="11.5" rx="2" />
@@ -25,7 +29,7 @@ const navItems = [
   },
   {
     to: '/consultants',
-    label: 'Find consultants',
+    labelKey: 'dash.nav_find',
     icon: (
       <>
         <circle cx="9" cy="8" r="4" />
@@ -48,7 +52,7 @@ function Logo() {
   )
 }
 
-function NavIcon({ children }: { children: React.ReactNode }) {
+function NavIcon({ children }: { children: ReactNode }) {
   return (
     <svg
       viewBox="0 0 20 20"
@@ -65,19 +69,22 @@ function NavIcon({ children }: { children: React.ReactNode }) {
 export default function DashboardLayout() {
   const { session, logout } = useApp()
   const { pathname } = useLocation()
+  const { t } = useTranslation()
 
-  const titles: Record<string, string> = {
-    '/client/dashboard': session
-      ? `Welcome back, ${session.name.split(' ')[0]}`
-      : 'Dashboard',
-    '/client/appointments': 'Appointments',
-  }
-  const subtitles: Record<string, string> = {
-    '/client/dashboard': 'Your upcoming sessions and history at a glance.',
-    '/client/appointments': 'Every session you have booked.',
-  }
-  const title = titles[pathname] ?? 'Client portal'
-  const subtitle = subtitles[pathname] ?? ''
+  const firstName = session?.name.split(' ')[0] ?? ''
+
+  // Derived from the route rather than looked up in a `Record`, so an
+  // unrecognised path still gets a real title rather than a generic fallback.
+  const isAppointments = pathname === '/client/appointments'
+
+  const title = isAppointments
+    ? t('dash.nav_appointments')
+    : session
+      ? t('dash.title_welcome', { name: firstName })
+      : t('common.dashboard')
+  const subtitle = isAppointments
+    ? t('dash.sub_appointments')
+    : t('dash.sub_dashboard')
 
   return (
     <div className="flex min-h-screen bg-surface-subtle">
@@ -108,13 +115,18 @@ export default function DashboardLayout() {
                     }`}
                   />
                   <NavIcon>{item.icon}</NavIcon>
-                  {item.label}
+                  {t(item.labelKey)}
                 </>
               )}
             </NavLink>
           ))}
-        </nav>
 
+          {/* At the foot of the sidebar rather than beside the links: it changes
+              the whole page, not where you are within it. */}
+          <div className="mt-6 border-t border-line pt-4">
+            <LanguageToggle />
+          </div>
+        </nav>
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
@@ -132,9 +144,13 @@ export default function DashboardLayout() {
                     }`
                   }
                 >
-                  {item.label}
+                  {t(item.labelKey)}
                 </NavLink>
               ))}
+              {/* Reachable here as well as in the sidebar: below `lg` the
+                  sidebar is not rendered, so the footer copy alone would leave
+                  these two routes with no way to switch language. */}
+              <LanguageToggle className="ml-1" />
             </nav>
           </Container>
         </header>
@@ -146,7 +162,7 @@ export default function DashboardLayout() {
         <InkBand as="header" flush className="py-8 lg:py-10">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
-              <p className="eyebrow text-gold-on-ink">Client portal</p>
+              <p className="eyebrow text-gold-on-ink">{t('dash.eyebrow')}</p>
               <h1 className="mt-3 font-display text-display-lg text-on-ink">{title}</h1>
               {subtitle && (
                 <p className="mt-2 text-base text-on-ink-muted">{subtitle}</p>
@@ -163,16 +179,16 @@ export default function DashboardLayout() {
                     </div>
                   </div>
                   <Button type="button" variant="onInkOutline" size="sm" onClick={logout}>
-                    Log out
+                    {t('common.log_out')}
                   </Button>
                 </>
               ) : (
                 <div className="flex flex-wrap gap-3">
                   <Button to="/login" variant="onInk" size="sm">
-                    Log in
+                    {t('common.log_in')}
                   </Button>
                   <Button to="/register" variant="onInkOutline" size="sm">
-                    Create account
+                    {t('common.create_account')}
                   </Button>
                 </div>
               )}
@@ -186,7 +202,7 @@ export default function DashboardLayout() {
 
         <div className="border-t border-line bg-surface px-5 py-6 lg:hidden">
           <Button to="/consultants" variant="dark" className="w-full">
-            Book a new consultant
+            {t('common.book_consultant')}
           </Button>
         </div>
       </div>

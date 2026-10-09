@@ -1,4 +1,5 @@
 import { formatDateShort } from '../../../lib/format'
+import { useTranslation } from '../../../i18n/LanguageContext'
 
 interface SlotStepProps {
   days: string[];
@@ -19,10 +20,12 @@ export default function SlotStep({
   selectedTime,
   onSelectTime,
 }: SlotStepProps) {
+  const { t } = useTranslation()
+
   return (
     <>
       <div>
-        <span className="mb-2 block text-sm font-medium text-body">Date</span>
+        <span className="mb-2 block text-sm font-medium text-body">{t('booking.date')}</span>
         <div className="flex flex-wrap gap-2">
           {days.map((candidate) => (
             <button
@@ -44,15 +47,17 @@ export default function SlotStep({
 
       <div>
         <div className="mb-2 flex items-baseline justify-between">
-          <span className="text-sm font-medium text-body">Available times</span>
+          <span className="text-sm font-medium text-body">{t('booking.available_times')}</span>
           {bookedCount > 0 && (
-            <span className="text-xs text-muted">{bookedCount} booked</span>
+            <span className="text-xs text-muted">
+              {t('booking.booked_count', { count: bookedCount })}
+            </span>
           )}
         </div>
 
         {slots.length === 0 ? (
           <p className="rounded-xl bg-surface-muted px-4 py-3 text-sm text-muted">
-            No free times on this date. Try another day.
+            {t('booking.no_slots')}
           </p>
         ) : (
           <div className="grid grid-cols-3 gap-2">

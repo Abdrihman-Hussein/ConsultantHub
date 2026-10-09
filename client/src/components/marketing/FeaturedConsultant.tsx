@@ -5,6 +5,7 @@ import Rating from '../ui/Rating'
 import Button from '../ui/Button'
 import { bioLine } from '../../lib/featured'
 import { countLabel } from '../../lib/format'
+import { useTranslation } from '../../i18n/LanguageContext'
 
 interface FeaturedConsultantProps {
   consultant: Consultant
@@ -29,6 +30,7 @@ interface FeaturedConsultantProps {
  * rather than a review count.
  */
 export default function FeaturedConsultant({ consultant }: FeaturedConsultantProps) {
+  const { t } = useTranslation()
   const firstName = consultant.name.split(' ')[0]
 
   return (
@@ -44,9 +46,13 @@ export default function FeaturedConsultant({ consultant }: FeaturedConsultantPro
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
             <Rating value={consultant.rating} size="sm" />
             <span aria-hidden="true" className="text-ink-200 shrink-0">|</span>
-            <span className="truncate">{countLabel(consultant.sessions, 'session')} delivered</span>
+            <span className="truncate">
+              {t('common.sessions_delivered', { count: consultant.sessions })}
+            </span>
             <span aria-hidden="true" className="text-ink-200 shrink-0">|</span>
-            <span className="truncate">responds {consultant.responseTime}</span>
+            <span className="truncate">
+              {t('card.responds', { time: consultant.responseTime })}
+            </span>
           </div>
         </div>
       </div>
@@ -56,14 +62,17 @@ export default function FeaturedConsultant({ consultant }: FeaturedConsultantPro
       </p>
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
+        {/* The first name is interpolated, not translated, and carries no
+            possessive: Somali attaches possession to the noun, so the name
+            stays as it is written. */}
         <Button to={`/consultants/${consultant.id}`} variant="primary" size="sm">
-          View {firstName}&rsquo;s profile
+          {t('card.view_profile_named', { name: firstName })}
         </Button>
         <Link
           to="/consultants"
           className="text-xs font-medium text-muted underline-offset-4 transition-colors hover:text-body hover:underline"
         >
-          Browse all
+          {t('common.browse_all')}
         </Link>
       </div>
     </article>

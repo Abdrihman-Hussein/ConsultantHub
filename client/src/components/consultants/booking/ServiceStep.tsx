@@ -1,4 +1,5 @@
 import { formatPrice } from '../../../lib/format'
+import { useTranslation } from '../../../i18n/LanguageContext'
 import type { Service } from '../../../types'
 
 interface ServiceStepProps {
@@ -9,10 +10,12 @@ interface ServiceStepProps {
 }
 
 export default function ServiceStep({ services, selectedId, selected, onSelect }: ServiceStepProps) {
+  const { t } = useTranslation()
+
   return (
     <div>
       <label htmlFor="booking-service" className="mb-2 block text-sm font-medium text-body">
-        Service
+        {t('booking.service')}
       </label>
       <div className="relative">
         <select
@@ -23,8 +26,11 @@ export default function ServiceStep({ services, selectedId, selected, onSelect }
         >
           {services.map((candidate) => (
             <option key={candidate.id} value={candidate.id}>
-              {candidate.name} — {candidate.isFree ? 'Free' : formatPrice(candidate.price)} ·{' '}
-              {candidate.duration} min
+              {/* The service's own name is seeded content and stays as written;
+                  only the price and duration around it are localised. */}
+              {candidate.name} —{' '}
+              {candidate.isFree ? t('common.free') : formatPrice(candidate.price)} ·{' '}
+              {t('common.minutes', { duration: candidate.duration })}
             </option>
           ))}
         </select>

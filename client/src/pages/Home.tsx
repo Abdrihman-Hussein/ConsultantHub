@@ -2,8 +2,10 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { consultants, specializations } from '../data'
 import { featuredOrder, nextIndex, rowConsultants } from '../lib/featured'
-import { countLabel } from '../lib/format'
+import { countLabelLocalized } from '../lib/format'
 import { identityCheckSentence, verifiedCount } from '../lib/trust'
+import { useTranslation } from '../i18n/LanguageContext'
+import type { MessageKey } from '../i18n/strings'
 import Container from '../components/ui/Container'
 import SectionHeading from '../components/ui/SectionHeading'
 import Button from '../components/ui/Button'
@@ -27,27 +29,31 @@ const specialties = specializations.map((name) => ({
   count: consultants.filter((consultant) => consultant.specialization === name).length,
 }))
 
-const guarantees = [
-  {
-    title: 'Identity checks, counted',
-    // Generated from the directory. This used to assert that every consultant
-    // had been verified, which is false of the seed — two of the six are not —
-    // and then, once that was fixed, swapped the quantified falsehood for an
-    // equally unbacked one: that every consultant had been "through our review
-    // process". No field on a Consultant records a review, so directory
-    // membership says nothing about one. Only the measurable claim survives —
-    // how many of the listed have completed an identity check — and it is
-    // derived, so it cannot drift from the data it describes.
-    body: `${identityCheckSentence(consultants)} Ratings, rates and availability are published for every listing.`,
-  },
-  {
-    title: 'Free intro calls',
-    body: 'Every consultant offers a complimentary short call. Find out whether it is worth the longer session before you pay for it.',
-  },
-  {
-    title: 'No scheduling back-and-forth',
-    body: 'Pick a service and an open slot directly. No email threads, no waiting to hear back about availability.',
-  },
+/**
+ * The three reasons to book here.
+ *
+ * Titles and bodies are dictionary keys rather than finished sentences. The
+ * first body embeds `identityCheckSentence`, which is generated from the
+ * directory: this used to assert that every consultant had been verified, which
+ * is false of the seed — two of the six are not — and then, once that was
+ * fixed, swapped the quantified falsehood for an equally unbacked one: that
+ * every consultant had been "through our review process". No field on a
+ * Consultant records a review, so directory membership says nothing about one.
+ * Only the measurable claim survives — how many of the listed have completed an
+ * identity check — and because it is derived rather than written, it cannot
+ * drift from the data it describes in any language.
+ */
+const GUARANTEES: { titleKey: MessageKey; bodyKey: MessageKey }[] = [
+  { titleKey: 'home.guarantee.identity_title', bodyKey: 'home.guarantee.identity_body' },
+  { titleKey: 'home.guarantee.free_title', bodyKey: 'home.guarantee.free_body' },
+  { titleKey: 'home.guarantee.scheduling_title', bodyKey: 'home.guarantee.scheduling_body' },
+]
+
+/** Labels for the closing band's figures. The values are computed, not listed. */
+const PROOF_LABELS: MessageKey[] = [
+  'home.proof.average_rating',
+  'home.proof.sessions_delivered',
+  'home.proof.identity_checked',
 ]
 
 /**
@@ -85,6 +91,7 @@ function useFeaturedRotation(total: number) {
 }
 
 export default function Home() {
+  const { t } = useTranslation()
   const order = useMemo(() => featuredOrder(consultants), [])
   const { position, next, pause, resume } = useFeaturedRotation(order.length)
   const current = order[position]
@@ -99,18 +106,18 @@ export default function Home() {
     {
       value: consultants.reduce((sum, c) => sum + c.rating, 0) / count,
       decimals: 1,
-      label: 'Average rating',
+      labelKey: PROOF_LABELS[0],
     },
     {
       value: consultants.reduce((sum, c) => sum + c.sessions, 0),
       suffix: '+',
       decimals: 0,
-      label: 'Sessions delivered',
+      labelKey: PROOF_LABELS[1],
     },
     {
       value: verifiedCount(consultants),
       decimals: 0,
-      label: 'Identity-checked consultants',
+      labelKey: PROOF_LABELS[2],
     },
   ]
 
@@ -128,10 +135,14 @@ export default function Home() {
       <section className="border-t border-line bg-surface">
         <div className="py-20 lg:py-28">
           <SectionHeading
-            eyebrow="Top rated"
-            title="More people worth a call"
-            description="Ordered by rating and sessions delivered, with every figure taken straight from the directory."
-            action={<Button to="/consultants" variant="outline">View all</Button>}
+            eyebrow={t('home.top.eyebrow')}
+            title={t('home.top.title')}
+            description={t('home.top.description')}
+            action={
+              <Button to="/consultants" variant="outline">
+                {t('common.view_all')}
+              </Button>
+            }
           />
           <Container className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {featured.map((consultant, index) => (
@@ -151,9 +162,13 @@ export default function Home() {
       <section className="border-t border-line bg-surface-subtle">
         <Container className="py-20 lg:py-28">
           <SectionHeading
-            eyebrow="Browse by specialty"
-            title="Start where your problem is"
-            action={<Button to="/consultants" variant="outline">All consultants</Button>}
+            eyebrow={t('home.specialties.eyebrow')}
+            title={t('home.specialties.title')}
+            action={
+              <Button to="/consultants" variant="outline">
+                {t('home.specialties.all')}
+              </Button>
+            }
           />
 
           <div className="mt-12 border-t border-line">
@@ -167,7 +182,14 @@ export default function Home() {
                   {specialty.name}
                 </span>
                 <span className="flex items-center gap-6 text-sm text-muted">
-                  <span>{countLabel(specialty.count, 'consultant')}</span>
+                  <span>
+                    {countLabelLocalized(
+                      specialty.count,
+                      t,
+                      'terms.consultant',
+                      'terms.consultants',
+                    )}
+                  </span>
                   <svg
                     viewBox="0 0 20 20"
                     className="h-4 w-4 text-accent-600 transition-transform duration-300 ease-spring group-hover:translate-x-1"
@@ -188,22 +210,28 @@ export default function Home() {
       <section className="border-t border-line bg-surface-muted">
         <Container className="py-20 lg:py-28">
           <Reveal>
-            <p className="eyebrow mb-3">Why book here</p>
+            <p className="eyebrow mb-3">{t('home.why.eyebrow')}</p>
             <h2 className="max-w-2xl font-display text-display-lg text-ink-950">
-              Less risk on both sides of the call
+              {t('home.why.title')}
             </h2>
           </Reveal>
 
           <div className="mt-12 border-t border-line-strong">
-            {guarantees.map((guarantee) => (
+            {GUARANTEES.map((guarantee) => (
               <div
-                key={guarantee.title}
+                key={guarantee.titleKey}
                 className="grid gap-3 border-b border-line-strong py-7 md:grid-cols-[18rem_1fr] md:gap-10"
               >
                 <h3 className="text-lg font-semibold tracking-tight text-ink-950">
-                  {guarantee.title}
+                  {t(guarantee.titleKey)}
                 </h3>
-                <p className="text-sm leading-relaxed text-muted">{guarantee.body}</p>
+                <p className="text-sm leading-relaxed text-muted">
+                  {/* Only the first body embeds the generated coverage
+                      sentence; the rest are plain copy. */}
+                  {guarantee.bodyKey === 'home.guarantee.identity_body'
+                    ? t(guarantee.bodyKey, { sentence: identityCheckSentence(consultants, t) })
+                    : t(guarantee.bodyKey)}
+                </p>
               </div>
             ))}
           </div>
@@ -219,24 +247,23 @@ export default function Home() {
         <div className="mx-auto max-w-2xl text-center">
           <Reveal>
             <h2 className="font-display text-display-lg text-ink-950">
-              Not sure who to book? Start with a free intro call.
+              {t('home.cta.title')}
             </h2>
           </Reveal>
 
           <Reveal delay={90}>
             <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-muted">
-              Every consultant offers a complimentary intro call. Low commitment, and it takes
-              one click to book.
+              {t('home.cta.body')}
             </p>
           </Reveal>
 
           <Reveal delay={160}>
             <div className="mt-9 flex flex-wrap justify-center gap-3">
               <Button to="/consultants" variant="primary" size="lg">
-                Hire a consultant
+                {t('home.cta.hire')}
               </Button>
               <Button to="/become-a-consultant" variant="outline" size="lg">
-                Become a consultant
+                {t('home.cta.become')}
               </Button>
             </div>
           </Reveal>
@@ -245,7 +272,7 @@ export default function Home() {
           <Reveal delay={230}>
             <dl className="mx-auto mt-14 grid max-w-xl grid-cols-3 gap-6 border-t border-line-strong pt-8">
               {proof.map((stat) => (
-                <div key={stat.label}>
+                <div key={stat.labelKey}>
                   <dd className="font-display text-2xl text-ink-950">
                     <CountUp
                       value={stat.value}
@@ -253,7 +280,9 @@ export default function Home() {
                       decimals={stat.decimals}
                     />
                   </dd>
-                  <dt className="mt-1 text-xs leading-snug text-muted">{stat.label}</dt>
+                  <dt className="mt-1 text-xs leading-snug text-muted">
+                    {t(stat.labelKey)}
+                  </dt>
                 </div>
               ))}
             </dl>

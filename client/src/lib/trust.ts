@@ -1,4 +1,6 @@
 import type { Consultant } from '../types';
+import { translateEn } from '../i18n/strings';
+import type { Translate } from '../i18n/strings';
 
 /**
  * Identity-check coverage, stated the way the directory supports.
@@ -25,14 +27,22 @@ export function verifiedCount(consultants: Consultant[]): number {
  * Reports a shortfall as a shortfall. It never rounds up to "everyone", never
  * implies the remainder are mid-check (nothing in the data says that), and
  * prints no figures at all for an empty directory.
+ *
+ * `t` is the only thing that varies: the branching, the figures, and the claim
+ * are identical in every language, so a translation can restate the number but
+ * cannot change what is being claimed about it. It defaults to English, which
+ * is what the logic checks assert against.
  */
-export function identityCheckSentence(consultants: Consultant[]): string {
+export function identityCheckSentence(
+  consultants: Consultant[],
+  t: Translate = translateEn,
+): string {
   const total = consultants.length;
 
-  if (total === 0) return 'No consultants are listed yet.';
+  if (total === 0) return t('trust.none');
 
   const verified = verifiedCount(consultants);
-  if (verified === total) return `All ${total} listed have completed an identity check.`;
+  if (verified === total) return t('trust.all', { total });
 
-  return `${verified} of the ${total} listed have completed an identity check.`;
+  return t('trust.partial', { verified, total });
 }

@@ -1,5 +1,6 @@
 import type { SortKey } from '../../lib/search'
-import { sortLabels } from '../../lib/search'
+import { sortKeys, sortLabelKeys } from '../../lib/search'
+import { useTranslation } from '../../i18n/LanguageContext'
 
 interface SortSelectProps {
   value: SortKey
@@ -12,12 +13,17 @@ interface SortSelectProps {
   id?: string
 }
 
-/** Labelled sort control fed straight from `sortLabels`, so new keys just work. */
+/**
+ * Labelled sort control fed straight from the sort-key list, so new keys just
+ * work once `sortLabelKeys` has an entry for them.
+ */
 export default function SortSelect({ value, onChange, id = 'sort-results' }: SortSelectProps) {
+  const { t } = useTranslation()
+
   return (
     <div className="flex items-center gap-2">
       <label htmlFor={id} className="text-sm text-muted">
-        Sort by
+        {t('sort.label')}
       </label>
       <select
         id={id}
@@ -25,9 +31,9 @@ export default function SortSelect({ value, onChange, id = 'sort-results' }: Sor
         onChange={(event) => onChange(event.target.value as SortKey)}
         className="cursor-pointer rounded-full border border-line-strong bg-surface px-3.5 py-2 text-xs text-body transition-colors hover:border-accent-400 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/20"
       >
-        {Object.entries(sortLabels).map(([key, label]) => (
+        {sortKeys.map((key) => (
           <option key={key} value={key}>
-            {label}
+            {t(sortLabelKeys[key])}
           </option>
         ))}
       </select>

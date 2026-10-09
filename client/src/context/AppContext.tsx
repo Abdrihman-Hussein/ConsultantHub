@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useMemo, useState } from 'react
 import type { ReactNode } from 'react';
 import { KEYS, read, write, remove, clearAll, isPersistent } from '../lib/storage';
 import { login as loginUser, register as registerUser, enableConsultantRole } from '../lib/auth';
-import type { LoginInput, RegisterInput } from '../lib/auth';
+import type { AuthFailure, LoginInput, RegisterInput } from '../lib/auth';
 import { createId, todayISO } from '../lib/format';
 import { seedAppointments, seedUsers } from '../data/seed';
 import type {
@@ -39,8 +39,12 @@ interface AppState {
   appointments: Appointment[];
   isPersistent: boolean;
 
-  register: (input: RegisterInput) => Promise<string | null>;
-  login: (input: LoginInput) => Promise<string | null>;
+  /**
+   * `null` on success, or the failure key from `lib/auth` — a dictionary key,
+   * not a sentence, so the caller renders it in the active language.
+   */
+  register: (input: RegisterInput) => Promise<AuthFailure | null>;
+  login: (input: LoginInput) => Promise<AuthFailure | null>;
   logout: () => void;
 
   /**

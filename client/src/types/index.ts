@@ -106,7 +106,16 @@ export interface Appointment {
   createdAt: string;
 }
 
-/** Result of an auth attempt, so forms can show a specific message. */
+import type { MessageKey } from '../i18n/strings';
+
+/**
+ * Result of an auth attempt, so forms can show a specific message.
+ *
+ * `error` is a dictionary key rather than a sentence — see `lib/auth.ts`. The
+ * form renders it through the active language, so an error never arrives
+ * pre-written in the wrong language. Typing it as `MessageKey` means a
+ * misspelled key is a compile error rather than a blank error message.
+ */
 export type AuthResult =
   | { ok: true; session: Session }
-  | { ok: false; error: string };
+  | { ok: false; error: { key: MessageKey } };

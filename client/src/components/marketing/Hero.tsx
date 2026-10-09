@@ -2,6 +2,7 @@ import Button from '../ui/Button'
 import Reveal from '../ui/Reveal'
 import CreamBand from './CreamBand'
 import FeaturedConsultant from './FeaturedConsultant'
+import { useTranslation } from '../../i18n/LanguageContext'
 import type { Consultant } from '../../types'
 
 interface HeroProps {
@@ -30,36 +31,37 @@ interface HeroProps {
  * `accent-on-ink` would have been the ink-band choice and is unreadable here.
  */
 export default function Hero({ consultant, onNext, position, total }: HeroProps) {
+  const { t } = useTranslation()
+
   return (
     <CreamBand className="border-b border-line">
       <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
         <div>
           <Reveal>
-            <p className="eyebrow text-accent-600">Independent expertise</p>
+            <p className="eyebrow text-accent-600">{t('home.hero.eyebrow')}</p>
           </Reveal>
 
           <Reveal delay={80}>
             <h1 className="mt-5 font-display text-display-2xl text-ink-950">
-              Find your person.
+              {t('home.hero.title_lead')}
               <br />
-              <span className="text-accent-600">Move forward.</span>
+              <span className="text-accent-600">{t('home.hero.title_accent')}</span>
             </h1>
           </Reveal>
 
           <Reveal delay={160}>
             <p className="mt-7 max-w-xl text-lg leading-relaxed text-muted">
-              Good advice changes things. Find a consultant who understands where you
-              are, read what they actually know, and book a clear next step.
+              {t('home.hero.body')}
             </p>
           </Reveal>
 
           <Reveal delay={240}>
             <div className="mt-9 flex flex-wrap items-center gap-3">
               <Button to="/consultants" variant="primary" size="lg">
-                Explore consultants
+                {t('home.hero.explore')}
               </Button>
               <Button to="/become-a-consultant" variant="outline" size="lg">
-                For consultants
+                {t('home.hero.for_consultants')}
               </Button>
             </div>
           </Reveal>
@@ -76,7 +78,7 @@ export default function Hero({ consultant, onNext, position, total }: HeroProps)
           </div>
 
           <div className="mt-6 flex items-center gap-4">
-            <div className="flex items-center gap-2" role="group" aria-label="Featured consultant">
+            <div className="flex items-center gap-2" role="group" aria-label={t('home.hero.dots_group')}>
               {Array.from({ length: total }, (_, index) => (
                 <span
                   key={index}
@@ -93,9 +95,9 @@ export default function Hero({ consultant, onNext, position, total }: HeroProps)
               onClick={onNext}
               className="text-xs font-medium text-muted underline-offset-4 transition-colors hover:text-body hover:underline"
             >
-              Next consultant
+              {t('home.hero.next')}
               <span className="sr-only">
-                {` (${position + 1} of ${total} featured)`}
+                {t('home.hero.position', { position: position + 1, total })}
               </span>
             </button>
           </div>

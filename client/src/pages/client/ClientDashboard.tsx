@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
 import { consultants } from '../../data'
 import { formatDate, relativeDay, todayISO, formatPrice } from '../../lib/format'
-import type { Appointment } from '../../types'
+import { useTranslation } from '../../i18n/LanguageContext'
+import type { MessageKey, Translate } from '../../i18n/strings'
+import type { Appointment, AppointmentStatus, MeetingType } from '../../types'
 import Container from '../../components/ui/Container'
 import Button from '../../components/ui/Button'
 import Card from '../../components/ui/Card'
@@ -22,6 +24,7 @@ function isUpcoming(appointment: Appointment) {
 
 export default function ClientDashboard() {
   const { session, myAppointments, cancelAppointment } = useApp()
+  const { t } = useTranslation()
   const [cancelling, setCancelling] = useState<string | null>(null)
 
   const { upcoming, past, spend } = useMemo(() => {
@@ -57,14 +60,14 @@ export default function ClientDashboard() {
       <Container className="py-16 lg:py-24">
         <Reveal>
           <EmptyState
-            title="Log in to see your dashboard"
-            body="Your bookings, messages, and history live here once you sign in."
+            title={t('client.login_title')}
+            body={t('client.login_body')}
             icon="user"
             action={
               <div className="flex flex-wrap justify-center gap-3">
-                <Button to="/login">Log in</Button>
+                <Button to="/login">{t('common.log_in')}</Button>
                 <Button to="/register" variant="outline">
-                  Create an account
+                  {t('common.create_account')}
                 </Button>
               </div>
             }
@@ -75,10 +78,10 @@ export default function ClientDashboard() {
   }
 
   const stats = [
-    { label: 'Upcoming', value: String(upcoming.length) },
-    { label: 'Completed', value: String(past.filter((a) => a.status === 'COMPLETED').length) },
-    { label: 'Cancelled', value: String(past.filter((a) => a.status === 'CANCELLED').length) },
-    { label: 'Total spent', value: formatPrice(spend) },
+    { label: t('client.stat_upcoming'), value: String(upcoming.length) },
+    { label: t('client.stat_completed'), value: String(past.filter((a) => a.status === 'COMPLETED').length) },
+    { label: t('client.stat_cancelled'), value: String(past.filter((a) => a.status === 'CANCELLED').length) },
+    { label: t('client.stat_spent'), value: formatPrice(spend) },
   ]
 
   return (
@@ -86,7 +89,7 @@ export default function ClientDashboard() {
       <div className="flex justify-end">
         <Reveal>
           <Button to="/consultants" variant="dark" size="sm">
-            Book a new consultant
+            {t('common.book_consultant')}
           </Button>
         </Reveal>
       </div>
@@ -97,20 +100,22 @@ export default function ClientDashboard() {
             <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <p className="eyebrow text-accent-600">Next session</p>
-                  <Badge tone="accent">{relativeDay(nextUp.date)}</Badge>
+                  <p className="eyebrow text-accent-600">{t('client.next_session')}</p>
+                  <Badge tone="accent">{relativeDay(nextUp.date, t)}</Badge>
                 </div>
                 <p className="mt-3 font-display text-display-md text-ink-950">
                   {nextUp.serviceName}
                 </p>
-                <p className="mt-1 text-base text-body">with {nextUp.consultantName}</p>
+                <p className="mt-1 text-base text-body">
+                  {t('client.with', { name: nextUp.consultantName })}
+                </p>
                 <p className="mt-3 text-sm text-muted">
                   {formatDate(nextUp.date)} · {nextUp.startTime} – {nextUp.endTime} ·{' '}
-                  <span className="capitalize">{nextUp.meetingType.replace('-', ' ')}</span>
+                  {t(meetingTypeKey(nextUp.meetingType))}
                 </p>
               </div>
               <Button to="/client/appointments" variant="primary" className="shrink-0">
-                Manage booking
+                {t('client.manage_booking')}
               </Button>
             </div>
           </div>
@@ -133,13 +138,15 @@ export default function ClientDashboard() {
       <section className="mt-14">
         <Reveal>
           <div className="flex items-baseline justify-between gap-4">
-            <h2 className="text-lg font-semibold tracking-tight text-ink-950">Upcoming</h2>
+            <h2 className="text-lg font-semibold tracking-tight text-ink-950">
+              {t('client.section_upcoming')}
+            </h2>
             {upcoming.length > 0 && (
               <Link
                 to="/client/appointments"
                 className="text-sm text-muted transition-colors hover:text-ink-950"
               >
-                View all
+                {t('common.view_all')}
               </Link>
             )}
           </div>
@@ -149,10 +156,12 @@ export default function ClientDashboard() {
           <Reveal delay={80}>
             <div className="mt-5">
               <EmptyState
-                title="Nothing booked yet"
-                body="Browse the directory and book an intro call — every consultant offers a free one."
+                title={t('client.empty_booked_title')}
+                body={t('client.empty_booked_body')}
                 icon="calendar"
-                action={<Button to="/consultants">Find a consultant</Button>}
+                action={
+                  <Button to="/consultants">{t('client.empty_booked_cta')}</Button>
+                }
               />
             </div>
           </Reveal>
@@ -173,12 +182,18 @@ export default function ClientDashboard() {
 
       <section className="mt-14">
         <Reveal>
-          <h2 className="text-lg font-semibold tracking-tight text-ink-950">History</h2>
+          <h2 className="text-lg font-semibold tracking-tight text-ink-950">
+            {t('client.section_history')}
+          </h2>
         </Reveal>
         {past.length === 0 ? (
           <Reveal delay={80}>
             <div className="mt-5">
-              <EmptyState title="No past sessions" body="Completed and cancelled bookings appear here." icon="clock" />
+              <EmptyState
+                title={t('client.empty_history_title')}
+                body={t('client.empty_history_body')}
+                icon="clock"
+              />
             </div>
           </Reveal>
         ) : (
@@ -207,7 +222,22 @@ interface RowProps {
   onCancel?: () => void
 }
 
+/**
+ * Meeting format labels. The stored value is `'in-person'`, which stringifies to
+ * an English hyphenation no other language can reuse, so the label is looked up
+ * rather than derived.
+ */
+function meetingTypeKey(meetingType: MeetingType): MessageKey {
+  return meetingType === 'video' ? 'meeting.video' : 'meeting.in_person'
+}
+
+function statusLabelKey(status: AppointmentStatus): MessageKey {
+  return `status.${status}` as MessageKey
+}
+
 function AppointmentRow({ appointment, cancelling, onCancel }: RowProps) {
+  const { t } = useTranslation()
+
   const statusTone =
     appointment.status === 'CONFIRMED'
       ? 'accent'
@@ -225,10 +255,13 @@ function AppointmentRow({ appointment, cancelling, onCancel }: RowProps) {
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
           <p className="font-medium text-ink-950">{appointment.serviceName}</p>
-          <Badge tone={statusTone}>{appointment.status.toLowerCase()}</Badge>
+          <Badge tone={statusTone}>{t(statusLabelKey(appointment.status))}</Badge>
         </div>
+        {/* The consultant's name is its own element — a link when they are still
+            in the directory — so the preposition is a separate key rather than
+            one sentence with the name interpolated into it. */}
         <p className="mt-1 text-sm text-muted">
-          with{' '}
+          {t('client.with_prefix')}{' '}
           {consultant ? (
             <Link
               to={`/consultants/${consultant.id}`}
@@ -255,7 +288,7 @@ function AppointmentRow({ appointment, cancelling, onCancel }: RowProps) {
               : 'border-line-strong text-muted hover:border-danger hover:text-danger'
           }`}
         >
-          {cancelling ? 'Tap again to confirm' : 'Cancel'}
+          {cancelling ? t('client.tap_again') : t('client.cancel')}
         </button>
       )}
     </Card>

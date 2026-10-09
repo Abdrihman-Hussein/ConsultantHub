@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import Avatar from '../ui/Avatar'
 import Badge from '../ui/Badge'
 import Rating from '../ui/Rating'
-import { countLabel } from '../../lib/format'
+import { useTranslation } from '../../i18n/LanguageContext'
 import type { Consultant } from '../../types'
 
 interface ConsultantCardProps {
@@ -19,6 +19,8 @@ interface ConsultantCardProps {
  * profile's review list.
  */
 export default function ConsultantCard({ consultant }: ConsultantCardProps) {
+  const { t } = useTranslation()
+
   return (
     <article className="group flex h-full flex-col rounded-2xl border border-line bg-surface p-5 transition-colors duration-300 hover:border-line-strong">
       <div className="flex items-start justify-between gap-4">
@@ -30,7 +32,7 @@ export default function ConsultantCard({ consultant }: ConsultantCardProps) {
         />
         {consultant.verified && (
           <Badge tone="accent" className="shrink-0">
-            Verified
+            {t('card.verified')}
           </Badge>
         )}
       </div>
@@ -45,7 +47,10 @@ export default function ConsultantCard({ consultant }: ConsultantCardProps) {
       <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
         <Rating value={consultant.rating} size="sm" />
         <span aria-hidden="true" className="text-ink-200">·</span>
-        <span>{countLabel(consultant.sessions, 'session')} delivered</span>
+        {/* One key for the whole phrase rather than a count and a separate word:
+            Somali orders and shapes the two differently, and a count helper
+            cannot know that. */}
+        <span>{t('common.sessions_delivered', { count: consultant.sessions })}</span>
       </div>
 
       <div className="mt-auto flex items-end justify-between gap-4 pt-5">
@@ -59,7 +64,7 @@ export default function ConsultantCard({ consultant }: ConsultantCardProps) {
           to={`/consultants/${consultant.id}`}
           className="rounded-full border border-line-strong px-4 py-2 text-sm font-medium text-body transition-all duration-300 ease-out hover:border-accent-500 hover:bg-accent-500 hover:text-white"
         >
-          View profile
+          {t('card.view_profile')}
         </Link>
       </div>
     </article>

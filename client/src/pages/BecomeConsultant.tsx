@@ -1,6 +1,8 @@
 import Container from '../components/ui/Container'
 import Reveal from '../components/ui/Reveal'
 import OfferServicesCard from '../components/consultants/OfferServicesCard'
+import { useTranslation } from '../i18n/LanguageContext'
+import type { MessageKey } from '../i18n/strings'
 
 /*
  * The standalone "offer my services" flow.
@@ -10,39 +12,30 @@ import OfferServicesCard from '../components/consultants/OfferServicesCard'
  * offer their own services, from wherever they already are.
  */
 
-const steps = [
-  {
-    title: 'One account, either way',
-    body: 'Sign up the same way as anyone else. There is no consultant-only sign-up to fill in first.',
-  },
-  {
-    title: 'Switch when it suits you',
-    body: 'Turn on your consultant profile in one click. Nothing you have booked as a client is affected.',
-  },
-  {
-    title: 'Stay in control of availability',
-    body: 'Set the hours you are free, the services you offer, and your rates — clients only see the slots you publish.',
-  },
+const steps: { titleKey: MessageKey; bodyKey: MessageKey }[] = [
+  { titleKey: 'become.step1_title', bodyKey: 'become.step1_body' },
+  { titleKey: 'become.step2_title', bodyKey: 'become.step2_body' },
+  { titleKey: 'become.step3_title', bodyKey: 'become.step3_body' },
 ]
 
 export default function BecomeConsultant() {
+  const { t } = useTranslation()
+
   return (
     <>
       <section className="border-b border-line bg-surface">
         <Container className="py-16 lg:py-20">
           <Reveal>
-            <p className="eyebrow mb-4">For consultants</p>
+            <p className="eyebrow mb-4">{t('home.hero.for_consultants')}</p>
           </Reveal>
           <Reveal delay={80}>
             <h1 className="max-w-3xl font-display text-display-lg text-ink-950">
-              Keep your client account. Add a consultant one.
+              {t('become.title')}
             </h1>
           </Reveal>
           <Reveal delay={160}>
             <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted">
-              Registration on ConsultantHub is the same for everyone — nobody is asked up front
-              whether they plan to hire or to be hired. Offering your services is a separate switch
-              you can flip whenever you want, without starting over.
+              {t('become.body')}
             </p>
           </Reveal>
         </Container>
@@ -56,15 +49,15 @@ export default function BecomeConsultant() {
 
           <div className="mt-10 grid gap-6 md:grid-cols-3">
             {steps.map((step, index) => (
-              <Reveal key={step.title} delay={100 + index * 90}>
+              <Reveal key={step.titleKey} delay={100 + index * 90}>
                 <div className="h-full rounded-2xl border border-line bg-surface p-6 shadow-card">
                   <span className="font-display text-2xl text-accent-500">
                     {String(index + 1).padStart(2, '0')}
                   </span>
                   <h2 className="mt-4 text-base font-semibold tracking-tight text-ink-950">
-                    {step.title}
+                    {t(step.titleKey)}
                   </h2>
-                  <p className="mt-2 text-sm leading-relaxed text-muted">{step.body}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-muted">{t(step.bodyKey)}</p>
                 </div>
               </Reveal>
             ))}

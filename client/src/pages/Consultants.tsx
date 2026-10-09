@@ -2,15 +2,16 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { consultants } from '../data'
 import { useApp } from '../context/AppContext'
-import { countLabel, isMdUp } from '../lib/format'
+import { countLabelLocalized, isMdUp } from '../lib/format'
 import {
   countActiveFilters,
   defaultFilters,
   describeFilters,
   searchConsultants,
-  sortLabels,
+  sortLabelKeys,
 } from '../lib/search'
 import type { Filters } from '../lib/search'
+import { useTranslation } from '../i18n/LanguageContext'
 import Container from '../components/ui/Container'
 import Button from '../components/ui/Button'
 import Reveal from '../components/ui/Reveal'
@@ -33,6 +34,7 @@ const suggestions = Array.from(
 export default function Consultants() {
   const [searchParams, setSearchParams] = useSearchParams()
   const { appointments } = useApp()
+  const { t } = useTranslation()
 
   const [filters, setFilters] = useState<Filters>(() => {
     const specialty = searchParams.get('specialty') ?? ''
@@ -180,11 +182,18 @@ export default function Consultants() {
         />
         <Container className="relative py-14">
           <Reveal>
-            <p className="eyebrow mb-3">Directory</p>
-            <h1 ref={headingRef} tabIndex={-1} className="font-display text-display-lg text-ink-950 focus:outline-none">Browse consultants</h1>
+            <p className="eyebrow mb-3">{t('directory.eyebrow')}</p>
+            <h1 ref={headingRef} tabIndex={-1} className="font-display text-display-lg text-ink-950 focus:outline-none">
+              {t('directory.title')}
+            </h1>
             <p className="mt-4 max-w-xl text-base leading-relaxed text-muted">
-              {consultants.length} consultants across {specialties.length} specialties. Search by
-              name, expertise, or city.
+              {/* Both figures are interpolated, never written in: they come from
+                  the directory, and a literal here would be a figure that could
+                  go stale without anything failing. */}
+              {t('directory.description', {
+                count: consultants.length,
+                specialties: specialties.length,
+              })}
             </p>
           </Reveal>
         </Container>
@@ -200,10 +209,19 @@ export default function Consultants() {
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-5">
               <p aria-live="polite" className="text-sm text-muted">
                 <span className="font-medium text-body">
-                  {countLabel(results.length, 'consultant')}
+                  {countLabelLocalized(
+                    results.length,
+                    t,
+                    'terms.consultant',
+                    'terms.consultants',
+                  )}
                 </span>
                 {results.length > 0 && (
-                  <span className="text-subtle"> · sorted by {sortLabels[filters.sort].toLowerCase()}</span>
+                  <span className="text-subtle">
+                    {/* Not lower-cased: the label is a whole clause in Somali and
+                        in English, and neither reads right part-folded. */}
+                    {t('directory.sorted_by', { label: t(sortLabelKeys[filters.sort]) })}
+                  </span>
                 )}
               </p>
 
@@ -223,7 +241,7 @@ export default function Consultants() {
                   }}
                   aria-expanded={mobileFiltersOpen}
                 >
-                  Filters
+                  {t('directory.filters')}
                   {activeCount > 0 && (
                     <span className="grid h-5 min-w-5 place-items-center rounded-full bg-accent-500 px-1.5 text-xs text-white">
                       {activeCount}
@@ -243,7 +261,9 @@ export default function Consultants() {
                     onClick={() => clearFilter(chip.key)}
                     className="group inline-flex items-center gap-1.5 rounded-full bg-accent-50 px-3 py-1.5 text-xs text-accent-800 transition-colors hover:bg-accent-100"
                   >
-                    {chip.label}
+                    {/* `verifiedOnly` carries no value; its key has no
+                        placeholder, so passing undefined is harmless. */}
+                    {t(chip.labelKey, { value: chip.value ?? '' })}
                     <svg
                       viewBox="0 0 20 20"
                       className="h-3 w-3 opacity-60 transition-opacity group-hover:opacity-100"
@@ -261,7 +281,7 @@ export default function Consultants() {
                     onClick={() => setFilters(defaultFilters)}
                     className="px-2 text-xs text-muted underline underline-offset-4 hover:text-ink-950"
                   >
-                    Clear all
+                    {t('directory.clear_all')}
                   </button>
                 )}
               </div>
@@ -279,13 +299,13 @@ export default function Consultants() {
                   ref={sheetRef}
                   role="dialog"
                   aria-modal="true"
-                  aria-label="Filters"
+                  aria-label={t('directory.filters')}
                   className="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-3xl border-t border-line bg-surface-subtle p-6 shadow-2xl"
                 >
                   <div className="-mr-2 -mt-2 mb-2 flex justify-end">
                     <button
                       type="button"
-                      aria-label="Close filters"
+                      aria-label={t('directory.close_filters')}
                       onClick={() => setMobileFiltersOpen(false)}
                       className="grid h-9 w-9 place-items-center rounded-full text-muted transition-colors hover:bg-ink-100 hover:text-body focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/45"
                     >
@@ -304,7 +324,14 @@ export default function Consultants() {
                     idPrefix="sheet"
                   />
                   <Button className="mt-6 w-full" onClick={() => setMobileFiltersOpen(false)}>
-                    Show {countLabel(results.length, 'consultant')}
+                    {t('directory.show_results', {
+                      count: countLabelLocalized(
+                        results.length,
+                        t,
+                        'terms.consultant',
+                        'terms.consultants',
+                      ),
+                    })}
                   </Button>
                 </div>
               </div>
@@ -327,16 +354,16 @@ export default function Consultants() {
             ) : (
               <div className="mt-8">
                 <EmptyState
-                  title="No consultants match those filters"
+                  title={t('directory.empty_title')}
                   body={
                     activeCount > 1
-                      ? 'Try removing a filter or two — combining several narrows results quickly.'
-                      : 'Try a different search term or specialty.'
+                      ? t('directory.empty_body_many')
+                      : t('directory.empty_body_one')
                   }
                   icon="search"
                   action={
                     <Button variant="outline" onClick={() => setFilters(defaultFilters)}>
-                      Reset filters
+                      {t('directory.reset_filters')}
                     </Button>
                   }
                 />
@@ -345,9 +372,18 @@ export default function Consultants() {
 
             {/* Surfaced so a demo does not imply bookings are enforced. */}
             <p className="mt-12 text-center text-xs text-subtle">
-              {countLabel(appointments.length, 'booking')} in this browser ·{' '}
+              {/* Count first, then the scope qualifier — Somali puts the
+                  qualifier after the noun phrase, so the two are separate
+                  fragments rather than one concatenated sentence. */}
+              {countLabelLocalized(
+                appointments.length,
+                t,
+                'terms.booking',
+                'terms.bookings',
+              )}{' '}
+              {t('directory.bookings_note')} ·{' '}
               <Link to="/login" className="underline underline-offset-4 hover:text-muted">
-                log in to manage yours
+                {t('directory.bookings_manage')}
               </Link>
             </p>
           </div>

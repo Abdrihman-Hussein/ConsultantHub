@@ -1,3 +1,5 @@
+import type { MessageKey } from '../i18n/strings'
+
 /**
  * Password hashing for the local demo accounts.
  *
@@ -43,9 +45,18 @@ export function createSalt(): string {
     .join('')
 }
 
-/** Rough password strength check, used to drive the meter on the register form. */
-export function scorePassword(password: string): { score: 0 | 1 | 2 | 3 | 4; label: string } {
-  if (!password) return { score: 0, label: 'Enter a password' }
+/**
+ * Rough password strength check, used to drive the meter on the register form.
+ *
+ * Returns the score and the dictionary key for its label, not the label: these
+ * were English literals, so the meter read "Weak" on a Somali form. Scoring
+ * stays here; naming the result belongs to the dictionary.
+ */
+export function scorePassword(password: string): {
+  score: 0 | 1 | 2 | 3 | 4
+  labelKey: MessageKey
+} {
+  if (!password) return { score: 0, labelKey: 'strength.empty' }
 
   let score = 0
   if (password.length >= 8) score += 1
@@ -53,7 +64,13 @@ export function scorePassword(password: string): { score: 0 | 1 | 2 | 3 | 4; lab
   if (/[A-Z]/.test(password) && /[a-z]/.test(password)) score += 1
   if (/\d/.test(password) && /[^\w\s]/.test(password)) score += 1
 
-  const labels = ['Too short', 'Weak', 'Fair', 'Good', 'Strong']
+  const keys: MessageKey[] = [
+    'strength.too_short',
+    'strength.weak',
+    'strength.fair',
+    'strength.good',
+    'strength.strong',
+  ]
   const scoreClamped = Math.min(score, 4) as 0 | 1 | 2 | 3 | 4
-  return { score: scoreClamped, label: labels[scoreClamped] }
+  return { score: scoreClamped, labelKey: keys[scoreClamped] }
 }

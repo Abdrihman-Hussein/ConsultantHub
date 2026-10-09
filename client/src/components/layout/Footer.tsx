@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import { consultants } from '../../data'
 import { identityCheckSentence } from '../../lib/trust'
+import { useTranslation } from '../../i18n/LanguageContext'
+import type { MessageKey } from '../../i18n/strings'
 import Reveal from '../ui/Reveal'
 import InkBand from '../marketing/InkBand'
 
@@ -13,36 +15,39 @@ import InkBand from '../marketing/InkBand'
  * navigated to the homepage. A link that lands somewhere other than its label
  * is worse than no link at all, so unimplemented destinations are modelled as
  * `href: null` and rendered as non-navigational text.
+ *
+ * Labels are dictionary keys, so an unimplemented entry cannot read as
+ * implemented in another language than the one it was written in.
  */
-type FooterLink = { label: string; href: string | null }
+type FooterLink = { labelKey: MessageKey; href: string | null }
 
-const columns: { title: string; links: FooterLink[] }[] = [
+const columns: { titleKey: MessageKey; links: FooterLink[] }[] = [
   {
-    title: 'Product',
+    titleKey: 'footer.column_product',
     links: [
-      { label: 'Browse consultants', href: '/consultants' },
-      { label: 'How it works', href: '/#how-it-works' },
+      { labelKey: 'footer.browse_consultants', href: '/consultants' },
+      { labelKey: 'nav.how_it_works', href: '/#how-it-works' },
       // Pricing is per-consultant and shown on every card and profile, so
       // there is no page to link to and no anchor to invent.
-      { label: 'Pricing', href: null },
+      { labelKey: 'footer.pricing', href: null },
     ],
   },
   {
-    title: 'Company',
+    titleKey: 'footer.column_company',
     links: [
-      { label: 'Become a consultant', href: '/become-a-consultant' },
-      { label: 'Client dashboard', href: '/client/dashboard' },
+      { labelKey: 'footer.become_consultant', href: '/become-a-consultant' },
+      { labelKey: 'footer.client_dashboard', href: '/client/dashboard' },
       // No support desk exists in this build, so this is a label, not a link.
-      { label: 'Contact support', href: null },
+      { labelKey: 'footer.contact_support', href: null },
     ],
   },
   {
-    title: 'Legal',
+    titleKey: 'footer.column_legal',
     links: [
       // These documents have not been written. Inventing stub pages would be
       // the same class of fabrication this redesign removed elsewhere.
-      { label: 'Terms of service', href: null },
-      { label: 'Privacy policy', href: null },
+      { labelKey: 'footer.terms', href: null },
+      { labelKey: 'footer.privacy', href: null },
     ],
   },
 ]
@@ -70,6 +75,8 @@ const socials = [
 ]
 
 export default function Footer() {
+  const { t } = useTranslation()
+
   return (
     <InkBand as="footer" className="border-t border-ink-line">
       <div className="grid gap-12 md:grid-cols-[1.5fr_repeat(3,1fr)]">
@@ -83,9 +90,13 @@ export default function Footer() {
                 ConsultantHub
               </span>
             </Link>
+            {/* Two sentences rather than one interpolated blob: the coverage
+                claim is generated from the directory and must not be
+                re-worded by the language, only re-ordered. */}
             <p className="mt-4 text-sm leading-relaxed text-on-ink-muted">
-              {identityCheckSentence(consultants)} Rates and availability are published for
-              every listing. Find the right person and book a session in minutes.
+              {identityCheckSentence(consultants, t)}{' '}
+              {t('footer.blurb_rates')}{' '}
+              {t('footer.blurb_cta')}
             </p>
 
             {/* Rendered inert: no accounts exist to link to, so these carry no href and
@@ -94,7 +105,7 @@ export default function Footer() {
               {socials.map((social) => (
                 <span
                   key={social.label}
-                  title={`${social.label} — not available yet`}
+                  title={t('footer.social_unavailable', { name: social.label })}
                   className="grid h-9 w-9 place-items-center rounded-full border border-ink-line text-on-ink-muted"
                 >
                   <svg
@@ -105,7 +116,9 @@ export default function Footer() {
                   >
                     <path d={social.path} />
                   </svg>
-                  <span className="sr-only">{social.label} — not available yet</span>
+                  <span className="sr-only">
+                    {t('footer.social_unavailable', { name: social.label })}
+                  </span>
                 </span>
               ))}
             </div>
@@ -113,17 +126,17 @@ export default function Footer() {
         </Reveal>
 
         {columns.map((column, index) => (
-          <Reveal key={column.title} delay={(index + 1) * 70}>
+          <Reveal key={column.titleKey} delay={(index + 1) * 70}>
             <div>
-              <h3 className="eyebrow mb-4 text-on-ink-muted">{column.title}</h3>
+              <h3 className="eyebrow mb-4 text-on-ink-muted">{t(column.titleKey)}</h3>
               <ul className="space-y-2.5">
                 {column.links.map((link) => (
-                  <li key={link.label}>
+                  <li key={link.labelKey}>
                     {link.href === null ? (
                       // Not a destination, so not a link: no href, no focus
                       // stop, no hover promise. The label stands for itself.
                       <span className="inline-flex items-center text-sm text-on-ink-muted">
-                        {link.label}
+                        {t(link.labelKey)}
                       </span>
                     ) : (
                       <Link
@@ -131,7 +144,7 @@ export default function Footer() {
                         className="group inline-flex items-center text-sm text-on-ink-muted transition-colors hover:text-on-ink"
                       >
                         <span className="mr-0 h-px w-0 bg-accent-on-ink transition-all duration-300 ease-out group-hover:mr-2 group-hover:w-3" />
-                        {link.label}
+                        {t(link.labelKey)}
                       </Link>
                     )}
                   </li>
@@ -145,9 +158,9 @@ export default function Footer() {
       <Reveal delay={120}>
         <div className="mt-14 flex flex-col gap-3 border-t border-ink-line pt-8 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-on-ink-muted">
-            © {new Date().getFullYear()} ConsultantHub. All rights reserved.
+            {t('footer.copyright', { year: new Date().getFullYear() })}
           </p>
-          <p className="text-xs text-on-ink-muted">MIT licensed.</p>
+          <p className="text-xs text-on-ink-muted">{t('footer.license')}</p>
         </div>
       </Reveal>
     </InkBand>

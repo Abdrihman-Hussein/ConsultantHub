@@ -1,33 +1,37 @@
 import { Link } from 'react-router-dom'
 import Container from '../ui/Container'
 import Reveal from '../ui/Reveal'
+import { useTranslation } from '../../i18n/LanguageContext'
+import type { MessageKey } from '../../i18n/strings'
 
-const steps = [
+const steps: { number: string; titleKey: MessageKey; bodyKey: MessageKey }[] = [
   {
     number: '01',
-    title: 'Search by specialty',
-    body: 'Filter verified consultants by expertise, rating, and rate so you only see people who fit.',
+    titleKey: 'how.step1.title',
+    bodyKey: 'how.step1.body',
   },
   {
     number: '02',
-    title: 'Review the profile',
-    body: 'Read real experience, session counts, and the services they offer before you commit.',
+    titleKey: 'how.step2.title',
+    bodyKey: 'how.step2.body',
   },
   {
     number: '03',
-    title: 'Pick a time and book',
-    body: 'Choose a service and an open slot. No email threads, no back-and-forth scheduling.',
+    titleKey: 'how.step3.title',
+    bodyKey: 'how.step3.body',
   },
 ]
 
 export default function HowItWorks() {
+  const { t } = useTranslation()
+
   return (
     <section id="how-it-works" className="scroll-mt-20 border-t border-line bg-surface-subtle">
       <Container className="py-20 lg:py-28">
         <Reveal>
-          <p className="eyebrow mb-3">How it works</p>
+          <p className="eyebrow mb-3">{t('how.eyebrow')}</p>
           <h2 className="max-w-2xl font-display text-display-lg text-ink-950">
-            Three steps from searching to booked.
+            {t('how.title')}
           </h2>
         </Reveal>
 
@@ -39,9 +43,9 @@ export default function HowItWorks() {
                   {step.number}
                 </span>
                 <h3 className="text-lg font-semibold tracking-tight text-ink-950">
-                  {step.title}
+                  {t(step.titleKey)}
                 </h3>
-                <p className="text-sm leading-relaxed text-muted">{step.body}</p>
+                <p className="text-sm leading-relaxed text-muted">{t(step.bodyKey)}</p>
               </div>
             </Reveal>
           ))}
@@ -49,13 +53,13 @@ export default function HowItWorks() {
 
         <Reveal delay={200}>
           <p className="mt-12 text-sm text-muted">
-            Ready to get started?{' '}
+            {t('how.ready')}{' '}
             <Link
               to="/consultants"
               className="group inline-flex items-center font-medium text-ink-950"
             >
               <span className="bg-gradient-to-r from-accent-500 to-accent-600 bg-clip-text text-transparent transition-all duration-300 group-hover:from-accent-600 group-hover:to-accent-700">
-                Browse consultants
+                {t('how.browse')}
               </span>
               <span className="ml-1 inline-block transition-transform duration-300 ease-spring group-hover:translate-x-1">
                 →
