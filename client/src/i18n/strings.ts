@@ -100,7 +100,7 @@ export const en = {
   'reviews.summary.unshown': 'Written reviews not shown yet',
 
   // ---- navbar ---------------------------------------------------------------
-  'nav.browse': 'Browse',
+  'nav.browse': 'Explore consultants',
   'nav.how_it_works': 'How it works',
   'nav.toggle_navigation': 'Toggle navigation',
 
@@ -509,7 +509,7 @@ export const so: Dict = {
   'reviews.summary.unshown': 'Tixraacyo qoraal ah oo hadda la sheegi karin',
 
   // ---- navbar ---------------------------------------------------------------
-  'nav.browse': 'Eeg',
+  'nav.browse': 'Eeg la-taliyada',
   'nav.how_it_works': 'Sida ay u shaqeyso',
   'nav.toggle_navigation': 'Uqur navigation-ka',
 
