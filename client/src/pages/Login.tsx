@@ -56,6 +56,9 @@ export default function Login() {
         signUpUrl="/register"
         forceRedirectUrl={redirectTo}
         appearance={authCardAppearance}
+        fallback={
+          <p className="py-8 text-center text-sm text-muted">{t('common.loading_form')}</p>
+        }
       />
     </AuthShell>
   )

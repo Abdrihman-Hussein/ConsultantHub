@@ -69,6 +69,7 @@ export const en = {
   'common.dashboard': 'Dashboard',
   'common.create_account': 'Create an account',
   'common.book_consultant': 'Book a new consultant',
+  'common.loading_form': 'One moment — the sign-in form is still loading.',
 
   // ---- relative dates (see i18n/datetime.ts) --------------------------------
   'time.today': 'Today',
@@ -469,6 +470,7 @@ export const so: Dict = {
   'common.dashboard': 'Xaraf',
   'common.create_account': 'Samee xisaab',
   'common.book_consultant': 'La-talin cusub ballan qabso',
+  'common.loading_form': 'Sug daqiiqad — foomku weli wuu soo shubanayaa.',
 
   // ---- relative dates (see i18n/datetime.ts) --------------------------------
   'time.today': 'Maanta',

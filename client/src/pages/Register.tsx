@@ -38,6 +38,9 @@ export default function Register() {
         signInUrl="/login"
         forceRedirectUrl="/client/dashboard"
         appearance={authCardAppearance}
+        fallback={
+          <p className="py-8 text-center text-sm text-muted">{t('common.loading_form')}</p>
+        }
       />
     </AuthShell>
   )
