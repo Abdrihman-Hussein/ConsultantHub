@@ -87,7 +87,7 @@ export default function Footer() {
                 C
               </span>
               <span className="text-[15px] font-semibold tracking-tight text-on-ink">
-                ConsultantHub
+                Lataliye
               </span>
             </Link>
             {/* Two sentences rather than one interpolated blob: the coverage

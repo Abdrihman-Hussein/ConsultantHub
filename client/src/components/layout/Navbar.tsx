@@ -52,7 +52,7 @@ export default function Navbar() {
               C
             </span>
             <span className="text-[15px] font-semibold tracking-tight text-ink-950">
-              ConsultantHub
+              Lataliye
             </span>
           </Link>
 
