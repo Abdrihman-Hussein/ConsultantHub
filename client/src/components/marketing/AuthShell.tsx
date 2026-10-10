@@ -59,7 +59,7 @@ export default function AuthShell({ title, subtitle, children, footer }: AuthShe
                 C
               </span>
               <span className="text-[15px] font-semibold tracking-tight text-on-ink">
-                ConsultantHub
+                Lataliye
               </span>
             </div>
 

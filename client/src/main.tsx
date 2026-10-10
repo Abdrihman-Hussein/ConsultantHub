@@ -22,8 +22,19 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           Clerk surface — the sign-in and sign-up forms, the navbar's user
           button, and anything added later — inherits the same palette. The
           forms override it locally with the two things that are specific to
-          being embedded in a card. */}
-      <ClerkProvider afterSignOutUrl="/" appearance={clerkAppearance}>
+          being embedded in a card.
+
+          publishableKey is passed explicitly because @clerk/react does not
+          read it from the environment on its own — the only env var the
+          package reads is NODE_ENV. Without this prop the key is undefined,
+          Clerk can never resolve its frontend API, `loaded` stays false, and
+          <SignIn>/<SignUp> render nothing at all: a blank card with no error.
+          The value in .env.local is useless until it is handed over here. */}
+      <ClerkProvider
+        publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
+        afterSignOutUrl="/"
+        appearance={clerkAppearance}
+      >
         <LanguageProvider>
           <BrowserRouter>
             <AppProvider>

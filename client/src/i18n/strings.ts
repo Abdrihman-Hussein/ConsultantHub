@@ -42,7 +42,7 @@ export const LANG_STORAGE_KEY = 'consultanthub:lang'
 
 export const en = {
   // ---- document / chrome ----------------------------------------------------
-  'meta.title': 'ConsultantHub — Find the right consultant',
+  'meta.title': 'Lataliye — Find the right consultant',
   'lang.label': 'Language',
   'lang.to_english': 'Switch to English',
   'lang.to_somali': 'Switch to Somali',
@@ -144,7 +144,7 @@ export const en = {
   'footer.blurb_cta':
     'Find the right person and book a session in minutes.',
   'footer.social_unavailable': '{name} — not available yet',
-  'footer.copyright': '© {year} ConsultantHub. All rights reserved.',
+  'footer.copyright': '© {year} Lataliye. All rights reserved.',
   'footer.license': 'MIT licensed.',
 
   // ---- home: hero -----------------------------------------------------------
@@ -337,7 +337,7 @@ export const en = {
   // ---- become a consultant --------------------------------------------------
   'become.title': 'Keep your client account. Add a consultant one.',
   'become.body':
-    'Registration on ConsultantHub is the same for everyone — nobody is asked up front whether they plan to hire or to be hired. Offering your services is a separate switch you can flip whenever you want, without starting over.',
+    'Registration on Lataliye is the same for everyone — nobody is asked up front whether they plan to hire or to be hired. Offering your services is a separate switch you can flip whenever you want, without starting over.',
   'become.step1_title': 'One account, either way',
   'become.step1_body':
     'Sign up the same way as anyone else. There is no consultant-only sign-up to fill in first.',
@@ -441,7 +441,7 @@ export type MessageKey = keyof Dict
 
 export const so: Dict = {
   // ---- document / chrome ----------------------------------------------------
-  'meta.title': 'ConsultantHub — Hel qofka ku habboon',
+  'meta.title': 'Lataliye — Hel qofka ku habboon',
   'lang.label': 'Luqad',
   'lang.to_english': 'Ku beddel Ingiriisiga',
   'lang.to_somali': 'Ku beddel Soomaaliga',
@@ -548,7 +548,7 @@ export const so: Dict = {
   'footer.blurb_cta':
     'Hel qofka ku habboon oo ballan kulan qabso minut gudahood.',
   'footer.social_unavailable': '{name} — ma jiro hadda',
-  'footer.copyright': '© {year} ConsultantHub. Xeer kasta waa la ilaaliyay.',
+  'footer.copyright': '© {year} Lataliye. Xeer kasta waa la ilaaliyay.',
   'footer.license': 'Ruuxayntiisa waa MIT.',
 
   // ---- home: hero -----------------------------------------------------------
@@ -735,7 +735,7 @@ export const so: Dict = {
   // ---- become a consultant --------------------------------------------------
   'become.title': 'Xisaabtaada macmiilka ku hay. Halkan ku dar akhis la-talin.',
   'become.body':
-    'Diiwaangelintu ConsultantHub waa isku mid ah qof walba — ma aan cidna hore weydiisan inuu qaarsanayo ama inuu qaarato. Bixinta adeegyadaada waa dooro kale oo keliya oo aad marka kasta oo aad rabto dooran kartaa, iyada oo aan dib u bilaabayn.',
+    'Diiwaangelintu Lataliye waa isku mid ah qof walba — ma aan cidna hore weydiisan inuu qaarsanayo ama inuu qaarato. Bixinta adeegyadaada waa dooro kale oo keliya oo aad marka kasta oo aad rabto dooran kartaa, iyada oo aan dib u bilaabayn.',
   'become.step1_title': 'Hal xisaab, labada hab',
   'become.step1_body':
     'Isku qaab qof kale ka soo diiiwaangeli. Diiwaangelin kaliya oo la-talinta ah ma jiro oo hore loo buuxiyo.',
