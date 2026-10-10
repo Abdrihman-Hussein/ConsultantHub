@@ -3,32 +3,15 @@
  * seed content that gets copied into localStorage on first run.
  */
 
-/** Roles a user can hold. Drives which flows are available to them. */
-export type UserRole = 'CLIENT' | 'CONSULTANT' | 'ADMIN';
-
 /**
- * A stored user record. `passwordHash` is only ever a SHA-256 digest — see
- * `lib/crypto.ts`. This is NOT real authentication: everything is client-side
- * and readable by anyone with devtools. See README.
+ * The role an account holds in this app: a client who books sessions, a
+ * consultant who offers them, or an admin.
+ *
+ * Clerk has no role field of its own, so this is not read from an account
+ * record — see `useConsultantRole` in `lib/useCurrentUser.ts` for where it
+ * actually comes from and what it can and cannot enforce.
  */
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: UserRole;
-  avatar?: string;
-  passwordHash: string;
-  /** ISO timestamp, used to sort and to show "member since". */
-  createdAt: string;
-}
-
-/** The signed-in user, without the password digest. */
-export interface Session {
-  userId: string;
-  email: string;
-  name: string;
-  role: UserRole;
-}
+export type UserRole = 'CLIENT' | 'CONSULTANT' | 'ADMIN';
 
 /**
  * A listed consultant.
@@ -120,17 +103,3 @@ export interface Appointment {
   location?: string;
   createdAt: string;
 }
-
-import type { MessageKey } from '../i18n/strings';
-
-/**
- * Result of an auth attempt, so forms can show a specific message.
- *
- * `error` is a dictionary key rather than a sentence — see `lib/auth.ts`. The
- * form renders it through the active language, so an error never arrives
- * pre-written in the wrong language. Typing it as `MessageKey` means a
- * misspelled key is a compile error rather than a blank error message.
- */
-export type AuthResult =
-  | { ok: true; session: Session }
-  | { ok: false; error: { key: MessageKey } };

@@ -69,8 +69,6 @@ export const en = {
   'common.dashboard': 'Dashboard',
   'common.create_account': 'Create an account',
   'common.book_consultant': 'Book a new consultant',
-  'common.email': 'Email',
-  'common.password': 'Password',
 
   // ---- relative dates (see i18n/datetime.ts) --------------------------------
   'time.today': 'Today',
@@ -320,48 +318,20 @@ export const en = {
   'done.no_storage':
     'Storage is unavailable, so this booking will not survive a reload.',
 
-  // ---- login ----------------------------------------------------------------
+  // ---- login / register ------------------------------------------------------
+  // Titles and subtitles only. The forms themselves are Clerk's components and
+  // carry their own strings, which Clerk localises; what lives here is the
+  // copy the page wraps around them, so it stays in this dictionary and in both
+  // languages. There are no longer demo credentials to offer — accounts are
+  // created by signing up.
   'login.title': 'Welcome back',
   'login.subtitle': 'Log in to manage your bookings.',
   'login.no_account': "Don't have an account?",
-  'login.demo_title': 'Demo account',
-  'login.demo_fill': 'Fill demo credentials',
-  'login.submit': 'Log in',
-  'login.submitting': 'Signing in…',
-  'login.error_email': 'Enter a valid email address.',
-  'login.error_password': 'Enter your password.',
-  'login.no_storage':
-    'Storage is unavailable in this browser, so your session lasts only until you reload.',
 
-  // ---- register -------------------------------------------------------------
   'register.title': 'Create your account',
   'register.subtitle':
     'One account for everyone. Free to join, and it takes under a minute.',
   'register.already': 'Already registered?',
-  'register.label_name': 'Full name',
-  'register.label_confirm': 'Confirm password',
-  'register.placeholder_password': 'At least 8 characters',
-  'register.placeholder_confirm': 'Repeat your password',
-  'register.hint_email': 'We will only use this to sign you in.',
-  'register.error_name': 'Enter your full name.',
-  'register.error_email': 'Enter a valid email address.',
-  'register.error_email_exists': 'An account with that email already exists.',
-  'register.error_password_short': 'Use at least 8 characters.',
-  'register.error_confirm': 'Passwords do not match.',
-  'register.submit': 'Create account',
-  'register.submitting': 'Creating account…',
-  'register.note':
-    "Everyone signs up the same way. If you also offer your own services, you can switch your account to a consultant profile at any time. Accounts are stored in this browser only — clearing site data removes them.",
-  'strength.empty': 'Enter a password',
-  'strength.too_short': 'Too short',
-  'strength.weak': 'Weak',
-  'strength.fair': 'Fair',
-  'strength.good': 'Good',
-  'strength.strong': 'Strong',
-
-  // ---- auth errors (lib/auth.ts) --------------------------------------------
-  'auth.invalid_credentials':
-    'That email and password combination is not recognised.',
 
   // ---- become a consultant --------------------------------------------------
   'become.title': 'Keep your client account. Add a consultant one.',
@@ -387,6 +357,7 @@ export const en = {
     'Listing your services and availability comes with the consultant dashboard.',
   'offer.button': 'Offer my services',
   'offer.button_note': 'One click. No new account, no new password.',
+  'offer.error': 'That did not save. Check your connection and try again.',
   'offer.guest_note': 'Registration is the same for everyone.',
 
   // ---- auth shell aside -----------------------------------------------------
@@ -498,8 +469,6 @@ export const so: Dict = {
   'common.dashboard': 'Xaraf',
   'common.create_account': 'Samee xisaab',
   'common.book_consultant': 'La-talin cusub ballan qabso',
-  'common.email': 'Imayl',
-  'common.password': 'Furryo',
 
   // ---- relative dates (see i18n/datetime.ts) --------------------------------
   'time.today': 'Maanta',
@@ -751,48 +720,15 @@ export const so: Dict = {
   'done.no_storage':
     'Kaydinta ma diyaar tahay, marka ballankan dib loo xareeysan ma raahdo.',
 
-  // ---- login ----------------------------------------------------------------
+  // ---- login / register ------------------------------------------------------
   'login.title': 'Ku soo dhowow',
   'login.subtitle': 'Soo gal si aad u maamusho ballannadaada.',
   'login.no_account': 'Ma haysato xisaab?',
-  'login.demo_title': 'Xisaab tiirrib',
-  'login.demo_fill': 'Buuxi xogta tiirribka',
-  'login.submit': 'Soo gal',
-  'login.submitting': 'Waa la soo galayaa…',
-  'login.error_email': 'Gali imayl sax ah.',
-  'login.error_password': 'Gali furyadaada.',
-  'login.no_storage':
-    'Kaydinta ma diyaar tahay browser-kan, marka kuguuma wada dhigmaan ilaa aad dib u xarato.',
 
-  // ---- register -------------------------------------------------------------
   'register.title': 'Samee xisaabtaada',
   'register.subtitle':
     'Hal xisaab oo qof walba. Ku-diiwaangelin waa bilaash, waxayna qaadataa wax ka yar ilbiriqsi.',
   'register.already': 'Horeybaa diiwaangeliyay?',
-  'register.label_name': 'Magac dhammaystiran',
-  'register.label_confirm': 'Xaqiiji furryada',
-  'register.placeholder_password': 'Ugu yaraan 8 xarfo ah',
-  'register.placeholder_confirm': 'Ku celi furryadaada',
-  'register.hint_email': 'Tan waad kaliya ayay xisaabtaada lagu soo galo.',
-  'register.error_name': 'Gali magac dhammaystiran.',
-  'register.error_email': 'Gali imayl sax ah.',
-  'register.error_email_exists': 'Xisaab leh imaylkaas ayaa horey u jirtay.',
-  'register.error_password_short': 'U isticmaal ugo yaraan 8 xarfo.',
-  'register.error_confirm': 'Furyadu isuma mid ah.',
-  'register.submit': 'Samee xisaab',
-  'register.submitting': 'Waa la sameeyaa…',
-  'register.note':
-    'Qof walba isla habaab ayuu diiiwaangeliyaa. Haddaad kale adeegyo bixiso, waad xisaabtaada waqti kasta uga beddeli kartaa akhis la-talin ah. Xisaabuhu waxay ku jiraan browser-kan oo keliya — haddaad xogta goobta xarunto ayaad ka baaxdaa.',
-  'strength.empty': 'Gali furyo',
-  'strength.too_short': 'Waa yar',
-  'strength.weak': 'Waa daciif',
-  'strength.fair': 'Waa celcelis',
-  'strength.good': 'Wanaagsan',
-  'strength.strong': 'Aad u wanaagsan',
-
-  // ---- auth errors (lib/auth.ts) --------------------------------------------
-  'auth.invalid_credentials':
-    'Imaylka iyo furyadu isku dhacmood ahaan lama aqoonsano.',
 
   // ---- become a consultant --------------------------------------------------
   'become.title': 'Xisaabtaada macmiilka ku hay. Halkan ku dar akhis la-talin.',
@@ -818,6 +754,7 @@ export const so: Dict = {
     'Sheegashada adeegyadaada iyo waqtiyadaada waxay ka timaaddaa xarafka la-talinta.',
   'offer.button': 'Bixi adeegyadayda',
   'offer.button_note': 'Hal guji. Xisaab cusub ma jiro, furryo cusubna ma jiro.',
+  'offer.error': 'Kama dhammaateyn. Hubi xiriirkaada oo mar kale isku day.',
   'offer.guest_note': 'Diiwaangelintu waa isku mid ah qof walba.',
 
   // ---- auth shell aside -----------------------------------------------------

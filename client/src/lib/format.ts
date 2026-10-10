@@ -130,7 +130,3 @@ export function countLabelLocalized(
   const word = count === 1 ? t(singularKey) : t(pluralKey);
   return `${count} ${word}`;
 }
-
-export function emailIsValid(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim())
-}

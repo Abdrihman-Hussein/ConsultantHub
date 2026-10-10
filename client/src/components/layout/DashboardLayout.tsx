@@ -1,11 +1,12 @@
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import Container from '../ui/Container'
-import Avatar from '../ui/Avatar'
+
 import Button from '../ui/Button'
 import InkBand from '../marketing/InkBand'
 import LanguageToggle from '../ui/LanguageToggle'
-import { useApp } from '../../context/AppContext'
+import { useAuth } from '@clerk/react'
+import { useCurrentUser } from '../../lib/useCurrentUser'
 import { useTranslation } from '../../i18n/LanguageContext'
 import type { MessageKey } from '../../i18n/strings'
 
@@ -67,19 +68,22 @@ function NavIcon({ children }: { children: ReactNode }) {
 }
 
 export default function DashboardLayout() {
-  const { session, logout } = useApp()
+  const user = useCurrentUser()
+  const { signOut } = useAuth()
   const { pathname } = useLocation()
   const { t } = useTranslation()
 
-  const firstName = session?.name.split(' ')[0] ?? ''
+  const firstName = user?.name.split(' ')[0] ?? ''
 
   // Derived from the route rather than looked up in a `Record`, so an
   // unrecognised path still gets a real title rather than a generic fallback.
   const isAppointments = pathname === '/client/appointments'
 
+  // Only greets by name when there is one: an account with no name set would
+  // otherwise read "Welcome back, " with nothing after it.
   const title = isAppointments
     ? t('dash.nav_appointments')
-    : session
+    : firstName
       ? t('dash.title_welcome', { name: firstName })
       : t('common.dashboard')
   const subtitle = isAppointments
@@ -169,16 +173,21 @@ export default function DashboardLayout() {
               )}
             </div>
             <div className="flex shrink-0 items-center gap-4">
-              {session ? (
+              {user ? (
                 <>
-                  <div className="flex min-w-0 items-center gap-3">
-                    <Avatar name={session.name} size="sm" />
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-on-ink">{session.name}</p>
-                      <p className="truncate text-xs text-on-ink-muted">{session.email}</p>
-                    </div>
-                  </div>
-                  <Button type="button" variant="onInkOutline" size="sm" onClick={logout}>
+                  {/* The name and the sign-out control, on ink. Clerk's
+                      UserButton is a popover anchored to an avatar and is
+                      styled for a light surface, so it is deliberately not
+                      used here: this band is ink, and the popover would have
+                      to fight it. `signOut` comes from Clerk rather than from
+                      any local session. The email line is gone with the local
+                      account record — the account is Clerk's now — and the
+                      name line is conditional for the same reason as in the
+                      navbar. */}
+                  {user.name && (
+                    <p className="truncate text-sm font-medium text-on-ink">{user.name}</p>
+                  )}
+                  <Button type="button" variant="onInkOutline" size="sm" onClick={() => void signOut()}>
                     {t('common.log_out')}
                   </Button>
                 </>

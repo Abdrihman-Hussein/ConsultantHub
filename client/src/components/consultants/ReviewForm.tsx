@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useApp } from '../../context/AppContext'
 import { canReview } from '../../lib/reviews'
+import { useCurrentUser } from '../../lib/useCurrentUser'
 import { useTranslation } from '../../i18n/LanguageContext'
 import type { MessageKey } from '../../i18n/strings'
 import type { Consultant } from '../../types'
@@ -36,16 +37,21 @@ export const BLOCK_KEYS: Record<string, MessageKey> = {
  * five-star average is most misleading without.
  */
 export default function ReviewForm({ consultant }: ReviewFormProps) {
-  const { session, appointments, reviews, isPersistent, addReview } = useApp()
+  const { appointments, reviews, isPersistent, addReview } = useApp()
+  const user = useCurrentUser()
   const { t } = useTranslation()
   const [rating, setRating] = useState<number | null>(null)
   const [body, setBody] = useState('')
   const [error, setError] = useState<MessageKey | null>(null)
   const [saved, setSaved] = useState(false)
 
+  // Unchanged rule, changed source: the reviewer's id is Clerk's `user.id`
+  // rather than `session.userId`. Both are strings, so the gate's four-argument
+  // contract and every appointment it reads are untouched — only the completed
+  // sessions belonging to *this* person can earn a review, and only once each.
   const gate = canReview(
     consultant.id,
-    session?.userId ?? null,
+    user?.id ?? null,
     appointments,
     reviews,
     new Date(),

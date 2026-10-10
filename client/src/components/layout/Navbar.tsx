@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
+import { UserButton } from '@clerk/react'
 import Button from '../ui/Button'
 import Container from '../ui/Container'
-import Avatar from '../ui/Avatar'
 import LanguageToggle from '../ui/LanguageToggle'
-import { useApp } from '../../context/AppContext'
+import { useCurrentUser } from '../../lib/useCurrentUser'
 import { useTranslation } from '../../i18n/LanguageContext'
 import type { MessageKey } from '../../i18n/strings'
 
@@ -18,8 +18,13 @@ export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const { pathname } = useLocation()
-  const { session, logout } = useApp()
+  const user = useCurrentUser()
   const { t } = useTranslation()
+
+  // Only shown when there is a name to show: an account with no name set would
+  // otherwise greet nobody with "Hi, ". The avatar is still rendered, so the
+  // account remains reachable.
+  const firstName = user?.name.split(' ')[0] ?? ''
 
   // Close the mobile sheet whenever the route changes.
   useEffect(() => setOpen(false), [pathname])
@@ -94,24 +99,21 @@ export default function Navbar() {
                 whole page, not where you are, so it belongs beside the other
                 page-level settings. */}
             <LanguageToggle />
-            {session ? (
+            {user ? (
               <>
-                <span className="hidden text-sm text-muted lg:inline">
-                  {t('common.hi')}{' '}
-                  <span className="font-medium text-body">{session.name.split(' ')[0]}</span>
-                </span>
-                <Link
-                  to="/client/dashboard"
-                  className="flex items-center gap-2 rounded-full p-0.5 pl-1 transition-colors hover:bg-ink-100"
-                >
-                  <Avatar name={session.name} size="sm" />
-                  <span className="hidden text-sm font-medium text-body lg:inline">
-                    {session.name}
+                {/* The greeting stays; the avatar and the logout button do
+                    not. Clerk's <UserButton /> is the avatar, and its menu is
+                    where signing out lives — rendering our own beside it would
+                    give the same person two ways to do one thing. */}
+                {firstName && (
+                  <span className="hidden text-sm text-muted lg:inline">
+                    {t('common.hi')}{' '}
+                    <span className="font-medium text-body">{firstName}</span>
                   </span>
-                </Link>
-                <Button variant="ghost" size="sm" onClick={logout}>
-                  {t('common.log_out')}
-                </Button>
+                )}
+                {/* No appearance prop: the palette is set once on ClerkProvider,
+                    so this button and the sign-in form cannot drift apart. */}
+                <UserButton />
               </>
             ) : (
               <>
@@ -172,14 +174,14 @@ export default function Navbar() {
             <span className="text-xs text-subtle">{t('lang.label')}</span>
           </div>
           <div className="flex items-center gap-3 pt-1">
-            {session ? (
+            {user ? (
               <>
                 <Button to="/client/dashboard" variant="outline" size="sm" className="flex-1">
                   {t('common.dashboard')}
                 </Button>
-                <Button variant="outline" size="sm" className="flex-1" onClick={logout}>
-                  {t('common.log_out')}
-                </Button>
+                {/* Signing out lives in Clerk's menu here too, for the same
+                    reason as in the desktop bar. */}
+                <UserButton />
               </>
             ) : (
               <>

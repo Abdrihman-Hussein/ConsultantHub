@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
 import { addMinutes, formatPrice } from '../../lib/format'
 import { bookedTimes, generateSlots, isSlotTaken, upcomingDays } from '../../lib/booking'
+import { useCurrentUser } from '../../lib/useCurrentUser'
 import { useTranslation } from '../../i18n/LanguageContext'
 import type { MessageKey } from '../../i18n/strings'
 import type { Consultant, MeetingType, Service } from '../../types'
@@ -22,7 +23,8 @@ interface BookingWidgetProps {
 type Stage = 'select' | 'confirm' | 'done'
 
 export default function BookingWidget({ consultant, services }: BookingWidgetProps) {
-  const { session, appointments, bookSession, isPersistent } = useApp();
+  const { appointments, bookSession, isPersistent } = useApp();
+  const user = useCurrentUser();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -77,7 +79,7 @@ export default function BookingWidget({ consultant, services }: BookingWidgetPro
   const endTime = service && time ? addMinutes(time, service.duration) : null;
 
   const submit = () => {
-    if (!session) {
+    if (!user) {
       navigate('/login', { state: { from: `/consultants/${consultant.id}` } });
       return;
     }
@@ -222,10 +224,10 @@ export default function BookingWidget({ consultant, services }: BookingWidgetPro
             setStage('confirm');
           }}
         >
-          {session ? t('booking.continue') : t('booking.log_in_to_book')}
+          {user ? t('booking.continue') : t('booking.log_in_to_book')}
         </Button>
 
-        {!session && (
+        {!user && (
           <p className="text-center text-xs text-muted">
             {t('booking.browse_note')}{' '}
             <Link to="/register" className="underline underline-offset-4 hover:text-ink-950">

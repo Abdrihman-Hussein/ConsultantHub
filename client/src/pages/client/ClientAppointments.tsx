@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
 import { canComplete } from '../../lib/booking'
 import { formatDate, relativeDay, formatPrice } from '../../lib/format'
+import { useCurrentUser } from '../../lib/useCurrentUser'
 import { useTranslation } from '../../i18n/LanguageContext'
 import type { MessageKey } from '../../i18n/strings'
 import type { AppointmentStatus, MeetingType } from '../../types'
@@ -72,7 +73,8 @@ function statusLabelKey(status: AppointmentStatus): MessageKey {
 }
 
 export default function ClientAppointments() {
-  const { session, myAppointments, cancelAppointment, completeAppointment } = useApp()
+  const { myAppointments, cancelAppointment, completeAppointment } = useApp()
+  const user = useCurrentUser()
   const { t } = useTranslation()
   const [tab, setTab] = useState<Tab>('ALL')
   const [cancelling, setCancelling] = useState<string | null>(null)
@@ -113,7 +115,7 @@ export default function ClientAppointments() {
   // booking is the only thing that unlocks a review.
   const now = useMemo(() => new Date(), [myAppointments])
 
-  if (!session) {
+  if (!user) {
     return (
       <Container className="py-16 lg:py-24">
         <Reveal>

@@ -9,8 +9,6 @@
 const PREFIX = 'consultanthub:'
 
 export const KEYS = {
-  users: `${PREFIX}users`,
-  session: `${PREFIX}session`,
   appointments: `${PREFIX}appointments`,
   /**
    * Written reviews. Deliberately seeded empty — a review can only be created

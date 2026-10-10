@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
 import { consultants } from '../../data'
 import { formatDate, relativeDay, todayISO, formatPrice } from '../../lib/format'
+import { useCurrentUser } from '../../lib/useCurrentUser'
 import { useTranslation } from '../../i18n/LanguageContext'
 import type { MessageKey, Translate } from '../../i18n/strings'
 import type { Appointment, AppointmentStatus, MeetingType } from '../../types'
@@ -23,7 +24,8 @@ function isUpcoming(appointment: Appointment) {
 }
 
 export default function ClientDashboard() {
-  const { session, myAppointments, cancelAppointment } = useApp()
+  const { myAppointments, cancelAppointment } = useApp()
+  const user = useCurrentUser()
   const { t } = useTranslation()
   const [cancelling, setCancelling] = useState<string | null>(null)
 
@@ -55,7 +57,7 @@ export default function ClientDashboard() {
 
   const nextUp = upcoming[0]
 
-  if (!session) {
+  if (!user) {
     return (
       <Container className="py-16 lg:py-24">
         <Reveal>

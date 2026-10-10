@@ -1,28 +1,35 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { KEYS, read, write, remove, clearAll, isPersistent } from '../lib/storage';
-import { login as loginUser, register as registerUser, enableConsultantRole } from '../lib/auth';
-import type { AuthFailure, LoginInput, RegisterInput } from '../lib/auth';
+import { KEYS, read, write, clearAll, isPersistent } from '../lib/storage';
+import { useCurrentUser } from '../lib/useCurrentUser';
 import { createId, todayISO } from '../lib/format';
 import { canComplete } from '../lib/booking';
 import { canReview, reviewerName } from '../lib/reviews';
-import { seedAppointments, seedUsers } from '../data/seed';
+import { seedAppointments } from '../data/seed';
 import type {
   Appointment,
   AppointmentStatus,
   MeetingType,
   Review,
   Service,
-  Session,
-  User,
 } from '../types';
 
 /**
- * Application state: accounts, the signed-in session, and bookings.
+ * Application data: bookings and the reviews written against them.
  *
- * State lives in localStorage so the app behaves like a real one across
- * reloads. This is a stand-in for a backend — see README for what a real
- * implementation would move server-side.
+ * Identity is not here any more. There is no `session`, no `login`, no
+ * `register`, no `logout` — Clerk owns all of that, and `lib/useCurrentUser`
+ * is the single place this app reads it. What is left is the data those flows
+ * produce.
+ *
+ * The user is still needed here, and deliberately so: every write below is
+ * attributed to whoever is signed in, and the ownership checks that stop
+ * somebody cancelling or completing somebody else's booking compare against
+ * that same id. Reading it from Clerk inside this provider keeps the identity
+ * rules in one place without duplicating any of them into local state.
+ *
+ * Bookings and reviews still live in localStorage. That is a stand-in for a
+ * backend — see README for what a real implementation would move server-side.
  */
 
 interface BookingInput {
@@ -37,25 +44,8 @@ interface BookingInput {
 }
 
 interface AppState {
-  users: User[];
-  session: Session | null;
   appointments: Appointment[];
   isPersistent: boolean;
-
-  /**
-   * `null` on success, or the failure key from `lib/auth` — a dictionary key,
-   * not a sentence, so the caller renders it in the active language.
-   */
-  register: (input: RegisterInput) => Promise<AuthFailure | null>;
-  login: (input: LoginInput) => Promise<AuthFailure | null>;
-  logout: () => void;
-
-  /**
-   * Independent switch for offering services. Registration never asks about it —
-   * anyone can add the consultant role later without losing their bookings.
-   * Returns false when nobody is signed in.
-   */
-  becomeConsultant: () => boolean;
 
   bookSession: (input: BookingInput) => Appointment | null;
   cancelAppointment: (id: string) => void;
@@ -87,14 +77,6 @@ interface AppState {
 
 const AppContext = createContext<AppState | null>(null);
 
-/** Seeds demo data the first time the app runs. */
-function initialUsers(): User[] {
-  const stored = read<User[]>(KEYS.users, []);
-  if (stored.length > 0) return stored;
-  write(KEYS.users, seedUsers);
-  return seedUsers;
-}
-
 function initialAppointments(): Appointment[] {
   const stored = read<Appointment[]>(KEYS.appointments, []);
   if (stored.length > 0) return stored;
@@ -105,26 +87,23 @@ function initialAppointments(): Appointment[] {
 /**
  * Reads the stored reviews, writing an empty list on first run.
  *
- * Unlike users and appointments this has no seed: every review in here was
- * written by a real client against a completed session, and inventing some
- * would be exactly the thing the review gate exists to prevent.
+ * Unlike appointments this has no seed: every review in here was written by a
+ * real client against a completed session, and inventing some would be exactly
+ * the thing the review gate exists to prevent.
  */
 function initialReviews(): Review[] {
   return read<Review[]>(KEYS.reviews, []);
 }
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [users, setUsers] = useState<User[]>(initialUsers);
-  const [session, setSession] = useState<Session | null>(() =>
-    read<Session | null>(KEYS.session, null),
-  );
+  // The one place identity enters the data layer. `user` is null while Clerk is
+  // loading and when nobody is signed in, so every guarded write below simply
+  // does nothing in both cases rather than attributing data to a stale id.
+  const user = useCurrentUser();
+  const userId = user?.id ?? null;
+
   const [appointments, setAppointments] = useState<Appointment[]>(initialAppointments);
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
-
-  const persistUsers = useCallback((next: User[]) => {
-    setUsers(next);
-    write(KEYS.users, next);
-  }, []);
 
   const persistAppointments = useCallback((next: Appointment[]) => {
     setAppointments(next);
@@ -136,54 +115,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     write(KEYS.reviews, next);
   }, []);
 
-  const register = useCallback(
-    async (input: RegisterInput) => {
-      const { result, users: nextUsers } = await registerUser(users, input);
-      if (!result.ok) return result.error;
-
-      persistUsers(nextUsers);
-      write(KEYS.session, result.session);
-      setSession(result.session);
-      return null;
-    },
-    [users, persistUsers],
-  );
-
-  const login = useCallback(
-    async (input: LoginInput) => {
-      const result = await loginUser(users, input);
-      if (!result.ok) return result.error;
-
-      write(KEYS.session, result.session);
-      setSession(result.session);
-      return null;
-    },
-    [users],
-  );
-
-  const logout = useCallback(() => {
-    remove(KEYS.session);
-    setSession(null);
-  }, []);
-
-  const becomeConsultant = useCallback(() => {
-    if (!session) return false;
-
-    persistUsers(enableConsultantRole(users, session.userId));
-
-    const nextSession: Session = { ...session, role: 'CONSULTANT' };
-    write(KEYS.session, nextSession);
-    setSession(nextSession);
-    return true;
-  }, [session, users, persistUsers]);
-
   const bookSession = useCallback(
     (input: BookingInput) => {
-      if (!session) return null;
+      if (!userId) return null;
 
       const appointment: Appointment = {
         id: createId('a'),
-        clientId: session.userId,
+        clientId: userId,
         consultantId: input.consultantId,
         consultantName: input.consultantName,
         consultantAvatar: input.consultantAvatar,
@@ -201,29 +139,29 @@ export function AppProvider({ children }: { children: ReactNode }) {
       persistAppointments([...appointments, appointment]);
       return appointment;
     },
-    [session, appointments, persistAppointments],
+    [userId, appointments, persistAppointments],
   );
 
   const cancelAppointment = useCallback(
     (id: string) => {
       // Guard: only the owner can cancel.
-      if (!session) return;
+      if (!userId) return;
 
       persistAppointments(
         appointments.map((appointment) =>
-          appointment.id === id && appointment.clientId === session.userId
+          appointment.id === id && appointment.clientId === userId
             ? { ...appointment, status: 'CANCELLED' as AppointmentStatus }
             : appointment,
         ),
       );
     },
-    [session, appointments, persistAppointments],
+    [userId, appointments, persistAppointments],
   );
 
   const rescheduleAppointment = useCallback(
     (id: string, date: string, startTime: string, endTime: string) => {
       const target = appointments.find((appointment) => appointment.id === id);
-      if (!target || !session || target.clientId !== session.userId) return false;
+      if (!target || !userId || target.clientId !== userId) return false;
       if (target.date === date && target.startTime === startTime) return false;
 
       persistAppointments(
@@ -233,7 +171,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       );
       return true;
     },
-    [appointments, session, persistAppointments],
+    [appointments, userId, persistAppointments],
   );
 
   const completeAppointment = useCallback(
@@ -242,7 +180,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       // Ownership first, then `canComplete`: the helper is the single rule and
       // the button that offers this action reads it too, so the two cannot
       // disagree about which bookings are eligible.
-      if (!target || !session || target.clientId !== session.userId) return false;
+      if (!target || !userId || target.clientId !== userId) return false;
       if (!canComplete(target)) return false;
 
       persistAppointments(
@@ -252,26 +190,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
       );
       return true;
     },
-    [appointments, session, persistAppointments],
+    [appointments, userId, persistAppointments],
   );
 
   const addReview = useCallback(
     ({ consultantId, rating, body }: { consultantId: string; rating: number; body: string }) => {
-      if (!session) return false;
+      if (!user) return false;
 
       // The form is not the authority. Re-running the gate here means a review
       // cannot be written for a session that was cancelled or already reviewed
       // while the form was on screen.
-      const gate = canReview(consultantId, session.userId, appointments, reviews, new Date(), isPersistent);
+      const gate = canReview(consultantId, user.id, appointments, reviews, new Date(), isPersistent);
       if (!gate.ok) return false;
 
       const review: Review = {
         id: createId('r'),
         consultantId,
         appointmentId: gate.appointmentId,
-        clientId: session.userId,
+        clientId: user.id,
         // Never the account's full name — see `reviewerName`.
-        authorName: reviewerName(session.name),
+        authorName: reviewerName(user.name),
         rating,
         date: todayISO(),
         body: body.trim(),
@@ -280,27 +218,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
       persistReviews([...reviews, review]);
       return true;
     },
-    [session, appointments, reviews, persistReviews],
+    [user, appointments, reviews, persistReviews],
   );
 
   const myAppointments = useMemo(() => {
-    if (!session) return [];
+    if (!userId) return [];
     return appointments
-      .filter((appointment) => appointment.clientId === session.userId)
+      .filter((appointment) => appointment.clientId === userId)
       .sort((a, b) => {
         const byDate = a.date.localeCompare(b.date);
         return byDate !== 0 ? byDate : a.startTime.localeCompare(b.startTime);
       });
-  }, [appointments, session]);
+  }, [appointments, userId]);
 
   const resetDemoData = useCallback(() => {
     clearAll();
-    write(KEYS.users, seedUsers);
     write(KEYS.appointments, seedAppointments);
-    remove(KEYS.session);
-    setUsers(seedUsers);
     setAppointments(seedAppointments);
-    setSession(null);
     // Reviews too: a reset demo has to land back on the honest empty state,
     // otherwise a review written before the reset would survive the data it
     // was written against.
@@ -309,15 +243,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<AppState>(
     () => ({
-      users,
-      session,
       appointments,
       reviews,
       isPersistent,
-      register,
-      login,
-      logout,
-      becomeConsultant,
       bookSession,
       cancelAppointment,
       rescheduleAppointment,
@@ -327,14 +255,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       resetDemoData,
     }),
     [
-      users,
-      session,
       appointments,
       reviews,
-      register,
-      login,
-      logout,
-      becomeConsultant,
       bookSession,
       cancelAppointment,
       rescheduleAppointment,
@@ -352,11 +274,6 @@ export function useApp(): AppState {
   const context = useContext(AppContext);
   if (!context) throw new Error('useApp must be used inside <AppProvider>');
   return context;
-}
-
-/** Convenience hook for pages that only care about the signed-in user. */
-export function useSession() {
-  return useApp().session;
 }
 
 export { todayISO };

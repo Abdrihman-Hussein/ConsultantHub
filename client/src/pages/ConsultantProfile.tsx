@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router-dom'
 import { getConsultant, getServicesFor } from '../data'
 import { useApp } from '../context/AppContext'
 import { canReview, ratingFor } from '../lib/reviews'
+import { useCurrentUser } from '../lib/useCurrentUser'
 import { useTranslation } from '../i18n/LanguageContext'
 import Container from '../components/ui/Container'
 import Button from '../components/ui/Button'
@@ -17,7 +18,8 @@ import ReviewForm, { BLOCK_KEYS } from '../components/consultants/ReviewForm'
 export default function ConsultantProfile() {
   const { id } = useParams<{ id: string }>();
   const consultant = id ? getConsultant(id) : undefined;
-  const { session, appointments, reviews, isPersistent } = useApp();
+  const { appointments, reviews, isPersistent } = useApp();
+  const user = useCurrentUser();
   const { t } = useTranslation();
 
   if (!consultant) {
@@ -54,7 +56,7 @@ export default function ConsultantProfile() {
   // is or is not on the page — the form re-reads it every render.
   const reviewGate = canReview(
     consultant.id,
-    session?.userId ?? null,
+    user?.id ?? null,
     appointments,
     reviews,
     new Date(),
@@ -216,7 +218,7 @@ export default function ConsultantProfile() {
               </div>
             </Reveal>
 
-            {!session && freeIntro && (
+            {!user && freeIntro && (
               <Reveal>
                 <Card className="border-accent-200 bg-accent-50/50 p-6">
                   <p className="text-sm text-accent-900">

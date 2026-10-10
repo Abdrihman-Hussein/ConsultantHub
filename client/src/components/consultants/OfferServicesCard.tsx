@@ -1,4 +1,5 @@
-import { useApp } from '../../context/AppContext'
+import { useState } from 'react'
+import { useConsultantRole } from '../../lib/useCurrentUser'
 import { useTranslation } from '../../i18n/LanguageContext'
 import Badge from '../ui/Badge'
 import Button from '../ui/Button'
@@ -16,10 +17,24 @@ interface OfferServicesCardProps {
  * door. It only ever adds the consultant role, so existing bookings survive it.
  */
 export default function OfferServicesCard({ className = '' }: OfferServicesCardProps) {
-  const { session, becomeConsultant } = useApp()
+  const { role, isConsultant, enableConsultantRole } = useConsultantRole()
   const { t } = useTranslation()
+  const [pending, setPending] = useState(false)
+  const [error, setError] = useState(false)
 
-  const isConsultant = session?.role === 'CONSULTANT'
+  const offer = async () => {
+    setPending(true)
+    setError(false)
+    try {
+      await enableConsultantRole()
+    } catch {
+      // The role is not stored locally any more, so a failed write leaves the
+      // account exactly as it was. Say so instead of silently doing nothing.
+      setError(true)
+    } finally {
+      setPending(false)
+    }
+  }
 
   return (
     <section
@@ -58,9 +73,20 @@ export default function OfferServicesCard({ className = '' }: OfferServicesCardP
               {t('offer.on_note')}
             </p>
           </div>
-        ) : session ? (
+        ) : role ? (
           <div className="shrink-0 sm:max-w-[15rem]">
-            <Button onClick={becomeConsultant}>{t('offer.button')}</Button>
+            {/* Clerk's metadata write is a network call, so it can fail. The
+                badge above only flips once Clerk confirms the write, which is
+                why a failure needs saying rather than leaving the button
+                looking like nothing happened. */}
+            <Button onClick={offer} disabled={pending}>
+              {t('offer.button')}
+            </Button>
+            {error && (
+              <p role="alert" className="mt-2.5 text-xs leading-relaxed text-danger">
+                {t('offer.error')}
+              </p>
+            )}
             <p className="mt-2.5 text-xs leading-relaxed text-muted">
               {t('offer.button_note')}
             </p>
