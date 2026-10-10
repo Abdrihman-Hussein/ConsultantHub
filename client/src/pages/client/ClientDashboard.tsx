@@ -3,7 +3,10 @@ import { Link } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
 import { consultants } from '../../data'
 import { formatDate, relativeDay, todayISO, formatPrice } from '../../lib/format'
-import type { Appointment } from '../../types'
+import { useCurrentUser } from '../../lib/useCurrentUser'
+import { useTranslation } from '../../i18n/LanguageContext'
+import type { MessageKey, Translate } from '../../i18n/strings'
+import type { Appointment, AppointmentStatus, MeetingType } from '../../types'
 import Container from '../../components/ui/Container'
 import Button from '../../components/ui/Button'
 import Card from '../../components/ui/Card'
@@ -21,7 +24,9 @@ function isUpcoming(appointment: Appointment) {
 }
 
 export default function ClientDashboard() {
-  const { session, myAppointments, cancelAppointment } = useApp()
+  const { myAppointments, cancelAppointment } = useApp()
+  const user = useCurrentUser()
+  const { t } = useTranslation()
   const [cancelling, setCancelling] = useState<string | null>(null)
 
   const { upcoming, past, spend } = useMemo(() => {
@@ -52,19 +57,19 @@ export default function ClientDashboard() {
 
   const nextUp = upcoming[0]
 
-  if (!session) {
+  if (!user) {
     return (
       <Container className="py-16 lg:py-24">
         <Reveal>
           <EmptyState
-            title="Log in to see your dashboard"
-            body="Your bookings, messages, and history live here once you sign in."
+            title={t('client.login_title')}
+            body={t('client.login_body')}
             icon="user"
             action={
               <div className="flex flex-wrap justify-center gap-3">
-                <Button to="/login">Log in</Button>
+                <Button to="/login">{t('common.log_in')}</Button>
                 <Button to="/register" variant="outline">
-                  Create an account
+                  {t('common.create_account')}
                 </Button>
               </div>
             }
@@ -75,32 +80,49 @@ export default function ClientDashboard() {
   }
 
   const stats = [
-    { label: 'Upcoming', value: String(upcoming.length) },
-    { label: 'Completed', value: String(past.filter((a) => a.status === 'COMPLETED').length) },
-    { label: 'Cancelled', value: String(past.filter((a) => a.status === 'CANCELLED').length) },
-    { label: 'Total spent', value: formatPrice(spend) },
+    { label: t('client.stat_upcoming'), value: String(upcoming.length) },
+    { label: t('client.stat_completed'), value: String(past.filter((a) => a.status === 'COMPLETED').length) },
+    { label: t('client.stat_cancelled'), value: String(past.filter((a) => a.status === 'CANCELLED').length) },
+    { label: t('client.stat_spent'), value: formatPrice(spend) },
   ]
 
   return (
     <Container className="py-10 lg:py-14">
-      <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex justify-end">
         <Reveal>
-          <p className="eyebrow mb-3">Client portal</p>
-          <h1 className="font-display text-display-lg text-ink-950">
-            Welcome back, {session.name.split(' ')[0]}
-          </h1>
-          <p className="mt-3 text-base text-muted">
-            {upcoming.length > 0
-              ? `You have ${upcoming.length} upcoming ${upcoming.length === 1 ? 'session' : 'sessions'}.`
-              : 'No sessions booked yet.'}
-          </p>
-        </Reveal>
-        <Reveal delay={80}>
-          <Button to="/consultants" variant="dark">
-            Book a new consultant
+          <Button to="/consultants" variant="dark" size="sm">
+            {t('common.book_consultant')}
           </Button>
         </Reveal>
       </div>
+
+      {nextUp && (
+        <Reveal className="mt-8">
+          <div className="overflow-hidden rounded-3xl border border-accent-300 bg-accent-50/70 p-6 shadow-card sm:p-10">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="eyebrow text-accent-600">{t('client.next_session')}</p>
+                  <Badge tone="accent">{relativeDay(nextUp.date, t)}</Badge>
+                </div>
+                <p className="mt-3 font-display text-display-md text-ink-950">
+                  {nextUp.serviceName}
+                </p>
+                <p className="mt-1 text-base text-body">
+                  {t('client.with', { name: nextUp.consultantName })}
+                </p>
+                <p className="mt-3 text-sm text-muted">
+                  {formatDate(nextUp.date)} · {nextUp.startTime} – {nextUp.endTime} ·{' '}
+                  {t(meetingTypeKey(nextUp.meetingType))}
+                </p>
+              </div>
+              <Button to="/client/appointments" variant="primary" className="shrink-0">
+                {t('client.manage_booking')}
+              </Button>
+            </div>
+          </div>
+        </Reveal>
+      )}
 
       <dl className="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line lg:grid-cols-4">
         {stats.map((stat, index) => (
@@ -115,41 +137,18 @@ export default function ClientDashboard() {
         ))}
       </dl>
 
-      {nextUp && (
-        <Reveal delay={140}>
-          <div className="mt-10 overflow-hidden rounded-2xl border border-accent-200 bg-accent-50/50 p-6">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="eyebrow text-accent-600">Next session</p>
-                  <Badge tone="accent">{relativeDay(nextUp.date)}</Badge>
-                </div>
-                <p className="mt-2 text-lg font-medium text-ink-950">
-                  {nextUp.serviceName} with {nextUp.consultantName}
-                </p>
-                <p className="mt-1 text-sm text-muted">
-                  {formatDate(nextUp.date)} · {nextUp.startTime} – {nextUp.endTime} ·{' '}
-                  <span className="capitalize">{nextUp.meetingType.replace('-', ' ')}</span>
-                </p>
-              </div>
-              <Button to="/client/appointments" variant="outline" size="sm" className="shrink-0">
-                Manage booking
-              </Button>
-            </div>
-          </div>
-        </Reveal>
-      )}
-
       <section className="mt-14">
         <Reveal>
           <div className="flex items-baseline justify-between gap-4">
-            <h2 className="text-lg font-semibold tracking-tight text-ink-950">Upcoming</h2>
+            <h2 className="text-lg font-semibold tracking-tight text-ink-950">
+              {t('client.section_upcoming')}
+            </h2>
             {upcoming.length > 0 && (
               <Link
                 to="/client/appointments"
                 className="text-sm text-muted transition-colors hover:text-ink-950"
               >
-                View all
+                {t('common.view_all')}
               </Link>
             )}
           </div>
@@ -159,10 +158,12 @@ export default function ClientDashboard() {
           <Reveal delay={80}>
             <div className="mt-5">
               <EmptyState
-                title="Nothing booked yet"
-                body="Browse the directory and book an intro call — every consultant offers a free one."
+                title={t('client.empty_booked_title')}
+                body={t('client.empty_booked_body')}
                 icon="calendar"
-                action={<Button to="/consultants">Find a consultant</Button>}
+                action={
+                  <Button to="/consultants">{t('client.empty_booked_cta')}</Button>
+                }
               />
             </div>
           </Reveal>
@@ -183,12 +184,18 @@ export default function ClientDashboard() {
 
       <section className="mt-14">
         <Reveal>
-          <h2 className="text-lg font-semibold tracking-tight text-ink-950">History</h2>
+          <h2 className="text-lg font-semibold tracking-tight text-ink-950">
+            {t('client.section_history')}
+          </h2>
         </Reveal>
         {past.length === 0 ? (
           <Reveal delay={80}>
             <div className="mt-5">
-              <EmptyState title="No past sessions" body="Completed and cancelled bookings appear here." icon="clock" />
+              <EmptyState
+                title={t('client.empty_history_title')}
+                body={t('client.empty_history_body')}
+                icon="clock"
+              />
             </div>
           </Reveal>
         ) : (
@@ -217,7 +224,22 @@ interface RowProps {
   onCancel?: () => void
 }
 
+/**
+ * Meeting format labels. The stored value is `'in-person'`, which stringifies to
+ * an English hyphenation no other language can reuse, so the label is looked up
+ * rather than derived.
+ */
+function meetingTypeKey(meetingType: MeetingType): MessageKey {
+  return meetingType === 'video' ? 'meeting.video' : 'meeting.in_person'
+}
+
+function statusLabelKey(status: AppointmentStatus): MessageKey {
+  return `status.${status}` as MessageKey
+}
+
 function AppointmentRow({ appointment, cancelling, onCancel }: RowProps) {
+  const { t } = useTranslation()
+
   const statusTone =
     appointment.status === 'CONFIRMED'
       ? 'accent'
@@ -235,14 +257,17 @@ function AppointmentRow({ appointment, cancelling, onCancel }: RowProps) {
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
           <p className="font-medium text-ink-950">{appointment.serviceName}</p>
-          <Badge tone={statusTone}>{appointment.status.toLowerCase()}</Badge>
+          <Badge tone={statusTone}>{t(statusLabelKey(appointment.status))}</Badge>
         </div>
+        {/* The consultant's name is its own element — a link when they are still
+            in the directory — so the preposition is a separate key rather than
+            one sentence with the name interpolated into it. */}
         <p className="mt-1 text-sm text-muted">
-          with{' '}
+          {t('client.with_prefix')}{' '}
           {consultant ? (
             <Link
               to={`/consultants/${consultant.id}`}
-              className="text-body underline underline-offset-2 hover:text-accent-600"
+              className="text-body underline underline-offset-2 hover:text-accent-600 truncate block"
             >
               {consultant.name}
             </Link>
@@ -265,7 +290,7 @@ function AppointmentRow({ appointment, cancelling, onCancel }: RowProps) {
               : 'border-line-strong text-muted hover:border-danger hover:text-danger'
           }`}
         >
-          {cancelling ? 'Tap again to confirm' : 'Cancel'}
+          {cancelling ? t('client.tap_again') : t('client.cancel')}
         </button>
       )}
     </Card>

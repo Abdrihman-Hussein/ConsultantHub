@@ -1,5 +1,11 @@
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { consultants, specializations } from '../data'
+import { featuredOrder, nextIndex, rowConsultants } from '../lib/featured'
+import { countLabelLocalized } from '../lib/format'
+import { identityCheckSentence, verifiedCount } from '../lib/trust'
+import { useTranslation } from '../i18n/LanguageContext'
+import type { MessageKey } from '../i18n/strings'
 import Container from '../components/ui/Container'
 import SectionHeading from '../components/ui/SectionHeading'
 import Button from '../components/ui/Button'
@@ -7,124 +13,143 @@ import Reveal from '../components/ui/Reveal'
 import CountUp from '../components/ui/CountUp'
 import ConsultantCard from '../components/consultants/ConsultantCard'
 import Hero from '../components/marketing/Hero'
+import CreamBand from '../components/marketing/CreamBand'
 import HowItWorks from '../components/marketing/HowItWorks'
-import AvailabilityPanel from '../components/marketing/AvailabilityPanel'
-import Rating from '../components/ui/Rating'
 
-/*
- * Counts are derived from the directory rather than hardcoded, so the marketing
- * copy cannot drift from what the app actually contains.
+/**
+ * How long each consultant holds the hero. Long enough to read the bio line,
+ * short enough that the rotation registers as motion rather than a slideshow.
  */
+const ROTATION_MS = 7000
+
+/** Counts are derived from the directory rather than hardcoded, so the marketing
+ * copy cannot drift from what the app actually contains. */
 const specialties = specializations.map((name) => ({
   name,
   count: consultants.filter((consultant) => consultant.specialization === name).length,
 }))
 
-const guarantees = [
-  {
-    title: 'Identity-checked consultants',
-    body: 'Every consultant has been verified before appearing in the directory, so you are not guessing who you are booking.',
-  },
-  {
-    title: 'Free intro calls',
-    body: 'Every consultant offers a complimentary short call. Find out whether it is worth the longer session before you pay for it.',
-  },
-  {
-    title: 'No scheduling back-and-forth',
-    body: 'Pick a service and an open slot directly. No email threads, no waiting to hear back about availability.',
-  },
+/**
+ * The three reasons to book here.
+ *
+ * Titles and bodies are dictionary keys rather than finished sentences. The
+ * first body embeds `identityCheckSentence`, which is generated from the
+ * directory: this used to assert that every consultant had been verified, which
+ * is false of the seed — two of the six are not — and then, once that was
+ * fixed, swapped the quantified falsehood for an equally unbacked one: that
+ * every consultant had been "through our review process". No field on a
+ * Consultant records a review, so directory membership says nothing about one.
+ * Only the measurable claim survives — how many of the listed have completed an
+ * identity check — and because it is derived rather than written, it cannot
+ * drift from the data it describes in any language.
+ */
+const GUARANTEES: { titleKey: MessageKey; bodyKey: MessageKey }[] = [
+  { titleKey: 'home.guarantee.identity_title', bodyKey: 'home.guarantee.identity_body' },
+  { titleKey: 'home.guarantee.free_title', bodyKey: 'home.guarantee.free_body' },
+  { titleKey: 'home.guarantee.scheduling_title', bodyKey: 'home.guarantee.scheduling_body' },
 ]
 
-export default function Home() {
-  const featured = consultants.slice(0, 3);
-  const count = Math.max(consultants.length, 1);
+/**
+ * Labels for the closing band's figures. The values are computed, not listed.
+ *
+ * There is no average rating here any more. It was the mean of six seeded
+ * numbers that no review in the app supported, so the band fell back from
+ * claiming four-and-a-half stars to claiming an average of all of them. The
+ * figure in its place — how many consultants are listed — is counted from the
+ * directory and cannot overstate it.
+ */
+const PROOF_LABELS: MessageKey[] = [
+  'home.proof.listed',
+  'home.proof.sessions_delivered',
+  'home.proof.identity_checked',
+]
 
-  // Derived from the directory so the hero cannot overstate what exists.
+/**
+ * Rotates the hero through the directory.
+ *
+ * Owns the interval here rather than inside `Hero` so pausing needs no document
+ * -level listeners: the hero tells us when it is hovered or focused, and we can
+ * simply not advance. Three conditions stop it — pointer over the band, focus
+ * anywhere inside it, and a hidden tab. A fourth, `prefers-reduced-motion`,
+ * stops the automatic advance from ever starting.
+ */
+function useFeaturedRotation(total: number) {
+  const [position, setPosition] = useState(0)
+  const paused = useRef(false)
+  const timer = useRef<ReturnType<typeof setInterval>>()
+
+  useEffect(() => {
+    // One media query object, kept for the lifetime of the effect, so a user
+    // toggling the OS setting mid-session is respected rather than pinned to
+    // whatever it was at mount.
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)')
+    if (query.matches) return
+
+    const interval = setInterval(() => {
+      if (paused.current || document.visibilityState === 'hidden') return
+      setPosition((current) => nextIndex(current, total))
+    }, ROTATION_MS)
+
+    return () => clearInterval(interval)
+  }, [total])
+
+  const next = () => setPosition((current) => nextIndex(current, total))
+
+  return { position, next, pause: () => { paused.current = true }, resume: () => { paused.current = false } }
+}
+
+export default function Home() {
+  const { t } = useTranslation()
+  const order = useMemo(() => featuredOrder(consultants), [])
+  const { position, next, pause, resume } = useFeaturedRotation(order.length)
+  const current = order[position]
+
+  // The row must not show whoever is in the hero right now, or the page reads
+  // as a mistake rather than a rotation.
+  const featured = useMemo(() => rowConsultants(order, current.id, 3), [order, current])
+
+  // Derived from the directory so no figure on the page can overstate it.
   const proof = [
     {
-      value: consultants.reduce((sum, c) => sum + c.rating, 0) / count,
-      decimals: 1,
-      label: 'Average rating',
+      value: consultants.length,
+      decimals: 0,
+      labelKey: PROOF_LABELS[0],
     },
     {
       value: consultants.reduce((sum, c) => sum + c.sessions, 0),
       suffix: '+',
       decimals: 0,
-      label: 'Sessions delivered',
+      labelKey: PROOF_LABELS[1],
     },
     {
-      value: consultants.filter((c) => c.verified).length,
+      value: verifiedCount(consultants),
       decimals: 0,
-      label: 'Verified consultants',
+      labelKey: PROOF_LABELS[2],
     },
-  ];
+  ]
 
   return (
     <>
-      <Hero
-        eyebrow="Verified consultants, instantly bookable"
-        title={
-          <>
-            Find the right
-            <br />
-            consultant.
-          </>
-        }
-        description="Browse vetted specialists by expertise, review their experience and rates, then book a session directly. No email threads, no scheduling friction."
-        primaryAction={<Button to="/consultants" size="lg">Hire a consultant</Button>}
-        secondaryAction={
-          <Button to="/become-a-consultant" variant="outline" size="lg">
-            Become a consultant
-          </Button>
-        }
-        aside={<AvailabilityPanel />}
-        proof={proof}
-      />
-
-      <section className="border-t border-line bg-surface-subtle">
-        <Container className="py-16">
-          <Reveal>
-            <p className="eyebrow mb-6">Browse by specialty</p>
-          </Reveal>
-
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {specialties.map((specialty, index) => (
-              <Reveal key={specialty.name} delay={index * 80}>
-                <Link
-                  to={`/consultants?specialty=${encodeURIComponent(specialty.name)}`}
-                  className="group block h-full rounded-2xl border border-line bg-surface p-6 shadow-card transition-all duration-400 ease-out hover:-translate-y-1 hover:border-accent-300 hover:shadow-lift"
-                >
-                  <p className="font-display text-display-md text-ink-950 transition-colors duration-300 group-hover:text-accent-600">
-                    {specialty.name}
-                  </p>
-                  <p className="mt-2 text-sm text-muted">{specialty.count} consultants</p>
-
-                  <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-ink-950">
-                    Explore
-                    <svg
-                      viewBox="0 0 20 20"
-                      className="h-4 w-4 transition-transform duration-300 ease-spring group-hover:translate-x-1"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                    >
-                      <path d="M4 10h12M11 5l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </span>
-                </Link>
-              </Reveal>
-            ))}
-          </div>
-        </Container>
-      </section>
+      <div onMouseEnter={pause} onMouseLeave={resume} onFocus={pause} onBlur={resume}>
+        <Hero
+          consultant={current}
+          onNext={next}
+          position={position}
+          total={order.length}
+        />
+      </div>
 
       <section className="border-t border-line bg-surface">
         <div className="py-20 lg:py-28">
           <SectionHeading
-            eyebrow="Top rated"
-            title="Consultants clients book again"
-            description="Every consultant on ConsultantHub is identity-verified and reviewed by the people they've worked with."
-            action={<Button to="/consultants" variant="outline">View all</Button>}
+            eyebrow={t('home.top.eyebrow')}
+            title={t('home.top.title')}
+            description={t('home.top.description')}
+            action={
+              <Button to="/consultants" variant="outline">
+                {t('common.view_all')}
+              </Button>
+            }
           />
           <Container className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {featured.map((consultant, index) => (
@@ -138,102 +163,139 @@ export default function Home() {
         </div>
       </section>
 
+      <HowItWorks />
+
+      {/* Browse by specialty — an index of ruled rows, not four identical cards. */}
       <section className="border-t border-line bg-surface-subtle">
         <Container className="py-20 lg:py-28">
-          <Reveal>
-            <p className="eyebrow mb-3">Why book here</p>
-            <h2 className="max-w-2xl font-display text-display-lg text-ink-950">
-              Less risk on both sides of the call
-            </h2>
-          </Reveal>
+          <SectionHeading
+            eyebrow={t('home.specialties.eyebrow')}
+            title={t('home.specialties.title')}
+            action={
+              <Button to="/consultants" variant="outline">
+                {t('home.specialties.all')}
+              </Button>
+            }
+          />
 
-          <div className="mt-14 grid gap-6 md:grid-cols-3">
-            {guarantees.map((guarantee, index) => (
-              <Reveal key={guarantee.title} delay={index * 100}>
-                <div className="group h-full rounded-2xl border border-line bg-surface p-6 shadow-card transition-all duration-300 ease-out hover:-translate-y-1 hover:border-accent-300 hover:shadow-lift">
-                  <span className="grid h-10 w-10 place-items-center rounded-full bg-accent-50 text-accent-600 transition-transform duration-300 ease-spring group-hover:scale-110">
-                    <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M4.5 10.5l3.5 3.5 7.5-8" />
-                    </svg>
+          <div className="mt-12 border-t border-line">
+            {specialties.map((specialty) => (
+              <Link
+                key={specialty.name}
+                to={`/consultants?specialty=${encodeURIComponent(specialty.name)}`}
+                className="group flex items-center justify-between gap-6 border-b border-line py-6 transition-colors duration-300 hover:bg-surface"
+              >
+                <span className="font-display text-display-md text-ink-950 transition-colors duration-300 group-hover:text-accent-600">
+                  {specialty.name}
+                </span>
+                <span className="flex items-center gap-6 text-sm text-muted">
+                  <span>
+                    {countLabelLocalized(
+                      specialty.count,
+                      t,
+                      'terms.consultant',
+                      'terms.consultants',
+                    )}
                   </span>
-                  <h3 className="mt-5 text-lg font-semibold tracking-tight text-ink-950">
-                    {guarantee.title}
-                  </h3>
-                  <p className="mt-2.5 text-sm leading-relaxed text-muted">{guarantee.body}</p>
-                </div>
-              </Reveal>
+                  <svg
+                    viewBox="0 0 20 20"
+                    className="h-4 w-4 text-accent-600 transition-transform duration-300 ease-spring group-hover:translate-x-1"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  >
+                    <path d="M4 10h12M11 5l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+              </Link>
             ))}
           </div>
         </Container>
       </section>
 
-      <HowItWorks />
-
-      <section id="pricing" className="scroll-mt-20 border-t border-line bg-surface">
-        <Container className="py-20 text-center lg:py-28">
+      {/* Why book here — a ruled band, not three cards. */}
+      <section className="border-t border-line bg-surface-muted">
+        <Container className="py-20 lg:py-28">
           <Reveal>
-            <h2 className="mx-auto max-w-2xl font-display text-display-lg text-ink-950">
-              Not sure who to book? Start with a free intro call.
+            <p className="eyebrow mb-3">{t('home.why.eyebrow')}</p>
+            <h2 className="max-w-2xl font-display text-display-lg text-ink-950">
+              {t('home.why.title')}
+            </h2>
+          </Reveal>
+
+          <div className="mt-12 border-t border-line-strong">
+            {GUARANTEES.map((guarantee) => (
+              <div
+                key={guarantee.titleKey}
+                className="grid gap-3 border-b border-line-strong py-7 md:grid-cols-[18rem_1fr] md:gap-10"
+              >
+                <h3 className="text-lg font-semibold tracking-tight text-ink-950">
+                  {t(guarantee.titleKey)}
+                </h3>
+                <p className="text-sm leading-relaxed text-muted">
+                  {/* Only the first body embeds the generated coverage
+                      sentence; the rest are plain copy. */}
+                  {guarantee.bodyKey === 'home.guarantee.identity_body'
+                    ? t(guarantee.bodyKey, { sentence: identityCheckSentence(consultants, t) })
+                    : t(guarantee.bodyKey)}
+                </p>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      {/*
+        Closing band. It used to mirror the hero in ink so the page opened and
+        landed on a dark surface. The hero is cream now, so this is too and the
+        only dark surface left on the page is the site footer below it.
+      */}
+      <CreamBand surface="subtle" className="border-t border-line">
+        <div className="mx-auto max-w-2xl text-center">
+          <Reveal>
+            <h2 className="font-display text-display-lg text-ink-950">
+              {t('home.cta.title')}
             </h2>
           </Reveal>
 
           <Reveal delay={90}>
             <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-muted">
-              Every consultant offers a complimentary intro call. Low commitment, and it takes one
-              click to book.
+              {t('home.cta.body')}
             </p>
           </Reveal>
 
           <Reveal delay={160}>
-            {/* Two independent doors: hire someone, or offer your own services.
-                Neither one is gated behind picking a role at sign-up. */}
             <div className="mt-9 flex flex-wrap justify-center gap-3">
-              <Button to="/consultants" size="lg">
-                Hire a consultant
+              <Button to="/consultants" variant="primary" size="lg">
+                {t('home.cta.hire')}
               </Button>
               <Button to="/become-a-consultant" variant="outline" size="lg">
-                Become a consultant
+                {t('home.cta.become')}
               </Button>
             </div>
           </Reveal>
 
-          {/* Derived from the directory, so these figures cannot overstate it. */}
+          {/* Every figure computed from the directory — nothing literal. */}
           <Reveal delay={230}>
-            <dl className="mx-auto mt-14 grid max-w-xl grid-cols-3 gap-6">
-              <div>
-                <dd className="font-display text-2xl text-ink-950">
-                  <CountUp value={consultants.length} />
-                </dd>
-                <dt className="mt-1 text-xs text-muted">Consultants listed</dt>
-              </div>
-              <div>
-                <dd className="font-display text-2xl text-ink-950">
-                  <CountUp
-                    value={
-                      consultants.reduce((sum, c) => sum + c.sessions, 0) /
-                      Math.max(consultants.length, 1)
-                    }
-                    decimals={0}
-                  />
-                </dd>
-                <dt className="mt-1 text-xs text-muted">Avg sessions each</dt>
-              </div>
-              <div>
-                <dd className="font-display text-2xl text-ink-950">
-                  <CountUp
-                    value={
-                      consultants.reduce((sum, c) => sum + c.rating, 0) /
-                      Math.max(consultants.length, 1)
-                    }
-                    decimals={1}
-                  />
-                </dd>
-                <dt className="mt-1 text-xs text-muted">Avg rating</dt>
-              </div>
+            <dl className="mx-auto mt-14 grid max-w-xl grid-cols-3 gap-6 border-t border-line-strong pt-8">
+              {proof.map((stat) => (
+                <div key={stat.labelKey}>
+                  <dd className="font-display text-2xl text-ink-950">
+                    <CountUp
+                      value={stat.value}
+                      suffix={stat.suffix}
+                      decimals={stat.decimals}
+                    />
+                  </dd>
+                  <dt className="mt-1 text-xs leading-snug text-muted">
+                    {t(stat.labelKey)}
+                  </dt>
+                </div>
+              ))}
             </dl>
           </Reveal>
-        </Container>
-      </section>
+        </div>
+      </CreamBand>
     </>
   )
 }

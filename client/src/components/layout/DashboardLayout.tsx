@@ -1,20 +1,26 @@
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
+import type { ReactNode } from 'react'
 import Container from '../ui/Container'
-import Avatar from '../ui/Avatar'
-import Button from '../ui/Button'
-import { useApp } from '../../context/AppContext'
 
-const navItems = [
+import Button from '../ui/Button'
+import InkBand from '../marketing/InkBand'
+import LanguageToggle from '../ui/LanguageToggle'
+import { useAuth } from '@clerk/react'
+import { useCurrentUser } from '../../lib/useCurrentUser'
+import { useTranslation } from '../../i18n/LanguageContext'
+import type { MessageKey } from '../../i18n/strings'
+
+const navItems: { to: string; labelKey: MessageKey; icon: ReactNode }[] = [
   {
     to: '/client/dashboard',
-    label: 'Overview',
+    labelKey: 'dash.nav_overview',
     icon: (
       <path d="M3 10.5 10 4l7 6.5M5 9.5V16h10V9.5" strokeLinecap="round" strokeLinejoin="round" />
     ),
   },
   {
     to: '/client/appointments',
-    label: 'Appointments',
+    labelKey: 'dash.nav_appointments',
     icon: (
       <>
         <rect x="3.5" y="5" width="13" height="11.5" rx="2" />
@@ -24,7 +30,7 @@ const navItems = [
   },
   {
     to: '/consultants',
-    label: 'Find consultants',
+    labelKey: 'dash.nav_find',
     icon: (
       <>
         <circle cx="9" cy="8" r="4" />
@@ -47,7 +53,7 @@ function Logo() {
   )
 }
 
-function NavIcon({ children }: { children: React.ReactNode }) {
+function NavIcon({ children }: { children: ReactNode }) {
   return (
     <svg
       viewBox="0 0 20 20"
@@ -62,8 +68,27 @@ function NavIcon({ children }: { children: React.ReactNode }) {
 }
 
 export default function DashboardLayout() {
-  const { session, logout } = useApp()
+  const user = useCurrentUser()
+  const { signOut } = useAuth()
   const { pathname } = useLocation()
+  const { t } = useTranslation()
+
+  const firstName = user?.name.split(' ')[0] ?? ''
+
+  // Derived from the route rather than looked up in a `Record`, so an
+  // unrecognised path still gets a real title rather than a generic fallback.
+  const isAppointments = pathname === '/client/appointments'
+
+  // Only greets by name when there is one: an account with no name set would
+  // otherwise read "Welcome back, " with nothing after it.
+  const title = isAppointments
+    ? t('dash.nav_appointments')
+    : firstName
+      ? t('dash.title_welcome', { name: firstName })
+      : t('common.dashboard')
+  const subtitle = isAppointments
+    ? t('dash.sub_appointments')
+    : t('dash.sub_dashboard')
 
   return (
     <div className="flex min-h-screen bg-surface-subtle">
@@ -94,39 +119,18 @@ export default function DashboardLayout() {
                     }`}
                   />
                   <NavIcon>{item.icon}</NavIcon>
-                  {item.label}
+                  {t(item.labelKey)}
                 </>
               )}
             </NavLink>
           ))}
-        </nav>
 
-        <div className="border-t border-line pt-4">
-          {session ? (
-            <>
-              <div className="flex items-center gap-3 rounded-xl px-2 py-1.5 transition-colors hover:bg-ink-100/60">
-                <Avatar name={session.name} size="sm" />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-body">{session.name}</p>
-                  <p className="truncate text-xs text-muted">{session.email}</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={logout}
-                className="mt-1 w-full rounded-xl px-2 py-1.5 text-left text-sm text-muted transition-colors hover:bg-ink-100/60 hover:text-danger"
-              >
-                Log out
-              </button>
-            </>
-          ) : (
-            <div className="px-2">
-              <Button to="/login" variant="outline" size="sm" className="w-full">
-                Log in
-              </Button>
-            </div>
-          )}
-        </div>
+          {/* At the foot of the sidebar rather than beside the links: it changes
+              the whole page, not where you are within it. */}
+          <div className="mt-6 border-t border-line pt-4">
+            <LanguageToggle />
+          </div>
+        </nav>
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
@@ -144,12 +148,62 @@ export default function DashboardLayout() {
                     }`
                   }
                 >
-                  {item.label}
+                  {t(item.labelKey)}
                 </NavLink>
               ))}
+              {/* Reachable here as well as in the sidebar: below `lg` the
+                  sidebar is not rendered, so the footer copy alone would leave
+                  these two routes with no way to switch language. */}
+              <LanguageToggle className="ml-1" />
             </nav>
           </Container>
         </header>
+
+        {/* Slightly tighter than the old `py-10 lg:py-12`. This band is the page
+            header, and `/client/appointments` continues it immediately with its
+            status tabs — at the previous scale the two pads stacked into ~88px
+            of unbroken ink before any content appeared. */}
+        <InkBand as="header" flush className="py-8 lg:py-10">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <p className="eyebrow text-gold-on-ink">{t('dash.eyebrow')}</p>
+              <h1 className="mt-3 font-display text-display-lg text-on-ink">{title}</h1>
+              {subtitle && (
+                <p className="mt-2 text-base text-on-ink-muted">{subtitle}</p>
+              )}
+            </div>
+            <div className="flex shrink-0 items-center gap-4">
+              {user ? (
+                <>
+                  {/* The name and the sign-out control, on ink. Clerk's
+                      UserButton is a popover anchored to an avatar and is
+                      styled for a light surface, so it is deliberately not
+                      used here: this band is ink, and the popover would have
+                      to fight it. `signOut` comes from Clerk rather than from
+                      any local session. The email line is gone with the local
+                      account record — the account is Clerk's now — and the
+                      name line is conditional for the same reason as in the
+                      navbar. */}
+                  {user.name && (
+                    <p className="truncate text-sm font-medium text-on-ink">{user.name}</p>
+                  )}
+                  <Button type="button" variant="onInkOutline" size="sm" onClick={() => void signOut()}>
+                    {t('common.log_out')}
+                  </Button>
+                </>
+              ) : (
+                <div className="flex flex-wrap gap-3">
+                  <Button to="/login" variant="onInk" size="sm">
+                    {t('common.log_in')}
+                  </Button>
+                  <Button to="/register" variant="onInkOutline" size="sm">
+                    {t('common.create_account')}
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        </InkBand>
 
         <main key={pathname} className="flex-1 animate-fade-in">
           <Outlet />
@@ -157,7 +211,7 @@ export default function DashboardLayout() {
 
         <div className="border-t border-line bg-surface px-5 py-6 lg:hidden">
           <Button to="/consultants" variant="dark" className="w-full">
-            Book a new consultant
+            {t('common.book_consultant')}
           </Button>
         </div>
       </div>

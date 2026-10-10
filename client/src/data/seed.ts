@@ -1,40 +1,22 @@
-import type { Appointment, User } from '../types';
+import type { Appointment } from '../types';
 
 /**
  * Demo seed data.
  *
- * The accounts here are pre-built so the login form can be tried immediately.
- * Their password hashes were produced with `lib/crypto.ts`; see the comment on
- * `seedPassword` for how to reproduce them.
+ * There are no seeded accounts. Accounts are Clerk's, created by signing up,
+ * and there is nothing local to seed — which also means there is no demo
+ * credential to type into a sign-in form.
  *
- * Everything below is fictional sample content, not real people or companies.
- */
-
-/**
- * Password for every seeded account: `consultant123`.
+ * That has a visible consequence worth stating rather than hiding: every
+ * appointment below belongs to `u_client_demo`, an account that no longer
+ * exists. A real person who signs up owns none of them, so their dashboard is
+ * empty and their review history starts empty. That is the honest state. No
+ * appointments have been re-pointed at a real id to make the demo look
+ * populated, because a booking attributed to somebody who never made it is
+ * exactly the kind of claim this app does not make.
  *
- * The digests below are baked in so a fresh clone has a working login. They are
- * salted with the per-user salt stored as the prefix of `passwordHash`.
+ * Everything here is fictional sample content, not real people or companies.
  */
-
-export const seedUsers: User[] = [
-  {
-    id: 'u_client_demo',
-    name: 'Amina Client',
-    email: 'amina@example.com',
-    role: 'CLIENT',
-    passwordHash: 'demo-amina:3aef19315a8e9f22a387212c80f7a06be8898ab23e45657a1dbe98fa9be74cc5',
-    createdAt: '2026-01-12T09:00:00.000Z',
-  },
-  {
-    id: 'u_consultant_demo',
-    name: 'Yusuf Consultant',
-    email: 'yusuf@example.com',
-    role: 'CONSULTANT',
-    passwordHash: 'demo-yusuf:72309961176a023ca6e9e736b722e6480764736fe243d7ca7fe1e79a72aa5417',
-    createdAt: '2026-01-20T09:00:00.000Z',
-  },
-];
 
 /** Relative dates keep the dashboard meaningful whenever the app is opened. */
 function relativeDate(offsetDays: number): string {

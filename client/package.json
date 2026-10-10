@@ -12,6 +12,7 @@
     "verify": "npm run typecheck && npm run check:logic && npm run build"
   },
   "dependencies": {
+    "@clerk/react": "^6.17.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.20.0"

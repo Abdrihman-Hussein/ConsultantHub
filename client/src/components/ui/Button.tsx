@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 
-type Variant = 'primary' | 'dark' | 'outline' | 'ghost'
+type Variant = 'primary' | 'dark' | 'outline' | 'ghost' | 'onInk' | 'onInkOutline'
 type Size = 'sm' | 'md' | 'lg'
 
 const base =
@@ -19,6 +19,14 @@ const variants: Record<Variant, string> = {
   dark: 'bg-ink-950 text-white hover:bg-ink-900 shadow-sm',
   outline: 'border border-line-strong bg-surface text-body hover:border-accent-500 hover:bg-accent-50',
   ghost: 'text-muted hover:bg-ink-100 hover:text-body',
+  // Dark-surface pairs. The shared `base` ring is tuned for cream and
+  // disappears against ink, so these override the ring and its offset too.
+  onInk:
+    'bg-accent-on-ink text-ink-950 hover:bg-gold-on-ink shadow-sm ' +
+    'focus-visible:ring-accent-on-ink/60 focus-visible:ring-offset-surface-ink',
+  onInkOutline:
+    'border border-ink-line bg-transparent text-on-ink hover:bg-ink-line ' +
+    'focus-visible:ring-accent-on-ink/60 focus-visible:ring-offset-surface-ink',
 }
 
 const sizes: Record<Size, string> = {

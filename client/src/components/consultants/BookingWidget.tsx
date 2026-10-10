@@ -1,11 +1,19 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
-import { addMinutes, formatDateShort, formatPrice } from '../../lib/format'
+import { addMinutes, formatPrice } from '../../lib/format'
 import { bookedTimes, generateSlots, isSlotTaken, upcomingDays } from '../../lib/booking'
+import { useCurrentUser } from '../../lib/useCurrentUser'
+import { useTranslation } from '../../i18n/LanguageContext'
+import type { MessageKey } from '../../i18n/strings'
 import type { Consultant, MeetingType, Service } from '../../types'
 import Badge from '../ui/Badge'
 import Button from '../ui/Button'
+import ServiceStep from './booking/ServiceStep'
+import SlotStep from './booking/SlotStep'
+import FormatStep from './booking/FormatStep'
+import ConfirmStep from './booking/ConfirmStep'
+import DoneStep from './booking/DoneStep'
 
 interface BookingWidgetProps {
   consultant: Consultant;
@@ -15,8 +23,10 @@ interface BookingWidgetProps {
 type Stage = 'select' | 'confirm' | 'done'
 
 export default function BookingWidget({ consultant, services }: BookingWidgetProps) {
-  const { session, appointments, bookSession, isPersistent } = useApp();
+  const { appointments, bookSession, isPersistent } = useApp();
+  const user = useCurrentUser();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [serviceId, setServiceId] = useState(services[0]?.id ?? '');
   const [days, setDays] = useState(() => upcomingDays(5));
@@ -24,7 +34,12 @@ export default function BookingWidget({ consultant, services }: BookingWidgetPro
   const [time, setTime] = useState<string | null>(null);
   const [meetingType, setMeetingType] = useState<MeetingType>('video');
   const [stage, setStage] = useState<Stage>('select');
-  const [error, setError] = useState<string | null>(null);
+  /**
+   * Stored as a dictionary key rather than a rendered sentence, so switching
+   * language re-renders the message in the new one. A string captured at the
+   * moment of failure would stay in whichever language was active then.
+   */
+  const [error, setError] = useState<MessageKey | null>(null);
 
   const service = useMemo(
     () => services.find((candidate) => candidate.id === serviceId),
@@ -56,7 +71,7 @@ export default function BookingWidget({ consultant, services }: BookingWidgetPro
   if (services.length === 0) {
     return (
       <div className="rounded-2xl border border-line bg-surface p-6 shadow-card">
-        <p className="text-sm text-muted">This consultant hasn&apos;t published services yet.</p>
+        <p className="text-sm text-muted">{t('booking.no_services')}</p>
       </div>
     );
   }
@@ -64,12 +79,12 @@ export default function BookingWidget({ consultant, services }: BookingWidgetPro
   const endTime = service && time ? addMinutes(time, service.duration) : null;
 
   const submit = () => {
-    if (!session) {
+    if (!user) {
       navigate('/login', { state: { from: `/consultants/${consultant.id}` } });
       return;
     }
     if (!service || !time || !endTime) {
-      setError('Choose a service and a time first.');
+      setError('booking.error_choose');
       return;
     }
 
@@ -82,7 +97,7 @@ export default function BookingWidget({ consultant, services }: BookingWidgetPro
         endTime,
       })
     ) {
-      setError('That slot was just taken. Pick another time.');
+      setError('booking.error_taken');
       setTime(null);
       setStage('select');
       return;
@@ -100,7 +115,7 @@ export default function BookingWidget({ consultant, services }: BookingWidgetPro
     });
 
     if (!created) {
-      setError('Something went wrong saving that booking.');
+      setError('booking.error_save');
       return;
     }
 
@@ -110,226 +125,94 @@ export default function BookingWidget({ consultant, services }: BookingWidgetPro
 
   if (stage === 'done' && service && time && endTime) {
     return (
-      <div className="rounded-2xl border border-accent-200 bg-accent-50/60 p-6 text-center shadow-card">
-        <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-accent-500 text-white">
-          <svg viewBox="0 0 20 20" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <path d="M4.5 10.5l3.5 3.5 7.5-8" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </span>
-        <h2 className="mt-4 font-display text-display-md text-ink-950">You&apos;re booked</h2>
-        <p className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-muted">
-          {service.name} with {consultant.name} on {formatDateShort(date)} at {time} (
-          {endTime}).
-        </p>
-
-        <div className="mt-6 flex flex-col gap-2">
-          <Button to="/client/appointments" className="w-full">
-            View my appointments
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              setStage('select');
-              setTime(null);
-            }}
-          >
-            Book another session
-          </Button>
-        </div>
-
-        {!isPersistent && (
-          <p className="mt-4 text-xs text-subtle">
-            Storage is unavailable, so this booking will not survive a reload.
-          </p>
-        )}
-      </div>
+      <DoneStep
+        consultantName={consultant.name}
+        service={service}
+        date={date}
+        time={time}
+        endTime={endTime}
+        isPersistent={isPersistent}
+        onBookAnother={() => {
+          setStage('select');
+          setTime(null);
+        }}
+      />
     );
   }
 
   if (stage === 'confirm' && service && time && endTime) {
     return (
-      <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
-        <div className="border-b border-line bg-accent-50/50 px-6 py-5">
-          <h2 className="text-lg font-semibold tracking-tight text-ink-950">Confirm booking</h2>
-        </div>
-
-        <dl className="space-y-3 p-6 text-sm">
-          {[
-            ['Consultant', consultant.name],
-            ['Service', service.name],
-            ['When', `${formatDateShort(date)} · ${time} – ${endTime}`],
-            ['Format', meetingType === 'video' ? 'Video call' : 'In person'],
-            ['Price', service.isFree ? 'Free' : formatPrice(service.price)],
-          ].map(([label, value]) => (
-            <div key={label} className="flex justify-between gap-6">
-              <dt className="text-muted">{label}</dt>
-              <dd className="text-right font-medium text-body">{value}</dd>
-            </div>
-          ))}
-        </dl>
-
-        {error && (
-          <p role="alert" className="mx-6 mb-4 rounded-xl bg-danger-soft px-4 py-3 text-sm text-danger">
-            {error}
-          </p>
-        )}
-
-        <div className="flex gap-3 px-6 pb-6">
-          <Button
-            variant="outline"
-            className="flex-1"
-            onClick={() => {
-              setStage('select');
-              setError(null);
-            }}
-          >
-            Back
-          </Button>
-          <Button className="flex-1" onClick={submit}>
-            Confirm
-          </Button>
-        </div>
-      </div>
+      <ConfirmStep
+        consultantName={consultant.name}
+        service={service}
+        date={date}
+        time={time}
+        endTime={endTime}
+        meetingType={meetingType}
+        error={error ? t(error) : null}
+        onBack={() => {
+          setStage('select');
+          setError(null);
+        }}
+        onConfirm={submit}
+      />
     );
   }
 
   return (
     <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
       <div className="border-b border-line bg-accent-50/50 px-6 py-5">
-        <h2 className="text-lg font-semibold tracking-tight text-ink-950">Book a session</h2>
-        <p className="mt-1 text-xs text-muted">Pick a service, a date and a time.</p>
+        <h2 className="text-lg font-semibold tracking-tight text-ink-950">{t('booking.title')}</h2>
+        <p className="mt-1 text-xs text-muted">{t('booking.subtitle')}</p>
       </div>
 
       <div className="space-y-6 p-6">
-        <div>
-          <label htmlFor="booking-service" className="mb-2 block text-sm font-medium text-body">
-            Service
-          </label>
-          <div className="relative">
-            <select
-              id="booking-service"
-              value={serviceId}
-              onChange={(event) => {
-                setServiceId(event.target.value);
-                setTime(null);
-              }}
-              className="w-full cursor-pointer appearance-none rounded-xl border border-line-strong bg-surface px-4 py-2.5 pr-10 text-sm transition-all duration-200 hover:border-ink-400 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/20"
-            >
-              {services.map((candidate) => (
-                <option key={candidate.id} value={candidate.id}>
-                  {candidate.name} — {candidate.isFree ? 'Free' : formatPrice(candidate.price)} ·{' '}
-                  {candidate.duration} min
-                </option>
-              ))}
-            </select>
-            <svg
-              viewBox="0 0 20 20"
-              aria-hidden="true"
-              className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            >
-              <path d="M6 8l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
-          {service && (
-            <p className="mt-2 text-xs leading-relaxed text-muted">{service.description}</p>
-          )}
-        </div>
+        <ServiceStep
+          services={services}
+          selectedId={serviceId}
+          selected={service}
+          onSelect={(id) => {
+            setServiceId(id);
+            setTime(null);
+          }}
+        />
 
-        <div>
-          <span className="mb-2 block text-sm font-medium text-body">Date</span>
-          <div className="flex flex-wrap gap-2">
-            {days.map((candidate) => (
-              <button
-                key={candidate}
-                type="button"
-                onClick={() => {
-                  setDate(candidate);
-                  setTime(null);
-                }}
-                aria-pressed={date === candidate}
-                className={`rounded-full border px-3.5 py-2 text-sm transition-all duration-200 ease-out ${
-                  date === candidate
-                    ? 'border-accent-500 bg-accent-500 text-white shadow-glow'
-                    : 'border-line-strong text-muted hover:border-accent-400 hover:text-body'
-                }`}
-              >
-                {formatDateShort(candidate)}
-              </button>
-            ))}
-          </div>
-        </div>
+        <SlotStep
+          days={days}
+          selectedDate={date}
+          onSelectDate={(candidate) => {
+            setDate(candidate);
+            setTime(null);
+          }}
+          slots={slots}
+          bookedCount={taken.length}
+          selectedTime={time}
+          onSelectTime={setTime}
+        />
 
-        <div>
-          <div className="mb-2 flex items-baseline justify-between">
-            <span className="text-sm font-medium text-body">Available times</span>
-            {taken.length > 0 && (
-              <span className="text-xs text-muted">{taken.length} booked</span>
-            )}
-          </div>
-
-          {slots.length === 0 ? (
-            <p className="rounded-xl bg-surface-muted px-4 py-3 text-sm text-muted">
-              No free times on this date. Try another day.
-            </p>
-          ) : (
-            <div className="grid grid-cols-3 gap-2">
-              {slots.map((candidate) => (
-                <button
-                  key={candidate}
-                  type="button"
-                  onClick={() => setTime(candidate)}
-                  aria-pressed={time === candidate}
-                  className={`rounded-xl border px-3 py-2 text-sm transition-all duration-200 ease-out ${
-                    time === candidate
-                      ? 'border-accent-500 bg-accent-500 text-white shadow-glow'
-                      : 'border-line-strong text-muted hover:border-accent-400 hover:text-body'
-                  }`}
-                >
-                  {candidate}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div>
-          <span className="mb-2 block text-sm font-medium text-body">Format</span>
-          <div className="grid grid-cols-2 gap-2">
-            {(['video', 'in-person'] as MeetingType[]).map((candidate) => (
-              <button
-                key={candidate}
-                type="button"
-                onClick={() => setMeetingType(candidate)}
-                aria-pressed={meetingType === candidate}
-                className={`rounded-xl border px-3 py-2 text-sm capitalize transition-all duration-200 ease-out ${
-                  meetingType === candidate
-                    ? 'border-accent-500 bg-accent-500 text-white shadow-glow'
-                    : 'border-line-strong text-muted hover:border-accent-400 hover:text-body'
-                }`}
-              >
-                {candidate.replace('-', ' ')}
-              </button>
-            ))}
-          </div>
-        </div>
+        <FormatStep selected={meetingType} onSelect={setMeetingType} />
 
         <div className="flex items-center justify-between border-t border-line pt-5">
           <div>
             <span className="text-xl font-semibold tracking-tight text-ink-950">
-              {service ? (service.isFree ? 'Free' : formatPrice(service.price)) : '—'}
+              {service
+                ? service.isFree
+                  ? t('common.free')
+                  : formatPrice(service.price)
+                : '—'}
             </span>
-            {service && <span className="text-sm text-subtle"> · {service.duration} min</span>}
+            {service && (
+              <span className="text-sm text-subtle">
+                {t('booking.price_row', { duration: service.duration })}
+              </span>
+            )}
           </div>
-          {service?.isFree && <Badge tone="accent">Intro call</Badge>}
+          {service?.isFree && <Badge tone="accent">{t('booking.intro_badge')}</Badge>}
         </div>
 
         {error && (
           <p role="alert" className="rounded-xl bg-danger-soft px-4 py-3 text-sm text-danger">
-            {error}
+            {t(error)}
           </p>
         )}
 
@@ -341,14 +224,14 @@ export default function BookingWidget({ consultant, services }: BookingWidgetPro
             setStage('confirm');
           }}
         >
-          {session ? 'Continue' : 'Log in to book'}
+          {user ? t('booking.continue') : t('booking.log_in_to_book')}
         </Button>
 
-        {!session && (
+        {!user && (
           <p className="text-center text-xs text-muted">
-            You can browse freely — an account is only needed to book.{' '}
+            {t('booking.browse_note')}{' '}
             <Link to="/register" className="underline underline-offset-4 hover:text-ink-950">
-              Create one
+              {t('booking.create_one')}
             </Link>
           </p>
         )}

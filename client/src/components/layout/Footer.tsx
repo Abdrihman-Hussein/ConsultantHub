@@ -1,33 +1,64 @@
 import { Link } from 'react-router-dom'
-import Container from '../ui/Container'
+import { consultants } from '../../data'
+import { identityCheckSentence } from '../../lib/trust'
+import { useTranslation } from '../../i18n/LanguageContext'
+import type { MessageKey } from '../../i18n/strings'
 import Reveal from '../ui/Reveal'
+import InkBand from '../marketing/InkBand'
 
-const columns = [
+/**
+ * A footer link is either a real destination or a plain label.
+ *
+ * Every entry used to be a `Link`, which meant "Pricing" pointed at a
+ * `/#pricing` anchor that no longer exists, and the two legal rows plus the
+ * social icons pointed at `/#` — so clicking "Privacy policy" silently
+ * navigated to the homepage. A link that lands somewhere other than its label
+ * is worse than no link at all, so unimplemented destinations are modelled as
+ * `href: null` and rendered as non-navigational text.
+ *
+ * Labels are dictionary keys, so an unimplemented entry cannot read as
+ * implemented in another language than the one it was written in.
+ */
+type FooterLink = { labelKey: MessageKey; href: string | null }
+
+const columns: { titleKey: MessageKey; links: FooterLink[] }[] = [
   {
-    title: 'Product',
+    titleKey: 'footer.column_product',
     links: [
-      { label: 'Browse consultants', to: '/consultants' },
-      { label: 'How it works', to: '/#how-it-works' },
-      { label: 'Pricing', to: '/#pricing' },
+      { labelKey: 'footer.browse_consultants', href: '/consultants' },
+      { labelKey: 'nav.how_it_works', href: '/#how-it-works' },
+      // Pricing is per-consultant and shown on every card and profile, so
+      // there is no page to link to and no anchor to invent.
+      { labelKey: 'footer.pricing', href: null },
     ],
   },
   {
-    title: 'Company',
+    titleKey: 'footer.column_company',
     links: [
-      { label: 'Become a consultant', to: '/register' },
-      { label: 'Client dashboard', to: '/client/dashboard' },
-      { label: 'Contact support', to: '/#' },
+      { labelKey: 'footer.become_consultant', href: '/become-a-consultant' },
+      { labelKey: 'footer.client_dashboard', href: '/client/dashboard' },
+      // No support desk exists in this build, so this is a label, not a link.
+      { labelKey: 'footer.contact_support', href: null },
     ],
   },
   {
-    title: 'Legal',
+    titleKey: 'footer.column_legal',
     links: [
-      { label: 'Terms of service', to: '/#' },
-      { label: 'Privacy policy', to: '/#' },
+      // These documents have not been written. Inventing stub pages would be
+      // the same class of fabrication this redesign removed elsewhere.
+      { labelKey: 'footer.terms', href: null },
+      { labelKey: 'footer.privacy', href: null },
     ],
   },
 ]
 
+/**
+ * Brand marks for accounts this project does not have. They were `href="/#"`
+ * anchors, so every one of them navigated to the homepage — a link promising
+ * GitHub that lands on marketing copy. They are rendered as inert marks with
+ * the unavailable state stated, so nothing on the page lies about being
+ * clickable.
+ */
 const socials = [
   {
     label: 'X',
@@ -44,73 +75,94 @@ const socials = [
 ]
 
 export default function Footer() {
+  const { t } = useTranslation()
+
   return (
-    <footer className="border-t border-line bg-surface">
-      <Container className="py-16">
-        <div className="grid gap-12 md:grid-cols-[1.5fr_repeat(3,1fr)]">
-          <Reveal>
-            <div className="max-w-xs">
-              <Link to="/" className="group inline-flex items-center gap-2.5">
-                <span className="grid h-8 w-8 place-items-center rounded-full bg-accent-500 text-xs font-semibold text-white transition-transform duration-300 ease-spring group-hover:scale-110">
-                  C
-                </span>
-                <span className="text-[15px] font-semibold tracking-tight text-ink-950">
-                  ConsultantHub
-                </span>
-              </Link>
-              <p className="mt-4 text-sm leading-relaxed text-muted">
-                A trusted network of verified consultants. Find the right person and book a session
-                in minutes.
-              </p>
-
-              <div className="mt-6 flex gap-2">
-                {socials.map((social) => (
-                  <a
-                    key={social.label}
-                    href="/#"
-                    aria-label={social.label}
-                    className="grid h-9 w-9 place-items-center rounded-full border border-line text-muted transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-500 hover:bg-accent-50 hover:text-accent-600"
-                  >
-                    <svg viewBox="0 0 20 20" className="h-4 w-4" fill="currentColor">
-                      <path d={social.path} />
-                    </svg>
-                  </a>
-                ))}
-              </div>
-            </div>
-          </Reveal>
-
-          {columns.map((column, index) => (
-            <Reveal key={column.title} delay={(index + 1) * 70}>
-              <div>
-                <h3 className="eyebrow mb-4">{column.title}</h3>
-                <ul className="space-y-2.5">
-                  {column.links.map((link) => (
-                    <li key={link.label}>
-                      <Link
-                        to={link.to}
-                        className="group inline-flex items-center text-sm text-muted transition-colors hover:text-ink-950"
-                      >
-                        <span className="mr-0 h-px w-0 bg-accent-500 transition-all duration-300 ease-out group-hover:mr-2 group-hover:w-3" />
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-
-        <Reveal delay={120}>
-          <div className="mt-14 flex flex-col gap-3 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-xs text-subtle">
-              © {new Date().getFullYear()} ConsultantHub. All rights reserved.
+    <InkBand as="footer" className="border-t border-ink-line">
+      <div className="grid gap-12 md:grid-cols-[1.5fr_repeat(3,1fr)]">
+        <Reveal>
+          <div className="max-w-xs">
+            <Link to="/" className="group inline-flex items-center gap-2.5">
+              <span className="grid h-8 w-8 place-items-center rounded-full bg-accent-on-ink text-xs font-semibold text-ink-950 transition-transform duration-300 ease-spring group-hover:scale-110">
+                C
+              </span>
+              <span className="text-[15px] font-semibold tracking-tight text-on-ink">
+                ConsultantHub
+              </span>
+            </Link>
+            {/* Two sentences rather than one interpolated blob: the coverage
+                claim is generated from the directory and must not be
+                re-worded by the language, only re-ordered. */}
+            <p className="mt-4 text-sm leading-relaxed text-on-ink-muted">
+              {identityCheckSentence(consultants, t)}{' '}
+              {t('footer.blurb_rates')}{' '}
+              {t('footer.blurb_cta')}
             </p>
-            <p className="text-xs text-subtle">MIT licensed.</p>
+
+            {/* Rendered inert: no accounts exist to link to, so these carry no href and
+                no hover affordance that would promise a destination. */}
+            <div className="mt-6 flex gap-2">
+              {socials.map((social) => (
+                <span
+                  key={social.label}
+                  title={t('footer.social_unavailable', { name: social.label })}
+                  className="grid h-9 w-9 place-items-center rounded-full border border-ink-line text-on-ink-muted"
+                >
+                  <svg
+                    viewBox="0 0 20 20"
+                    className="h-4 w-4"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path d={social.path} />
+                  </svg>
+                  <span className="sr-only">
+                    {t('footer.social_unavailable', { name: social.label })}
+                  </span>
+                </span>
+              ))}
+            </div>
           </div>
         </Reveal>
-      </Container>
-    </footer>
+
+        {columns.map((column, index) => (
+          <Reveal key={column.titleKey} delay={(index + 1) * 70}>
+            <div>
+              <h3 className="eyebrow mb-4 text-on-ink-muted">{t(column.titleKey)}</h3>
+              <ul className="space-y-2.5">
+                {column.links.map((link) => (
+                  <li key={link.labelKey}>
+                    {link.href === null ? (
+                      // Not a destination, so not a link: no href, no focus
+                      // stop, no hover promise. The label stands for itself.
+                      <span className="inline-flex items-center text-sm text-on-ink-muted">
+                        {t(link.labelKey)}
+                      </span>
+                    ) : (
+                      <Link
+                        to={link.href}
+                        className="group inline-flex items-center text-sm text-on-ink-muted transition-colors hover:text-on-ink"
+                      >
+                        <span className="mr-0 h-px w-0 bg-accent-on-ink transition-all duration-300 ease-out group-hover:mr-2 group-hover:w-3" />
+                        {t(link.labelKey)}
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+
+      <Reveal delay={120}>
+        <div className="mt-14 flex flex-col gap-3 border-t border-ink-line pt-8 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-on-ink-muted">
+            {t('footer.copyright', { year: new Date().getFullYear() })}
+          </p>
+          <p className="text-xs text-on-ink-muted">{t('footer.license')}</p>
+        </div>
+      </Reveal>
+    </InkBand>
   )
 }

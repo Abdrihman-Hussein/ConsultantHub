@@ -1,123 +1,65 @@
-import { useState } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { useApp } from '../context/AppContext'
-import { emailIsValid } from '../lib/format'
-import Button from '../components/ui/Button'
-import { Input } from '../components/ui/Field'
+import { Link, useLocation } from 'react-router-dom'
+import { SignIn } from '@clerk/react'
+import { useTranslation } from '../i18n/LanguageContext'
 import AuthShell from '../components/marketing/AuthShell'
+import { authCardAppearance } from '../lib/clerkAppearance'
 
 interface LocationState {
   from?: string
 }
 
+/**
+ * Sign-in. The form itself is Clerk's; the page around it is still ours.
+ *
+ * `AuthShell` renders unchanged, so the ink aside and the cream panel survive —
+ * the shell owns the title, subtitle, card and footer, and Clerk's `<SignIn>`
+ * is rendered inside the card where the hand-written form used to be. Clerk's
+ * own card chrome is switched off (`elevation: 'flush'`) so its border, radius
+ * and shadow do not stack on top of the shell's, and its "Don't have an
+ * account? Sign up" footer is hidden because the shell footer already says
+ * exactly that and links to the same route.
+ *
+ * `routing="hash"` is deliberate. With the default path routing Clerk would
+ * push `/login/continue` and friends, which React Router has no route for, so
+ * the catch-all would send the user back to the home page mid-flow. Hash
+ * routing keeps Clerk's internal step in the fragment and leaves `/login` — and
+ * every other route URL in this app — exactly where it was.
+ *
+ * The intended destination survives: `RequireAuth` puts the path it was
+ * guarding into `location.state.from`, and that is passed as the redirect, so
+ * arriving at `/client/appointments` still lands on `/client/appointments`
+ * after signing in. `forceRedirectUrl` rather than `fallbackRedirectUrl`,
+ * because this value is a decision the app already made and Clerk's dashboard
+ * default must not override it.
+ */
 export default function Login() {
-  const { login, isPersistent } = useApp()
-  const navigate = useNavigate()
   const location = useLocation()
-
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [errors, setErrors] = useState<{ email?: string; password?: string; form?: string }>({})
-  const [submitting, setSubmitting] = useState(false)
+  const { t } = useTranslation()
 
   const redirectTo = (location.state as LocationState | null)?.from ?? '/client/dashboard'
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault()
-
-    const next: typeof errors = {}
-    if (!emailIsValid(email)) next.email = 'Enter a valid email address.'
-    if (!password) next.password = 'Enter your password.'
-
-    setErrors(next)
-    if (Object.keys(next).length > 0) return
-
-    setSubmitting(true)
-    const error = await login({ email, password })
-    setSubmitting(false)
-
-    if (error) {
-      setErrors({ form: error })
-      return
-    }
-    navigate(redirectTo, { replace: true })
-  }
-
   return (
     <AuthShell
-      title="Welcome back"
-      subtitle="Log in to manage your bookings."
+      title={t('login.title')}
+      subtitle={t('login.subtitle')}
       footer={
         <>
-          Don&apos;t have an account?{' '}
+          {t('login.no_account')}{' '}
           <Link to="/register" className="font-medium text-ink-950 underline underline-offset-4">
-            Create one
+            {t('booking.create_one')}
           </Link>
         </>
       }
     >
-      {/*
-        Demo credentials are surfaced because there is no real backend here. A
-        production build would remove this entirely.
-      */}
-      <div className="mb-6 rounded-xl border border-accent-200 bg-accent-50/60 p-4">
-        <p className="text-xs font-medium text-accent-800">Demo account</p>
-        <p className="mt-1 font-mono text-xs text-accent-700">
-          amina@example.com · consultant123
-        </p>
-        <button
-          type="button"
-          onClick={() => {
-            setEmail('amina@example.com')
-            setPassword('consultant123')
-            setErrors({})
-          }}
-          className="mt-2.5 rounded-full border border-accent-300 px-3 py-1.5 text-xs font-medium text-accent-700 transition-colors hover:bg-accent-100"
-        >
-          Fill demo credentials
-        </button>
-      </div>
-
-      <form className="space-y-5" onSubmit={handleSubmit} noValidate>
-        {errors.form && (
-          <p role="alert" className="rounded-xl bg-danger-soft px-4 py-3 text-sm text-danger">
-            {errors.form}
-          </p>
-        )}
-
-        <Input
-          label="Email"
-          type="email"
-          name="email"
-          autoComplete="email"
-          placeholder="you@company.com"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          error={errors.email}
-          required
-        />
-        <Input
-          label="Password"
-          type="password"
-          name="password"
-          autoComplete="current-password"
-          placeholder="••••••••"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          error={errors.password}
-          required
-        />
-
-        <Button type="submit" className="w-full" disabled={submitting}>
-          {submitting ? 'Signing in…' : 'Log in'}
-        </Button>
-
-        {!isPersistent && (
-          <p className="text-xs leading-relaxed text-subtle">
-            Storage is unavailable in this browser, so your session lasts only until you reload.
-          </p>
-        )}
-      </form>
+      <SignIn
+        routing="hash"
+        signUpUrl="/register"
+        forceRedirectUrl={redirectTo}
+        appearance={authCardAppearance}
+        fallback={
+          <p className="py-8 text-center text-sm text-muted">{t('common.loading_form')}</p>
+        }
+      />
     </AuthShell>
   )
 }

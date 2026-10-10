@@ -1,9 +1,12 @@
 import { useEffect, useId, useRef, useState } from 'react'
+import { useTranslation } from '../../i18n/LanguageContext'
 
 interface SearchInputProps {
   value: string
   onChange: (value: string) => void
+  /** Omit to use the translated default for the active language. */
   placeholder?: string
+  /** Omit to use the translated default for the active language. */
   label?: string
   /** Suggestions shown beneath the field, e.g. matching specialties. */
   suggestions?: string[]
@@ -15,15 +18,23 @@ interface SearchInputProps {
  *
  * Typing is debounced so filtering does not run on every keystroke, and the
  * delay is skipped when the user presses Enter or blurs the field.
+ *
+ * The `label` and `placeholder` defaults are resolved from the dictionary at
+ * render rather than being module constants, so they follow a language switch
+ * instead of freezing at import time.
  */
 export default function SearchInput({
   value,
   onChange,
-  placeholder = 'Search',
-  label = 'Search consultants',
+  placeholder,
+  label,
   suggestions = [],
   className = '',
 }: SearchInputProps) {
+  const { t } = useTranslation()
+  const resolvedLabel = label ?? t('filters.search_label')
+  const resolvedPlaceholder = placeholder ?? t('search.placeholder')
+
   const [draft, setDraft] = useState(value)
   const [open, setOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -70,7 +81,7 @@ export default function SearchInput({
   return (
     <div ref={containerRef} className={`relative ${className}`}>
       <label htmlFor={inputId} className="sr-only">
-        {label}
+        {resolvedLabel}
       </label>
 
       <svg
@@ -93,7 +104,7 @@ export default function SearchInput({
         aria-autocomplete="list"
         aria-controls={`${inputId}-listbox`}
         value={draft}
-        placeholder={placeholder}
+        placeholder={resolvedPlaceholder}
         onChange={(event) => {
           setDraft(event.target.value)
           setOpen(true)
@@ -113,7 +124,7 @@ export default function SearchInput({
         <button
           type="button"
           onClick={() => commit('')}
-          aria-label="Clear search"
+          aria-label={t('filters.clear_search')}
           className="absolute right-3 top-1/2 grid h-5 w-5 -translate-y-1/2 place-items-center rounded-full text-muted transition-colors hover:bg-ink-100 hover:text-body"
         >
           <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.6">

@@ -1,12 +1,17 @@
-/**
+﻿/**
  * The consultant directory and their services.
  *
- * Static sample content for the MVP — a real build would serve this from an
+ * Static sample content for the MVP â€” a real build would serve this from an
  * API. Everyone listed here is fictional, and the portraits in
  * `public/portraits` are drawn illustrations rather than photographs.
+ *
+ * There is no `rating` and no `reviewCount` on a consultant. Both were seeded
+ * numbers that nothing in the app could substantiate; every figure shown about
+ * someone's standing is now computed from the reviews that exist (see
+ * `ratingFor` in `lib/reviews.ts`), and an un-reviewed consultant has none.
  */
 
-import type { Consultant, Service } from '../types';
+import type { Consultant, Review, Service } from '../types';
 
 export const consultants: Consultant[] = [
   {
@@ -16,8 +21,6 @@ export const consultants: Consultant[] = [
     title: 'Strategic Marketing',
     specialization: 'Marketing',
     bio: 'Go-to-market strategy for B2B SaaS. Over a decade scaling marketing teams across East Africa and the Gulf, and tying spend to pipeline with data rather than instinct.',
-    rating: 4.9,
-    reviewCount: 128,
     hourlyRate: 150,
     location: 'Mogadishu, Somalia',
     experience: '10+ years',
@@ -33,8 +36,6 @@ export const consultants: Consultant[] = [
     title: 'Systems Engineering',
     specialization: 'Engineering',
     bio: 'Cloud architecture and infrastructure optimisation. Previously led platform teams at large-scale enterprises, now focused on helping small teams avoid the same costly mistakes.',
-    rating: 5.0,
-    reviewCount: 95,
     hourlyRate: 200,
     location: 'Hargeisa, Somaliland',
     experience: '12 years',
@@ -50,8 +51,6 @@ export const consultants: Consultant[] = [
     title: 'Corporate Law',
     specialization: 'Law',
     bio: 'Strategic counsel on mergers, acquisitions, and governance. I translate regulatory complexity into plain language so you can make a decision without a lawyer translating it twice.',
-    rating: 4.8,
-    reviewCount: 76,
     hourlyRate: 250,
     location: 'Nairobi, Kenya',
     experience: '15 years',
@@ -67,8 +66,6 @@ export const consultants: Consultant[] = [
     title: 'Financial Modelling',
     specialization: 'Finance',
     bio: 'Forecasting, valuation, and capital strategy for early-stage companies. I will tell you which assumptions your model is actually sensitive to, and which ones you can stop worrying about.',
-    rating: 4.7,
-    reviewCount: 64,
     hourlyRate: 120,
     location: 'Minneapolis, MN',
     experience: '8 years',
@@ -84,8 +81,6 @@ export const consultants: Consultant[] = [
     title: 'Product Design',
     specialization: 'Design',
     bio: 'Product design and design systems. I help teams move from scattered screens to one coherent system that a team can actually maintain after I leave.',
-    rating: 4.9,
-    reviewCount: 88,
     hourlyRate: 175,
     location: 'London, UK',
     experience: '9 years',
@@ -101,8 +96,6 @@ export const consultants: Consultant[] = [
     title: 'Data Analytics',
     specialization: 'Data',
     bio: 'Analytics setup and measurement. Most dashboards I inherit are measuring the wrong things; I start by working out what decision each one is supposed to inform.',
-    rating: 4.6,
-    reviewCount: 52,
     hourlyRate: 140,
     location: 'Dubai, UAE',
     experience: '7 years',
@@ -233,6 +226,168 @@ export const services: Service[] = [
   },
 ];
 
+/**
+ * Fictional written reviews, three per consultant.
+ *
+ * These are fixture content and are deliberately NOT rendered anywhere in the
+ * app. They belong to no appointment and no account, and they were written to
+ * make the directory look busy. A review is only allowed to exist once a real
+ * client has completed a real session (see `canReview`), so showing these
+ * would put invented five-star quotes back on the page by the back door — the
+ * same dishonesty the seeded `rating` and `reviewCount` fields were removed
+ * for. The app's review list reads `KEYS.reviews`, which starts empty.
+ *
+ * They are kept because the logic harness checks their shape — every review
+ * names a real consultant, carries a rating in range, and has a body — which
+ * is what guards the type and the format the app itself writes into.
+ */
+export const reviews: Review[] = [
+  {
+    id: 'r1',
+    consultantId: '1',
+    authorName: 'Halima Osman',
+    rating: 5,
+    date: '2026-08-14',
+    body: 'I had been guessing at channel mix for two quarters. Ahmed spent the hour on which assumptions my spend actually rested on, and I left with three things to stop doing.',
+  },
+  {
+    id: 'r2',
+    consultantId: '1',
+    authorName: 'Yusuf Barre',
+    rating: 5,
+    date: '2026-05-02',
+    body: 'Direct, and unusually honest about what a marketing session cannot fix. The follow-up notes were worth more than the call itself.',
+  },
+  {
+    id: 'r3',
+    consultantId: '1',
+    authorName: 'Nadia Yusuf',
+    rating: 4,
+    date: '2026-02-19',
+    body: 'Very solid on positioning. I would have liked more time on pricing, but that is what the intro call is for.',
+  },
+  {
+    id: 'r4',
+    consultantId: '2',
+    authorName: 'Farah Ismail',
+    rating: 5,
+    date: '2026-09-01',
+    body: 'The architecture review gave us a written list ordered by impact. We fixed the top two items that week and stopped paying for the third problem we had been tolerating.',
+  },
+  {
+    id: 'r5',
+    consultantId: '2',
+    authorName: 'Ahmed Noor',
+    rating: 5,
+    date: '2026-06-11',
+    body: 'Answered in under an hour and did not waste any of the thirty minutes. Knew exactly why our build times degraded once traffic picked up.',
+  },
+  {
+    id: 'r6',
+    consultantId: '2',
+    authorName: 'Layla Hersi',
+    rating: 5,
+    date: '2026-01-27',
+    body: 'Omar spotted a single misconfigured setting that our previous consultant had signed off on twice. Worth every pound of the ninety minutes.',
+  },
+  {
+    id: 'r7',
+    consultantId: '3',
+    authorName: 'Omar Aden',
+    rating: 5,
+    date: '2026-07-21',
+    body: 'I needed corporate counsel on an acquisition and did not want the answer translated twice. He laid the options out with the tradeoffs attached and then stopped talking.',
+  },
+  {
+    id: 'r8',
+    consultantId: '3',
+    authorName: 'Sahra Ali',
+    rating: 4,
+    date: '2026-04-08',
+    body: 'Extremely clear on governance. Book the longer session, not the intro, if you have a real transaction in front of you.',
+  },
+  {
+    id: 'r9',
+    consultantId: '3',
+    authorName: 'Mohamed Warsame',
+    rating: 5,
+    date: '2025-11-30',
+    body: 'The contract review flagged three clauses I would have signed straight through. Saved me from a bad quarter.',
+  },
+  {
+    id: 'r10',
+    consultantId: '4',
+    authorName: 'Amina Hassan',
+    rating: 5,
+    date: '2026-08-03',
+    body: 'He identified which of my assumptions actually drove the output and which ones I could stop worrying about. That is a more useful answer than a rebuilt model.',
+  },
+  {
+    id: 'r11',
+    consultantId: '4',
+    authorName: 'Idris Barre',
+    rating: 4,
+    date: '2026-03-15',
+    body: 'Calm and practical about runway. I would have liked a deeper look at the fundraising timeline, but the framing was excellent.',
+  },
+  {
+    id: 'r12',
+    consultantId: '4',
+    authorName: 'Zahra Osman',
+    rating: 5,
+    date: '2025-10-12',
+    body: 'Went through the model line by line and explained the reasoning rather than just the correction. I understand it now.',
+  },
+  {
+    id: 'r13',
+    consultantId: '5',
+    authorName: 'Khadar Nur',
+    rating: 5,
+    date: '2026-09-09',
+    body: 'The design system audit gave us a token structure we could actually maintain. Six months on, the components are still consistent, which was our real problem.',
+  },
+  {
+    id: 'r14',
+    consultantId: '5',
+    authorName: 'Asha Mohamud',
+    rating: 5,
+    date: '2026-05-26',
+    body: 'Yusuf helped us move from scattered screens to one system without a big-bang rewrite. Practical to an unusual degree.',
+  },
+  {
+    id: 'r15',
+    consultantId: '5',
+    authorName: 'Abdi Farah',
+    rating: 4,
+    date: '2026-01-09',
+    body: 'Good on systems and documentation. Less experience on research practice, but he was upfront about that.',
+  },
+  {
+    id: 'r16',
+    consultantId: '6',
+    authorName: 'Rahma Farah',
+    rating: 5,
+    date: '2026-08-25',
+    body: 'Started by asking what each dashboard was supposed to inform. Half of them could not answer that, and he said so before proposing anything.',
+  },
+  {
+    id: 'r17',
+    consultantId: '6',
+    authorName: 'Yasin Abdi',
+    rating: 4,
+    date: '2026-04-22',
+    body: 'Clean tracking setup and it held up once real traffic arrived. Slightly over-engineered for our team size.',
+  },
+  {
+    id: 'r18',
+    consultantId: '6',
+    authorName: 'Halima Nur',
+    rating: 5,
+    date: '2025-12-04',
+    body: 'The most useful hour I have spent on measurement. We cut two dashboards and started making decisions from the rest.',
+  },
+];
+
 export const specializations = Array.from(
   new Set(consultants.map((consultant) => consultant.specialization)),
 ).sort();
@@ -248,4 +403,11 @@ export function getServicesFor(consultantId: string): Service[] {
 export function getConsultantForService(serviceId: string): Consultant | undefined {
   const service = services.find((candidate) => candidate.id === serviceId);
   return service ? getConsultant(service.consultantId) : undefined;
+}
+
+/** A consultant's fixture reviews, newest first. Not app content — see above. */
+export function getReviewsFor(consultantId: string): Review[] {
+  return reviews
+    .filter((review) => review.consultantId === consultantId)
+    .sort((a, b) => b.date.localeCompare(a.date));
 }

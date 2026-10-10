@@ -1,0 +1,83 @@
+import { Link } from 'react-router-dom'
+import type { Consultant } from '../../types'
+import { useApp } from '../../context/AppContext'
+import Avatar from '../ui/Avatar'
+import Rating from '../ui/Rating'
+import Button from '../ui/Button'
+import { bioLine } from '../../lib/featured'
+import { ratingFor } from '../../lib/reviews'
+import { useTranslation } from '../../i18n/LanguageContext'
+
+interface FeaturedConsultantProps {
+  consultant: Consultant
+}
+
+/**
+ * The consultant card that occupies the hero — the single strongest trust
+ * signal on the page, and the way into the directory.
+ *
+ * It sits on cream, so it is a light-surface card rather than a translucent
+ * panel: an opaque `bg-surface` with a `border-line` edge, and the same muted
+ * tiers every other card on the site uses. That also means the `Rating` runs
+ * on its default palette (`gold-400` stars, `ink-200` empties) — the `onInk`
+ * variant exists because that palette disappears against a dark band, and on
+ * cream it would be a light peach on white.
+ *
+ * The one line of copy is the consultant's own first bio sentence, extracted
+ * rather than written (see `lib/featured`). It is deliberately not wrapped in
+ * quotation marks: none of these people said it, and implying otherwise would
+ * be the same class of dishonesty as the invented figures this redesign
+ * removed. For the same reason the rating here is computed from real reviews
+ * and the credential line carries delivered sessions.
+ */
+export default function FeaturedConsultant({ consultant }: FeaturedConsultantProps) {
+  const { reviews } = useApp()
+  const { t } = useTranslation()
+  const firstName = consultant.name.split(' ')[0]
+  const rating = ratingFor(consultant, reviews)
+
+  return (
+    <article className="rounded-2xl border border-line bg-surface p-5 shadow-card sm:p-6">
+      <div className="flex items-start gap-4">
+        <Avatar src={consultant.avatar} name={consultant.name} size="lg" />
+
+        <div className="min-w-0 flex-1">
+          <h2 className="truncate font-display text-xl text-ink-950">{consultant.name}</h2>
+          <p className="mt-1 text-xs leading-relaxed text-muted truncate">
+            {consultant.title} · {consultant.location}
+          </p>
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
+            <Rating value={rating} size="sm" />
+            <span aria-hidden="true" className="text-ink-200 shrink-0">|</span>
+            <span className="truncate">
+              {t('common.sessions_delivered', { count: consultant.sessions })}
+            </span>
+            <span aria-hidden="true" className="text-ink-200 shrink-0">|</span>
+            <span className="truncate">
+              {t('card.responds', { time: consultant.responseTime })}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <p className="mt-5 border-l-2 border-accent-600 pl-4 text-sm leading-relaxed text-muted line-clamp-3">
+        {bioLine(consultant.bio, consultant.title)}
+      </p>
+
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        {/* The first name is interpolated, not translated, and carries no
+            possessive: Somali attaches possession to the noun, so the name
+            stays as it is written. */}
+        <Button to={`/consultants/${consultant.id}`} variant="primary" size="sm">
+          {t('card.view_profile_named', { name: firstName })}
+        </Button>
+        <Link
+          to="/consultants"
+          className="text-xs font-medium text-muted underline-offset-4 transition-colors hover:text-body hover:underline"
+        >
+          {t('common.browse_all')}
+        </Link>
+      </div>
+    </article>
+  )
+}

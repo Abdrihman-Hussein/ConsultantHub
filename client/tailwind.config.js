@@ -51,6 +51,16 @@ export default {
         'danger-soft': '#FCEBE9',
         // Matches the Badge 'accent' fill — used to knock shapes out of a seal.
         'on-accent-soft': '#FDF4EF',
+        // Ink surface family. Cream-on-ink typography needs its own accent:
+        // `accent-500` is unreadable on ink, so the dark bands use these.
+        // Every pairing is pinned by the contrast checks in check-logic.ts.
+        'surface-ink': '#2A2118',
+        'surface-ink-soft': '#3D3229',
+        'on-ink': '#F9F1E8',
+        'on-ink-muted': '#B79E88',
+        'accent-on-ink': '#E8A05C',
+        'gold-on-ink': '#E8C88A',
+        'ink-line': 'rgba(249, 241, 232, 0.14)',
       },
       fontFamily: {
         // Soft, slightly wonky serif for display; neutral sans for UI.
@@ -58,6 +68,7 @@ export default {
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       fontSize: {
+        'display-2xl': ['clamp(3rem, 8vw, 6rem)', { lineHeight: '0.98', letterSpacing: '-0.035em' }],
         'display-xl': ['clamp(2.75rem, 7vw, 5rem)', { lineHeight: '1.02', letterSpacing: '-0.03em' }],
         'display-lg': ['clamp(2rem, 4.5vw, 3.25rem)', { lineHeight: '1.08', letterSpacing: '-0.02em' }],
         'display-md': ['clamp(1.5rem, 3vw, 2rem)', { lineHeight: '1.18', letterSpacing: '-0.01em' }],

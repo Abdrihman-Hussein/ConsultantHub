@@ -10,3 +10,6 @@ dist
 .agents/
 .claude/
 agent/
+
+# Brainstorming mockups — scratch, not part of the app.
+.superpowers/

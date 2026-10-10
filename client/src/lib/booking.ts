@@ -70,6 +70,30 @@ export function generateSlots(durationMinutes: number, booked: string[] = []): s
   return slots;
 }
 
+/** Today as `YYYY-MM-DD` for a given instant, in that instant's local time. */
+function isoDay(now: Date): string {
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${now.getFullYear()}-${month}-${day}`;
+}
+
+/**
+ * Whether a client may mark this booking finished.
+ *
+ * Without this there is no path out of `CONFIRMED`: booking always creates a
+ * confirmed appointment and cancelling is the only other transition, so the
+ * only completed sessions in the app belong to the demo account and nobody
+ * else can ever leave a review.
+ *
+ * The day has to have *passed*, not merely arrived — a session happening now
+ * has not happened yet, and marking it finished would unlock a review for a
+ * meeting that has not happened.
+ */
+export function canComplete(appointment: Appointment, now: Date = new Date()): boolean {
+  if (appointment.status !== 'CONFIRMED') return false;
+  return appointment.date < isoDay(now);
+}
+
 /** The next `count` weekdays, as ISO dates, starting tomorrow. */
 export function upcomingDays(count = 5): string[] {
   const days: string[] = []
