@@ -49,9 +49,17 @@ const GUARANTEES: { titleKey: MessageKey; bodyKey: MessageKey }[] = [
   { titleKey: 'home.guarantee.scheduling_title', bodyKey: 'home.guarantee.scheduling_body' },
 ]
 
-/** Labels for the closing band's figures. The values are computed, not listed. */
+/**
+ * Labels for the closing band's figures. The values are computed, not listed.
+ *
+ * There is no average rating here any more. It was the mean of six seeded
+ * numbers that no review in the app supported, so the band fell back from
+ * claiming four-and-a-half stars to claiming an average of all of them. The
+ * figure in its place — how many consultants are listed — is counted from the
+ * directory and cannot overstate it.
+ */
 const PROOF_LABELS: MessageKey[] = [
-  'home.proof.average_rating',
+  'home.proof.listed',
   'home.proof.sessions_delivered',
   'home.proof.identity_checked',
 ]
@@ -101,11 +109,10 @@ export default function Home() {
   const featured = useMemo(() => rowConsultants(order, current.id, 3), [order, current])
 
   // Derived from the directory so no figure on the page can overstate it.
-  const count = Math.max(consultants.length, 1)
   const proof = [
     {
-      value: consultants.reduce((sum, c) => sum + c.rating, 0) / count,
-      decimals: 1,
+      value: consultants.length,
+      decimals: 0,
       labelKey: PROOF_LABELS[0],
     },
     {

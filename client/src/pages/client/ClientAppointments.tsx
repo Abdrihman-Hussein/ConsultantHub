@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
+import { canComplete } from '../../lib/booking'
 import { formatDate, relativeDay, formatPrice } from '../../lib/format'
 import { useTranslation } from '../../i18n/LanguageContext'
 import type { MessageKey } from '../../i18n/strings'
@@ -71,7 +72,7 @@ function statusLabelKey(status: AppointmentStatus): MessageKey {
 }
 
 export default function ClientAppointments() {
-  const { session, myAppointments, cancelAppointment } = useApp()
+  const { session, myAppointments, cancelAppointment, completeAppointment } = useApp()
   const { t } = useTranslation()
   const [tab, setTab] = useState<Tab>('ALL')
   const [cancelling, setCancelling] = useState<string | null>(null)
@@ -105,6 +106,12 @@ export default function ClientAppointments() {
     cancelAppointment(id)
     setCancelling(null)
   }
+
+  // One clock read per render, shared by every row, so two appointments cannot
+  // disagree about what "today" is. This is also the only path out of
+  // CONFIRMED: without it a booking can never be finished, and a finished
+  // booking is the only thing that unlocks a review.
+  const now = useMemo(() => new Date(), [myAppointments])
 
   if (!session) {
     return (
@@ -193,6 +200,11 @@ export default function ClientAppointments() {
             {visible.map((appointment, index) => {
               const canCancel =
                 appointment.status === 'CONFIRMED' || appointment.status === 'PENDING'
+              // Eligibility is `canComplete`, the same helper the state change
+              // runs, so the button can never be offered for a booking that
+              // would be refused — and never for a future, pending, cancelled
+              // or already-completed one.
+              const canFinish = canComplete(appointment, now)
 
               return (
                 <Reveal key={appointment.id} delay={index * 70}>
@@ -224,20 +236,29 @@ export default function ClientAppointments() {
                         {t('appointments.profile')}
                       </Link>
                       {canCancel && (
-                        <button
-                          type="button"
-                          onClick={() => confirmCancel(appointment.id)}
-                          className={`rounded-full border px-4 py-2 text-sm transition-all duration-200 ${
-                            cancelling === appointment.id
-                              ? 'border-danger bg-danger text-white'
-                              : 'border-line-strong text-muted hover:border-danger hover:text-danger'
-                          }`}
-                        >
-                          {cancelling === appointment.id
-                            ? t('appointments.confirm')
-                            : t('client.cancel')}
-                        </button>
-                      )}
+                          <button
+                            type="button"
+                            onClick={() => confirmCancel(appointment.id)}
+                            className={`rounded-full border px-4 py-2 text-sm transition-all duration-200 ${
+                              cancelling === appointment.id
+                                ? 'border-danger bg-danger text-white'
+                                : 'border-line-strong text-muted hover:border-danger hover:text-danger'
+                            }`}
+                          >
+                            {cancelling === appointment.id
+                              ? t('appointments.confirm')
+                              : t('client.cancel')}
+                          </button>
+                        )}
+                        {canFinish && (
+                          <button
+                            type="button"
+                            onClick={() => completeAppointment(appointment.id)}
+                            className="rounded-full border border-line-strong px-4 py-2 text-sm text-muted transition-all duration-200 hover:border-accent-500 hover:text-accent-600"
+                          >
+                            {t('appointments.complete')}
+                          </button>
+                        )}
                     </div>
                   </Card>
                 </Reveal>

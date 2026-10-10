@@ -2,10 +2,19 @@
  * Throwaway harness for the pure logic in lib/ and data/. Not part of the app
  * build — run with `npm run check:logic`.
  */
-import { isSlotTaken, generateSlots, bookedTimes, upcomingDays } from './src/lib/booking'
-import { searchConsultants, defaultFilters, countActiveFilters } from './src/lib/search'
+import { isSlotTaken, generateSlots, bookedTimes, upcomingDays, canComplete } from './src/lib/booking'
+import { searchConsultants, defaultFilters, countActiveFilters, sortKeys } from './src/lib/search'
+import type { SortKey } from './src/lib/search'
 import { bioLine, featuredOrder, nextIndex, rowConsultants } from './src/lib/featured'
-import { avgRating, reviewsSummary, reviewCountSuffix } from './src/lib/reviews'
+import {
+  avgRating,
+  reviewsSummary,
+  canReview,
+  ratingFor,
+  reviewsFor,
+  reviewerName,
+} from './src/lib/reviews'
+import { translateEn } from './src/i18n/strings'
 import { identityCheckSentence, verifiedCount } from './src/lib/trust'
 import { countLabel, isMdUp } from './src/lib/format'
 import { consultants, getConsultant, reviews, getReviewsFor } from './src/data'
@@ -168,10 +177,6 @@ check(
   searchConsultants(consultants, { ...base, verifiedOnly: true }).every((r) => r.consultant.verified),
 )
 check(
-  'minRating filters',
-  searchConsultants(consultants, { ...base, minRating: 4.8 }).every((r) => r.consultant.rating >= 4.8),
-)
-check(
   'maxRate filters',
   searchConsultants(consultants, { ...base, maxRate: 130 }).every((r) => r.consultant.hourlyRate <= 130),
 )
@@ -183,9 +188,16 @@ check(
   })(),
 )
 check(
-  'rating sort is descending',
+  // Replaces the removed 'rating sort is descending' check. Sorting by a
+  // rating nothing can produce is not offered at all, so the guarantee now is
+  // that the option cannot come back, and that what is left still sorts.
+  'no sort option ranks by a rating',
+  !sortKeys.includes('rating' as SortKey),
+)
+check(
+  'sessions sort is descending',
   (() => {
-    const r = searchConsultants(consultants, { ...base, sort: 'rating' }).map((x) => x.consultant.rating)
+    const r = searchConsultants(consultants, { ...base, sort: 'sessions' }).map((x) => x.consultant.sessions)
     return r.every((v, i) => i === 0 || r[i - 1] >= v)
   })(),
 )
@@ -233,18 +245,28 @@ check(
 
 console.log('\nfeatured: ordering');
 check(
-  'highest rated leads',
-  featuredOrder(consultants)[0].name === 'Omar Nur',
+  // Replaces the removed 'highest rated leads' check. Nothing can rank the
+  // directory by rating any more, so the hero leads on delivered sessions —
+  // a field the record actually publishes.
+  'the busiest consultant leads',
+  featuredOrder(consultants)[0].name === 'Ahmed Warsame',
   featuredOrder(consultants)[0].name,
 );
 check(
-  'rating ties break on sessions',
+  'session volume orders the rotation',
+  (() => {
+    const sessions = featuredOrder(consultants).map((c) => c.sessions);
+    return sessions.every((v, i) => i === 0 || sessions[i - 1] >= v);
+  })(),
+);
+check(
+  'ties keep directory order',
   (() => {
     const tied = [
-      { ...consultants[0], id: 'a', rating: 5, sessions: 10 },
-      { ...consultants[0], id: 'b', rating: 5, sessions: 90 },
+      { ...consultants[0], id: 'a', sessions: 90 },
+      { ...consultants[0], id: 'b', sessions: 90 },
     ];
-    return featuredOrder(tied)[0].id === 'b';
+    return featuredOrder(tied).map((c) => c.id).join(',') === 'a,b';
   })(),
 );
 check(
@@ -306,20 +328,18 @@ check(
   })(),
 );
 check(
-  'sample label counts the total, not the sample',
-  reviewsSummary(consultants[0], getReviewsFor(consultants[0].id)) ===
-    `Showing 3 of ${consultants[0].reviewCount} reviews`,
-  reviewsSummary(consultants[0], getReviewsFor(consultants[0].id)),
+  // Replaces the removed 'sample label counts the total, not the sample'
+  // check. There is no separate total to qualify any more, so the line must
+  // report exactly what is shown and nothing beyond it.
+  'the summary counts exactly the reviews shown',
+  reviewsSummary(getReviewsFor(consultants[0].id), translateEn) ===
+    `Showing ${getReviewsFor(consultants[0].id).length} reviews`,
+  reviewsSummary(getReviewsFor(consultants[0].id), translateEn),
 );
 check(
-  'a zero review count does not print (0)',
-  reviewsSummary({ ...consultants[0], reviewCount: 0 }, []) === 'No written reviews yet',
-  reviewsSummary({ ...consultants[0], reviewCount: 0 }, []),
-);
-check(
-  'a total without samples does not imply a broken page',
-  reviewsSummary({ ...consultants[0], reviewCount: 40 }, []) === 'Written reviews not shown yet',
-  reviewsSummary({ ...consultants[0], reviewCount: 40 }, []),
+  'an empty list says so plainly rather than printing a zero',
+  reviewsSummary([], translateEn) === 'No reviews yet',
+  reviewsSummary([], translateEn),
 );
 check(
   'a seeded review average is within its own bounds',
@@ -329,9 +349,214 @@ check(
   })(),
 );
 check('an empty review list averages to null', avgRating([]) === null);
-check('a missing review count shows no suffix', reviewCountSuffix(undefined) === '');
-check('a zero review count shows no suffix', reviewCountSuffix(0) === '');
-check('a positive review count prints in parentheses', reviewCountSuffix(128) === ' (128)');
+
+/* --------------------------------------------------------------------------
+ * Gated reviews and stars.
+ *
+ * A review is only possible once a session has actually happened, so these
+ * checks pin the whole chain: a session can be finished, a finished session
+ * unlocks exactly one review, and the star average is computed from the
+ * reviews that exist rather than from a seeded figure.
+ * -------------------------------------------------------------------------- */
+
+const review = (over: Partial<any> = {}) => ({
+  id: 'rv',
+  consultantId: '2',
+  appointmentId: 'a1',
+  clientId: 'me',
+  authorName: 'Amina C.',
+  rating: 5,
+  date: '2026-09-01',
+  body: 'A real, earned review.',
+  ...over,
+})
+
+const completedAppt = (over: Partial<any> = {}) =>
+  appt({ id: 'a1', clientId: 'me', consultantId: '2', status: 'COMPLETED', date: '2026-01-05', ...over })
+
+const at = (iso: string) => new Date(`${iso}T09:00:00`)
+
+console.log('\nreviews: finishing a session')
+check(
+  'a confirmed session whose date has passed can be completed',
+  canComplete(completedAppt({ status: 'CONFIRMED', date: '2026-11-02' }), at('2026-11-10')) === true,
+);
+check(
+  'a confirmed session in the future cannot be completed',
+  canComplete(completedAppt({ status: 'CONFIRMED', date: '2026-11-11' }), at('2026-11-10')) === false,
+);
+check(
+  'a session happening today cannot be completed — the day has not passed yet',
+  canComplete(completedAppt({ status: 'CONFIRMED', date: '2026-11-10' }), at('2026-11-10')) === false,
+);
+check(
+  'a pending session cannot be completed',
+  canComplete(completedAppt({ status: 'PENDING', date: '2026-11-02' }), at('2026-11-10')) === false,
+);
+check(
+  'a cancelled session cannot be completed',
+  canComplete(completedAppt({ status: 'CANCELLED', date: '2026-11-02' }), at('2026-11-10')) === false,
+);
+check(
+  'an already-completed session cannot be completed again',
+  canComplete(completedAppt({ status: 'COMPLETED', date: '2026-11-02' }), at('2026-11-10')) === false,
+);
+
+console.log('\nreviews: the review gate');
+check(
+  'signed out, nobody may review',
+  canReview('2', null, [completedAppt()], []).reason === 'not_signed_in',
+);
+check(
+  'no appointments at all means no completed booking',
+  canReview('2', 'me', [], []).reason === 'no_completed_booking',
+);
+check(
+  'a confirmed-but-not-completed session does not unlock a review',
+  canReview('2', 'me', [completedAppt({ status: 'CONFIRMED', date: '2026-01-05' })], []).reason ===
+    'no_completed_booking',
+);
+check(
+  'a cancelled session does not unlock a review',
+  canReview('2', 'me', [completedAppt({ status: 'CANCELLED', date: '2026-01-05' })], []).reason ===
+    'no_completed_booking',
+);
+check(
+  'another consultant\'s completed session does not unlock a review here',
+  canReview('1', 'me', [completedAppt()], []).reason === 'no_completed_booking',
+);
+check(
+  "somebody else's completed session does not unlock a review",
+  canReview('2', 'someone-else', [completedAppt()], []).reason === 'no_completed_booking',
+);
+check(
+  'a completed session unlocks its own consultant',
+  canReview('2', 'me', [completedAppt()], []).ok === true &&
+    (canReview('2', 'me', [completedAppt()], []) as { appointmentId: string }).appointmentId === 'a1',
+);
+check(
+  'a second completed session is chosen once the first is reviewed',
+  (() => {
+    const gate = canReview(
+      '2',
+      'me',
+      [completedAppt(), completedAppt({ id: 'a2', date: '2026-02-06' })],
+      [review({ appointmentId: 'a1' })],
+    );
+    return gate.ok === true && (gate as { appointmentId: string }).appointmentId === 'a2';
+  })(),
+);
+check(
+  'the same session cannot be reviewed twice',
+  canReview('2', 'me', [completedAppt()], [review({ appointmentId: 'a1' })]).reason === 'already_reviewed',
+);
+check(
+  'uniqueness is per appointment, not per consultant — three sessions allow three reviews',
+  (() => {
+    const appointments = [
+      completedAppt(),
+      completedAppt({ id: 'a2', date: '2026-02-06' }),
+      completedAppt({ id: 'a3', date: '2026-03-07' }),
+    ];
+    const afterOne = canReview('2', 'me', appointments, [review({ appointmentId: 'a1' })]);
+    const afterTwo = canReview(
+      '2',
+      'me',
+      appointments,
+      [review({ appointmentId: 'a1' }), review({ id: 'rv2', appointmentId: 'a2' })],
+    );
+    const afterThree = canReview(
+      '2',
+      'me',
+      appointments,
+      [
+        review({ appointmentId: 'a1' }),
+        review({ id: 'rv2', appointmentId: 'a2' }),
+        review({ id: 'rv3', appointmentId: 'a3' }),
+      ],
+    );
+    return (
+      afterOne.ok &&
+      (afterOne as { appointmentId: string }).appointmentId === 'a2' &&
+      afterTwo.ok &&
+      (afterTwo as { appointmentId: string }).appointmentId === 'a3' &&
+      afterThree.reason === 'already_reviewed'
+    );
+  })(),
+);
+check(
+  'a review of a different session does not consume this one',
+  (() => {
+    const gate = canReview(
+      '2',
+      'me',
+      [completedAppt(), completedAppt({ id: 'a2', date: '2026-02-06' })],
+      [review({ appointmentId: 'a2' })],
+    );
+    return gate.ok === true && (gate as { appointmentId: string }).appointmentId === 'a1';
+  })(),
+);
+check(
+  'an unavailable store blocks the review rather than losing it',
+  canReview('2', 'me', [completedAppt()], [], undefined, false).reason === 'storage_unavailable',
+);
+
+console.log('\nreviews: aggregation');
+check('no reviews averages to null', avgRating([]) === null);
+check('a single review averages to itself', avgRating([review({ rating: 4 })]) === 4);
+check(
+  'many reviews average across all of them',
+  avgRating([review({ rating: 5 }), review({ rating: 4 }), review({ rating: 3 })]) === 4,
+);
+check(
+  'an average is never invented from the directory when nothing has been reviewed',
+  ratingFor(consultants[0], []) === null,
+);
+check(
+  'a rating comes from the reviews alone',
+  ratingFor(consultants[0], [
+    review({ consultantId: consultants[0].id, rating: 4 }),
+    review({ consultantId: consultants[0].id, rating: 5 }),
+  ]) === 4.5,
+);
+check(
+  'reviews for one consultant never leak into another\'s aggregate',
+  ratingFor(consultants[0], [review({ consultantId: '2', rating: 1 })]) === null,
+);
+
+console.log('\nreviews: isolation and ordering');
+check(
+  'reviewsFor returns only that consultant',
+  reviewsFor('2', [review({ consultantId: '2' }), review({ id: 'b', consultantId: '1' })]).length === 1,
+);
+check(
+  'reviewsFor returns nothing for a consultant with no reviews',
+  reviewsFor('99', [review({ consultantId: '2' })]).length === 0,
+);
+check(
+  'reviewsFor comes back newest first',
+  (() => {
+    const dates = reviewsFor('2', [
+      review({ id: 'x', date: '2026-01-01' }),
+      review({ id: 'y', date: '2026-09-01' }),
+      review({ id: 'z', date: '2026-05-01' }),
+    ]).map((r) => r.date);
+    return dates.join(',') === '2026-09-01,2026-05-01,2026-01-01';
+  })(),
+);
+
+console.log('\nreviews: reviewer identity');
+check('the reviewer is a first name and a last initial', reviewerName('Amina Client') === 'Amina C.');
+check(
+  'the full name is never shown',
+  !reviewerName('Amina Client').includes('Client'),
+);
+check('a single-word name gets no invented initial', reviewerName('Amina') === 'Amina');
+check(
+  'extra whitespace does not produce a broken label',
+  reviewerName('  Amina   Yusuf  Client ') === 'Amina C.',
+);
+check('a blank name yields a blank label rather than undefined', reviewerName('   ') === '');
 
 console.log('\ntrust: identity-check copy');
 // The home page used to assert that every consultant was verified. Two of the

@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom'
 import type { Consultant } from '../../types'
+import { useApp } from '../../context/AppContext'
 import Avatar from '../ui/Avatar'
 import Rating from '../ui/Rating'
 import Button from '../ui/Button'
 import { bioLine } from '../../lib/featured'
-import { countLabel } from '../../lib/format'
+import { ratingFor } from '../../lib/reviews'
 import { useTranslation } from '../../i18n/LanguageContext'
 
 interface FeaturedConsultantProps {
@@ -26,12 +27,14 @@ interface FeaturedConsultantProps {
  * rather than written (see `lib/featured`). It is deliberately not wrapped in
  * quotation marks: none of these people said it, and implying otherwise would
  * be the same class of dishonesty as the invented figures this redesign
- * removed. For the same reason the credential line carries delivered sessions
- * rather than a review count.
+ * removed. For the same reason the rating here is computed from real reviews
+ * and the credential line carries delivered sessions.
  */
 export default function FeaturedConsultant({ consultant }: FeaturedConsultantProps) {
+  const { reviews } = useApp()
   const { t } = useTranslation()
   const firstName = consultant.name.split(' ')[0]
+  const rating = ratingFor(consultant, reviews)
 
   return (
     <article className="rounded-2xl border border-line bg-surface p-5 shadow-card sm:p-6">
@@ -44,7 +47,7 @@ export default function FeaturedConsultant({ consultant }: FeaturedConsultantPro
             {consultant.title} · {consultant.location}
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
-            <Rating value={consultant.rating} size="sm" />
+            <Rating value={rating} size="sm" />
             <span aria-hidden="true" className="text-ink-200 shrink-0">|</span>
             <span className="truncate">
               {t('common.sessions_delivered', { count: consultant.sessions })}

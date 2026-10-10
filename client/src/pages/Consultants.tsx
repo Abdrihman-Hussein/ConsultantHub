@@ -74,7 +74,6 @@ export default function Consultants() {
       const next = { ...current }
       if (key === 'search') next.search = ''
       if (key === 'specialization') next.specialization = ''
-      if (key === 'minRating') next.minRating = 0
       if (key === 'maxRate') next.maxRate = defaultFilters.maxRate
       if (key === 'verifiedOnly') next.verifiedOnly = false
       return next
@@ -342,8 +341,9 @@ export default function Consultants() {
                 {results.map(({ consultant }, index) => (
                   <Reveal key={consultant.id} delay={Math.min(index, 6) * 70}>
                     <div className="flex h-full flex-col">
-                      {/* Session volume sits on the card itself now that the
-                          rating no longer carries a review count. */}
+                      {/* The card carries the rating and the session volume itself: both are
+                          computed from the directory and the real reviews, so
+                          neither needs qualifying from here. */}
                       <div className="min-h-0 flex-1">
                         <ConsultantCard consultant={consultant} />
                       </div>

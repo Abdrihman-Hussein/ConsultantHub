@@ -9,16 +9,25 @@ import type { MessageKey } from '../i18n/strings';
 export interface Filters {
   search: string;
   specialization: string;
-  minRating: number;
   maxRate: number;
   verifiedOnly: boolean;
   sort: SortKey;
 }
 
-export type SortKey = 'recommended' | 'rating' | 'rate-low' | 'rate-high' | 'sessions';
+/**
+ * There is no `rating` sort and no minimum-rating filter.
+ *
+ * Both sorted or filtered over `Consultant.rating`, a seeded number that no
+ * review in the app supported. Keeping the control would mean offering readers
+ * a choice between ranking criteria that all return the same answer — with no
+ * reviews yet, "highest rated" has nothing to rank on — which is worse than
+ * not offering it. Both return when consultants have been reviewed by people
+ * who booked them.
+ */
+export type SortKey = 'recommended' | 'rate-low' | 'rate-high' | 'sessions';
 
 /** Render order of the sort control. */
-export const sortKeys: SortKey[] = ['recommended', 'rating', 'rate-low', 'rate-high', 'sessions'];
+export const sortKeys: SortKey[] = ['recommended', 'rate-low', 'rate-high', 'sessions'];
 
 /**
  * Sort option labels, as dictionary keys rather than English strings.
@@ -30,7 +39,6 @@ export const sortKeys: SortKey[] = ['recommended', 'rating', 'rate-low', 'rate-h
  */
 export const sortLabelKeys: Record<SortKey, MessageKey> = {
   recommended: 'sort.recommended',
-  rating: 'sort.rating',
   'rate-low': 'sort.rate-low',
   'rate-high': 'sort.rate-high',
   sessions: 'sort.sessions',
@@ -39,25 +47,25 @@ export const sortLabelKeys: Record<SortKey, MessageKey> = {
 export const defaultFilters: Filters = {
   search: '',
   specialization: '',
-  minRating: 0,
   maxRate: 300,
   verifiedOnly: false,
   sort: 'recommended',
 };
 
 /**
- * Recommended ordering: verified consultants first, then rating, then volume.
- * A stable proxy for editorial ranking that stays deterministic.
+ * Recommended ordering: verified consultants first, then delivered sessions.
+ *
+ * A stable proxy for editorial ranking that stays deterministic, and — unlike
+ * the rating version it replaces — built entirely from fields the record
+ * actually publishes.
  */
 function compareRecommended(a: Consultant, b: Consultant): number {
   if (a.verified !== b.verified) return a.verified ? -1 : 1;
-  if (b.rating !== a.rating) return b.rating - a.rating;
   return b.sessions - a.sessions;
 }
 
 const comparators: Record<SortKey, (a: Consultant, b: Consultant) => number> = {
   recommended: compareRecommended,
-  rating: (a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount,
   'rate-low': (a, b) => a.hourlyRate - b.hourlyRate,
   'rate-high': (a, b) => b.hourlyRate - a.hourlyRate,
   sessions: (a, b) => b.sessions - a.sessions,
@@ -123,7 +131,6 @@ export function searchConsultants(
       continue;
     }
     if (filters.verifiedOnly && !consultant.verified) continue;
-    if (consultant.rating < filters.minRating) continue;
     if (consultant.hourlyRate > filters.maxRate) continue;
 
     const score = terms.length > 0 ? scoreMatch(consultant, terms) : 0;
@@ -154,7 +161,6 @@ export function countActiveFilters(filters: Filters): number {
   return (
     (filters.search.trim() ? 1 : 0) +
     (filters.specialization ? 1 : 0) +
-    (filters.minRating > 0 ? 1 : 0) +
     (filters.maxRate < defaultFilters.maxRate ? 1 : 0) +
     (filters.verifiedOnly ? 1 : 0) +
     (filters.sort !== 'recommended' ? 1 : 0)
@@ -166,9 +172,9 @@ export function countActiveFilters(filters: Filters): number {
  *
  * Each chip is a dictionary key plus its parameters, not a finished string, so
  * the surrounding words are translated while the values inside them — the
- * search text, the specialty, the rate, the rating — are rendered exactly as
- * they are stored. `value` is passed as a parameter rather than concatenated so
- * a value containing a placeholder-shaped substring cannot be misread.
+ * search text, the specialty, the rate — are rendered exactly as they are
+ * stored. `value` is passed as a parameter rather than concatenated so a
+ * value containing a placeholder-shaped substring cannot be misread.
  */
 export function describeFilters(
   filters: Filters,
@@ -188,9 +194,6 @@ export function describeFilters(
         ? { key: 'specialization', labelKey: 'chip.specialty_value', value: filters.specialization }
         : { key: 'specialization', labelKey: 'chip.specialty', value: filters.specialization },
     );
-  }
-  if (filters.minRating > 0) {
-    chips.push({ key: 'minRating', labelKey: 'chip.min_rating', value: String(filters.minRating) });
   }
   if (filters.maxRate < defaultFilters.maxRate) {
     chips.push({ key: 'maxRate', labelKey: 'chip.max_rate', value: `$${filters.maxRate}` });

@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { getConsultant, getServicesFor } from '../data'
 import { useApp } from '../context/AppContext'
+import { canReview, ratingFor } from '../lib/reviews'
 import { useTranslation } from '../i18n/LanguageContext'
 import Container from '../components/ui/Container'
 import Button from '../components/ui/Button'
@@ -11,11 +12,12 @@ import Card from '../components/ui/Card'
 import Reveal from '../components/ui/Reveal'
 import BookingWidget from '../components/consultants/BookingWidget'
 import ReviewList from '../components/consultants/ReviewList'
+import ReviewForm, { BLOCK_KEYS } from '../components/consultants/ReviewForm'
 
 export default function ConsultantProfile() {
   const { id } = useParams<{ id: string }>();
   const consultant = id ? getConsultant(id) : undefined;
-  const { session } = useApp();
+  const { session, appointments, reviews, isPersistent } = useApp();
   const { t } = useTranslation();
 
   if (!consultant) {
@@ -43,6 +45,21 @@ export default function ConsultantProfile() {
   }
 
   const consultantServices = getServicesFor(consultant.id);
+
+  // Computed from the reviews that exist. There is no seeded rating left to
+  // fall back on, so an un-reviewed consultant reads as un-reviewed here too.
+  const rating = ratingFor(consultant, reviews);
+
+  // The same gate the form itself uses. Read here only to explain why the form
+  // is or is not on the page — the form re-reads it every render.
+  const reviewGate = canReview(
+    consultant.id,
+    session?.userId ?? null,
+    appointments,
+    reviews,
+    new Date(),
+    isPersistent,
+  );
 
   // Labels only. `value` is derived from the consultant's own record, and
   // `experience` and `responseTime` are seeded strings that are deliberately
@@ -100,11 +117,10 @@ export default function ConsultantProfile() {
               </div>
               <p className="mt-2 text-lg text-muted">{consultant.title}</p>
               <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted">
-                {/* No review count here: this is the one page that shows written reviews, so
-                    it states the real figure itself, qualified, in the list
-                    below. Repeating it unqualified beside the stars is what made
-                    the count look like a plain review tally. */}
-                <Rating value={consultant.rating} />
+                {/* Computed, not declared: this page shows the reviews
+                    themselves immediately below, so a figure here would be
+                    checked against them. */}
+                <Rating value={rating} />
                 <span className="flex items-center gap-1.5">
                   <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.4">
                     <path d="M10 17.5s6-5.2 6-9.4a6 6 0 1 0-12 0c0 4.2 6 9.4 6 9.4z" />
@@ -185,6 +201,19 @@ export default function ConsultantProfile() {
 
             <Reveal>
               <ReviewList consultant={consultant} />
+            </Reveal>
+
+            <Reveal>
+              <div className="space-y-4">
+                <ReviewForm consultant={consultant} />
+                {!reviewGate.ok && (
+                  <p className="text-sm text-muted">
+                    {BLOCK_KEYS[reviewGate.reason]
+                      ? t(BLOCK_KEYS[reviewGate.reason])
+                      : null}
+                  </p>
+                )}
+              </div>
             </Reveal>
 
             {!session && freeIntro && (

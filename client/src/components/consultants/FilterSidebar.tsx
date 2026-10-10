@@ -17,7 +17,6 @@ interface FilterSidebarProps {
 
 const rateFloor = 50
 const rateCeiling = 300
-const ratingOptions = [0, 4, 4.5, 4.8]
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -119,26 +118,6 @@ export default function FilterSidebar({
               }`}
             >
               {specialization}
-            </button>
-          ))}
-        </div>
-      </Section>
-
-      <Section title={t('filters.min_rating')}>
-        <div className="flex flex-wrap gap-2">
-          {ratingOptions.map((rating) => (
-            <button
-              key={rating}
-              type="button"
-              onClick={() => set('minRating', rating)}
-              aria-pressed={filters.minRating === rating}
-              className={`rounded-full border px-3.5 py-1.5 text-sm transition-all duration-200 ease-out ${
-                filters.minRating === rating
-                  ? 'border-accent-500 bg-accent-500 text-white shadow-glow'
-                  : 'border-line-strong text-muted hover:border-accent-400 hover:text-body'
-              }`}
-            >
-              {rating === 0 ? t('filters.any') : `${rating}+`}
             </button>
           ))}
         </div>

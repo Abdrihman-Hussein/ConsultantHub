@@ -1,8 +1,8 @@
-import type { Consultant } from '../../types'
-import { getReviewsFor } from '../../data'
-import { reviewsSummary } from '../../lib/reviews'
+import { useApp } from '../../context/AppContext'
+import { reviewsFor, reviewsSummary } from '../../lib/reviews'
 import { formatDate } from '../../lib/format'
 import { useTranslation } from '../../i18n/LanguageContext'
+import type { Consultant } from '../../types'
 import Avatar from '../ui/Avatar'
 import Rating from '../ui/Rating'
 
@@ -11,14 +11,22 @@ interface ReviewListProps {
 }
 
 /**
- * The seeded sample of written reviews, framed by the `reviewsSummary` line so
- * the true total is never hidden. Author portraits are initials monograms, not
- * photographs, and review bodies are rendered as plain text — nothing here
- * should read as a real testimonial.
+ * The reviews this consultant actually has.
+ *
+ * These come from `KEYS.reviews`, which starts empty and is only ever written
+ * through the gate in `lib/reviews.ts` — every entry belongs to a completed
+ * session and to a real account. The fictional sample in `data/index.ts` is
+ * not rendered here, because a five-star quote from nobody reads exactly like
+ * a rating nobody earned.
+ *
+ * Author portraits are initials monograms, not photographs, and bodies are
+ * plain text: nothing on this page should read as a verified testimonial
+ * beyond what the booking it came from establishes.
  */
 export default function ReviewList({ consultant }: ReviewListProps) {
+  const { reviews } = useApp()
   const { t } = useTranslation()
-  const sample = getReviewsFor(consultant.id)
+  const list = reviewsFor(consultant.id, reviews)
 
   return (
     <section aria-labelledby="reviews-heading">
@@ -26,11 +34,11 @@ export default function ReviewList({ consultant }: ReviewListProps) {
         {t('profile.reviews_heading')}
       </h2>
 
-      {sample.length === 0 ? (
-        <p className="mt-4 text-sm text-muted">{reviewsSummary(consultant, sample, t)}</p>
+      {list.length === 0 ? (
+        <p className="mt-4 text-sm text-muted">{reviewsSummary(list, t)}</p>
       ) : (
         <ol className="mt-2 divide-y divide-line">
-          {sample.map((review) => (
+          {list.map((review) => (
             <li key={review.id} className="py-5 first:pt-4">
               <div className="flex items-center gap-3">
                 <Avatar name={review.authorName} size="sm" />
@@ -44,15 +52,17 @@ export default function ReviewList({ consultant }: ReviewListProps) {
                   <Rating value={review.rating} />
                 </div>
               </div>
-              <p className="mt-3 text-sm leading-relaxed text-muted">{review.body}</p>
+              {review.body && (
+                <p className="mt-3 text-sm leading-relaxed text-muted">{review.body}</p>
+              )}
             </li>
           ))}
         </ol>
       )}
 
-      {sample.length > 0 && (
+      {list.length > 0 && (
         <p className="mt-4 border-t border-line pt-4 text-xs text-subtle">
-          {reviewsSummary(consultant, sample, t)}
+          {reviewsSummary(list, t)}
         </p>
       )}
     </section>

@@ -1,9 +1,14 @@
-/**
+﻿/**
  * The consultant directory and their services.
  *
- * Static sample content for the MVP — a real build would serve this from an
+ * Static sample content for the MVP â€” a real build would serve this from an
  * API. Everyone listed here is fictional, and the portraits in
  * `public/portraits` are drawn illustrations rather than photographs.
+ *
+ * There is no `rating` and no `reviewCount` on a consultant. Both were seeded
+ * numbers that nothing in the app could substantiate; every figure shown about
+ * someone's standing is now computed from the reviews that exist (see
+ * `ratingFor` in `lib/reviews.ts`), and an un-reviewed consultant has none.
  */
 
 import type { Consultant, Review, Service } from '../types';
@@ -16,8 +21,6 @@ export const consultants: Consultant[] = [
     title: 'Strategic Marketing',
     specialization: 'Marketing',
     bio: 'Go-to-market strategy for B2B SaaS. Over a decade scaling marketing teams across East Africa and the Gulf, and tying spend to pipeline with data rather than instinct.',
-    rating: 4.9,
-    reviewCount: 128,
     hourlyRate: 150,
     location: 'Mogadishu, Somalia',
     experience: '10+ years',
@@ -33,8 +36,6 @@ export const consultants: Consultant[] = [
     title: 'Systems Engineering',
     specialization: 'Engineering',
     bio: 'Cloud architecture and infrastructure optimisation. Previously led platform teams at large-scale enterprises, now focused on helping small teams avoid the same costly mistakes.',
-    rating: 5.0,
-    reviewCount: 95,
     hourlyRate: 200,
     location: 'Hargeisa, Somaliland',
     experience: '12 years',
@@ -50,8 +51,6 @@ export const consultants: Consultant[] = [
     title: 'Corporate Law',
     specialization: 'Law',
     bio: 'Strategic counsel on mergers, acquisitions, and governance. I translate regulatory complexity into plain language so you can make a decision without a lawyer translating it twice.',
-    rating: 4.8,
-    reviewCount: 76,
     hourlyRate: 250,
     location: 'Nairobi, Kenya',
     experience: '15 years',
@@ -67,8 +66,6 @@ export const consultants: Consultant[] = [
     title: 'Financial Modelling',
     specialization: 'Finance',
     bio: 'Forecasting, valuation, and capital strategy for early-stage companies. I will tell you which assumptions your model is actually sensitive to, and which ones you can stop worrying about.',
-    rating: 4.7,
-    reviewCount: 64,
     hourlyRate: 120,
     location: 'Minneapolis, MN',
     experience: '8 years',
@@ -84,8 +81,6 @@ export const consultants: Consultant[] = [
     title: 'Product Design',
     specialization: 'Design',
     bio: 'Product design and design systems. I help teams move from scattered screens to one coherent system that a team can actually maintain after I leave.',
-    rating: 4.9,
-    reviewCount: 88,
     hourlyRate: 175,
     location: 'London, UK',
     experience: '9 years',
@@ -101,8 +96,6 @@ export const consultants: Consultant[] = [
     title: 'Data Analytics',
     specialization: 'Data',
     bio: 'Analytics setup and measurement. Most dashboards I inherit are measuring the wrong things; I start by working out what decision each one is supposed to inform.',
-    rating: 4.6,
-    reviewCount: 52,
     hourlyRate: 140,
     location: 'Dubai, UAE',
     experience: '7 years',
@@ -234,11 +227,19 @@ export const services: Service[] = [
 ];
 
 /**
- * A sample of written reviews, three per consultant.
+ * Fictional written reviews, three per consultant.
  *
- * `Consultant.reviewCount` is the real aggregate for that consultant; these are
- * the subset the app actually shows. The profile states both numbers, so the
- * seed never has to pretend eighteen written reviews exist.
+ * These are fixture content and are deliberately NOT rendered anywhere in the
+ * app. They belong to no appointment and no account, and they were written to
+ * make the directory look busy. A review is only allowed to exist once a real
+ * client has completed a real session (see `canReview`), so showing these
+ * would put invented five-star quotes back on the page by the back door — the
+ * same dishonesty the seeded `rating` and `reviewCount` fields were removed
+ * for. The app's review list reads `KEYS.reviews`, which starts empty.
+ *
+ * They are kept because the logic harness checks their shape — every review
+ * names a real consultant, carries a rating in range, and has a body — which
+ * is what guards the type and the format the app itself writes into.
  */
 export const reviews: Review[] = [
   {
@@ -404,7 +405,7 @@ export function getConsultantForService(serviceId: string): Consultant | undefin
   return service ? getConsultant(service.consultantId) : undefined;
 }
 
-/** A consultant's seeded reviews, newest first. */
+/** A consultant's fixture reviews, newest first. Not app content — see above. */
 export function getReviewsFor(consultantId: string): Review[] {
   return reviews
     .filter((review) => review.consultantId === consultantId)

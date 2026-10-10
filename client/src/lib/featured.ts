@@ -47,14 +47,16 @@ export function bioLine(bio: string, fallback: string): string {
 }
 
 /**
- * Featured order: rating first, then session volume as the tiebreak. Omar Nur
- * leads on 5.0. Returns a new array — the caller passes the seed directory
- * directly and must not see it reordered.
+ * Featured order: delivered sessions, descending.
+ *
+ * This used to be rating first, which was a sort over a seeded number — the
+ * hero rotated by a figure no review in the app could produce. Sessions are a
+ * real, published field on the record, so the ordering is now derived from
+ * something the directory can substantiate. Returns a new array — the caller
+ * passes the seed directory directly and must not see it reordered.
  */
 export function featuredOrder(consultants: Consultant[]): Consultant[] {
-  return [...consultants].sort(
-    (a, b) => b.rating - a.rating || b.sessions - a.sessions,
-  );
+  return [...consultants].sort((a, b) => b.sessions - a.sessions);
 }
 
 export function rowConsultants(order: Consultant[], excludeId: string, count: number): Consultant[] {

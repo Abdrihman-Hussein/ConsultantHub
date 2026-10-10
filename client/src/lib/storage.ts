@@ -12,6 +12,13 @@ export const KEYS = {
   users: `${PREFIX}users`,
   session: `${PREFIX}session`,
   appointments: `${PREFIX}appointments`,
+  /**
+   * Written reviews. Deliberately seeded empty — a review can only be created
+   * against a completed session (see `canReview`), so there is no honest seed
+   * content for this key. The fictional sample in `data/index.ts` is not
+   * written here, which is why every consultant shows no reviews on first run.
+   */
+  reviews: `${PREFIX}reviews`,
 } as const
 
 function available() {

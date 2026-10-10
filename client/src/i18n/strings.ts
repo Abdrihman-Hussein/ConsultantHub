@@ -60,7 +60,7 @@ export const en = {
   'common.sessions_delivered': '{count} sessions delivered',
   'common.view_all': 'View all',
   'common.rates_published':
-    'Ratings, rates and availability are published for every listing.',
+    'Rates and availability are published for every listing.',
   'common.browse_all': 'Browse all',
   'common.hi': 'Hi,',
   'common.log_out': 'Log out',
@@ -95,9 +95,34 @@ export const en = {
   'trust.partial': '{verified} of the {total} listed have completed an identity check.',
 
   // ---- review framing (lib/reviews.ts) --------------------------------------
-  'reviews.summary.showing': 'Showing {count} of {total} reviews',
-  'reviews.summary.none': 'No written reviews yet',
-  'reviews.summary.unshown': 'Written reviews not shown yet',
+  'reviews.summary.showing': 'Showing {count} reviews',
+  'reviews.summary.none': 'No reviews yet',
+  'reviews.block.not_signed_in': 'Log in to review this consultant.',
+  'reviews.block.no_completed_booking':
+    'You can review a consultant once you have completed a session with them.',
+  'reviews.block.already_reviewed':
+    'You have already reviewed this session. Book another to leave another review.',
+  'reviews.block.storage_unavailable':
+    'Storage is unavailable in this browser, so a review you write would be lost on reload.',
+
+  // ---- writing a review (components/consultants/ReviewForm.tsx) --------------
+  'reviews.form.title': 'Write a review',
+  'reviews.form.subtitle': 'About your completed session with {name}.',
+  'reviews.form.stars_label': 'Your rating',
+  'reviews.form.star_option': '{value} out of 5 stars',
+  'reviews.form.stars_hint':
+    'Use the arrow keys to move between stars, or pick one with the pointer.',
+  'reviews.form.stars_required': 'Choose a rating to continue.',
+  'reviews.form.body_label': 'Your review (optional)',
+  'reviews.form.body_placeholder': 'What was the session like? What should the next person know?',
+  'reviews.form.hint': 'Your first name and last initial are shown with the review.',
+  'reviews.form.submit': 'Publish review',
+  'reviews.form.saved': 'Your review is published. Thank you.',
+  'reviews.form.refused':
+    'That review could not be saved — the session may have been cancelled or already reviewed.',
+
+  // ---- finishing a session (lib/booking.ts) ----------------------------------
+  'appointments.complete': 'Mark as completed',
 
   // ---- navbar ---------------------------------------------------------------
   'nav.browse': 'Explore consultants',
@@ -136,10 +161,10 @@ export const en = {
   'home.hero.position': ' ({position} of {total} featured)',
 
   // ---- home: top rated ------------------------------------------------------
-  'home.top.eyebrow': 'Top rated',
+  'home.top.eyebrow': 'Most booked',
   'home.top.title': 'More people worth a call',
   'home.top.description':
-    'Ordered by rating and sessions delivered, with every figure taken straight from the directory.',
+    'Ordered by sessions delivered, with every figure taken straight from the directory.',
 
   // ---- home: specialties ----------------------------------------------------
   'home.specialties.eyebrow': 'Browse by specialty',
@@ -150,7 +175,7 @@ export const en = {
   'home.why.eyebrow': 'Why book here',
   'home.why.title': 'Less risk on both sides of the call',
   'home.guarantee.identity_title': 'Identity checks, counted',
-  'home.guarantee.identity_body': '{sentence} Ratings, rates and availability are published for every listing.',
+  'home.guarantee.identity_body': '{sentence} Rates and availability are published for every listing.',
   'home.guarantee.free_title': 'Free intro calls',
   'home.guarantee.free_body':
     'Every consultant offers a complimentary short call. Find out whether it is worth the longer session before you pay for it.',
@@ -164,7 +189,7 @@ export const en = {
     'Every consultant offers a complimentary intro call. Low commitment, and it takes one click to book.',
   'home.cta.hire': 'Hire a consultant',
   'home.cta.become': 'Become a consultant',
-  'home.proof.average_rating': 'Average rating',
+  'home.proof.listed': 'Consultants listed',
   'home.proof.sessions_delivered': 'Sessions delivered',
   'home.proof.identity_checked': 'Identity-checked consultants',
 
@@ -173,7 +198,7 @@ export const en = {
   'how.title': 'Three steps from searching to booked.',
   'how.step1.title': 'Search by specialty',
   'how.step1.body':
-    'Filter verified consultants by expertise, rating, and rate so you only see people who fit.',
+    'Filter verified consultants by expertise, session volume and rate so you only see people who fit.',
   'how.step2.title': 'Review the profile',
   'how.step2.body':
     'Read real experience, session counts, and the services they offer before you commit.',
@@ -208,8 +233,6 @@ export const en = {
   'filters.search_label': 'Search consultants',
   'filters.specialty': 'Specialty',
   'filters.all': 'All',
-  'filters.min_rating': 'Minimum rating',
-  'filters.any': 'Any',
   'filters.max_rate': 'Max hourly rate',
   'filters.up_to': 'Up to',
   'filters.up_to_aria': 'Up to {rate} per hour',
@@ -222,14 +245,12 @@ export const en = {
   'chip.search': '"{value}"',
   'chip.specialty_value': '{value}',
   'chip.specialty': 'Specialty: {value}',
-  'chip.min_rating': '{value}+ rating',
   'chip.max_rate': 'Under {value}/hr',
   'chip.verified_only': 'Verified only',
 
   // ---- sorting --------------------------------------------------------------
   'sort.label': 'Sort by',
   'sort.recommended': 'Recommended',
-  'sort.rating': 'Highest rated',
   'sort.rate-low': 'Rate: low to high',
   'sort.rate-high': 'Rate: high to low',
   'sort.sessions': 'Most sessions',
@@ -431,6 +452,7 @@ export const en = {
 
   // ---- rating ---------------------------------------------------------------
   'rating.sr_value': 'Rated {value} out of 5',
+  'rating.none': 'No reviews yet',
 
   // ---- error boundary -------------------------------------------------------
   'error.title': 'Something broke',
@@ -504,9 +526,36 @@ export const so: Dict = {
     '{verified} oo ka mid ah {total} ayaa dhammeeyay hubinta aqonsiga.',
 
   // ---- review framing (lib/reviews.ts) --------------------------------------
-  'reviews.summary.showing': '{count} oo ka mid ah {total} ayaa la muujiyay',
-  'reviews.summary.none': 'Weli tixraac qoraal ah ma jiro',
-  'reviews.summary.unshown': 'Tixraacyo qoraal ah oo hadda la sheegi karin',
+  'reviews.summary.showing': '{count} oo la muujiyay',
+  'reviews.summary.none': 'Weli tixraac ma jiro',
+  'reviews.block.not_signed_in':
+    'Si aad u tixraac la-talinta u qorto, marka hore soo gal.',
+  'reviews.block.no_completed_booking':
+    'Waad tixraac la-talin kastaa markaad la-talin la sameeyso kulan oo la dhammaystiray.',
+  'reviews.block.already_reviewed':
+    'Waxad tixraacdaan kulan hore loo qaatay. Si aad tixraac kale u qorto, ballan kale qabso.',
+  'reviews.block.storage_unavailable':
+    'Kaydintu ma diyaar tahay browser-kan, marka tixraacda aad qorto dib loo xaraskiinta ayuu baaba\'daa.',
+
+  // ---- writing a review (components/consultants/ReviewForm.tsx) --------------
+  'reviews.form.title': 'Qor tixraac',
+  'reviews.form.subtitle': 'Kulankaaga oo la dhammaystiray ee {name}.',
+  'reviews.form.stars_label': 'Hearkaaga',
+  'reviews.form.star_option': '{value} oo ka mid ah 5 xiddidood',
+  'reviews.form.stars_hint':
+    'U isticmaal furaha arrow si aad u dhaqaaqo xiddidaha, ama ku dooro pointer-ka.',
+  'reviews.form.stars_required': 'Dooro heer si aad hore u socon.',
+  'reviews.form.body_label': 'Tixraacdaada (ikhtiyaari)',
+  'reviews.form.body_placeholder':
+    'Kulanku wuxuu noqday maxay? Qofka xiga waa maxay u baahan yahay inuu ogaado?',
+  'reviews.form.hint': 'Magacaaga koowaad iyo xarafka ugu dambeeya ayaa tixraacda ku qoranaya.',
+  'reviews.form.submit': 'Daabac tixraac',
+  'reviews.form.saved': 'Tixraacdaada waa la daabacay. Mahadsanid.',
+  'reviews.form.refused':
+    'Tixraacdaas ma la keydin karin — kulanuhu wuxuu dhicii karo yahay ama horeyba waa la qaatay.',
+
+  // ---- finishing a session (lib/booking.ts) ----------------------------------
+  'appointments.complete': 'La dhammaystiray',
 
   // ---- navbar ---------------------------------------------------------------
   'nav.browse': 'Eeg la-taliyada',
@@ -544,10 +593,10 @@ export const so: Dict = {
   'home.hero.position': ' ({position} oo ka mid ah {total})',
 
   // ---- home: top rated ------------------------------------------------------
-  'home.top.eyebrow': 'Ku ugu dheereeya',
+  'home.top.eyebrow': 'Ku ugu la ballansan yihiin',
   'home.top.title': 'Qofyo kale oo la wacagi karaa',
   'home.top.description':
-    'Waxay ku kala horreeyaan heerka iyo tirada kulanada, tiro kastana waxay ka timid tahay liiska.',
+    'Waxay ku kala horreeyaan tirada kulanada, tiro kastana waxay ka timid tahay liiska.',
 
   // ---- home: specialties ----------------------------------------------------
   'home.specialties.eyebrow': 'U kala saar khibrad',
@@ -573,7 +622,7 @@ export const so: Dict = {
     'La-talin kastaa wuxuu bixiyaa wacqo hore oo bilaash ah. Ballan adag ma baahna, hal guji oo keliya ayay kugu qabso lahaa.',
   'home.cta.hire': 'Qaado la-talin',
   'home.cta.become': 'Noqo la-talin',
-  'home.proof.average_rating': 'Heerka celcelis ah',
+  'home.proof.listed': 'La-taliyada liiska ku jira',
   'home.proof.sessions_delivered': 'Kulanado la sameeyay',
   'home.proof.identity_checked': 'La-talin la xaqiijay',
 
@@ -582,7 +631,7 @@ export const so: Dict = {
   'how.title': 'Saddex talaabo: raadi, eeg, ballan qabso.',
   'how.step1.title': 'Raadi khibrad',
   'how.step1.body':
-    'Shaandhee la-taliyada la xaqiijay khibradda, heerka iyo qiimaha si aad u aragto qofyo kula habboon.',
+    'Shaandhee la-taliyada la xaqiijay tirada kulanada, khibradda iyo qiimaha si aad u aragto qofyo kula habboon.',
   'how.step2.title': 'Eeg akhiska',
   'how.step2.body':
     'Akhri khibrad dhabta ah, tirada kulanada iyo adeegyada ayay bixiyaan ka hor intaadan go’aan gaarin.',
@@ -617,8 +666,6 @@ export const so: Dict = {
   'filters.search_label': 'Raadi la-taliyada',
   'filters.specialty': 'Khibrad',
   'filters.all': 'Dhammaan',
-  'filters.min_rating': 'Heerka ugu hooseeya',
-  'filters.any': 'Kasta',
   'filters.max_rate': 'Qiimaha saacadka ugu sarreeya',
   'filters.up_to': 'Ila',
   'filters.up_to_aria': 'Ila {rate} saacad kasta',
@@ -629,14 +676,12 @@ export const so: Dict = {
   'chip.search': '"{value}"',
   'chip.specialty_value': '{value}',
   'chip.specialty': 'Khibrad: {value}',
-  'chip.min_rating': 'Heer {value}+',
   'chip.max_rate': 'Ka hooseeya {value} saacad kasta',
   'chip.verified_only': 'La xaqiijay oo keliya',
 
   // ---- sorting --------------------------------------------------------------
   'sort.label': 'Haleey',
   'sort.recommended': 'Waa lagu talagalay',
-  'sort.rating': 'Ku ugu dheereeya heerka',
   'sort.rate-low': 'Qiimaha: hoose ilaa sarre',
   'sort.rate-high': 'Qiimaha: sarre ilaa hoose',
   'sort.sessions': 'Kulanado badan',
@@ -839,6 +884,7 @@ export const so: Dict = {
 
   // ---- rating ---------------------------------------------------------------
   'rating.sr_value': 'Heer {value} oo ka mid ah 5',
+  'rating.none': 'Weli tixraac ma jiro',
 
   // ---- error boundary -------------------------------------------------------
   'error.title': 'Wax ku qaldan yahay',

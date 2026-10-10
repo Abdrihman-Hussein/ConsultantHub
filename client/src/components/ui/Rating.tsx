@@ -1,7 +1,15 @@
 import { useTranslation } from '../../i18n/LanguageContext'
 
 interface RatingProps {
-  value: number
+  /**
+   * The average, or `null` when nobody has reviewed this consultant yet.
+   *
+   * `null` renders as "No reviews yet" rather than five empty stars, because
+   * five empty stars read as a zero out of five — a score nobody gave. The
+   * value used to be a seeded `Consultant.rating`; there is no fallback
+   * number now, so an un-reviewed consultant looks un-reviewed.
+   */
+  value: number | null
   size?: 'sm' | 'md'
   /** Hide the numeric value and show stars only. */
   compact?: boolean
@@ -18,17 +26,19 @@ const sizes = {
   md: 'text-sm gap-1.5',
 }
 
+const starSize = {
+  sm: 'h-3.5 w-3.5',
+  md: 'h-4 w-4',
+}
+
 /**
- * A star rating and nothing else.
+ * A star rating, or an honest statement that there is not one.
  *
- * This component deliberately has no `reviewCount` prop. It used to render a
- * bare ` (128)` next to the number, and a parenthesised figure beside five stars
- * is read as a written-review count everywhere except the one page that
- * explains it — the profile, whose review list states how many are actually
- * shown. On a card and on the hero the same number implied 128 written reviews
- * exist, which they do not. Rather than label the lie, the number is gone:
- * surfaces without visible reviews show session volume instead, which is real,
- * and the count is stated once, where it is qualified.
+ * This component deliberately has no `reviewCount` prop, and it has never had
+ * a default value: a parenthesised figure beside five stars is read as a
+ * written-review count, and a rating with no reviews behind it is a claim the
+ * data cannot support. Both are shown where they can be substantiated —
+ * sessions on the cards, and the written reviews themselves on the profile.
  */
 export default function Rating({
   value,
@@ -37,6 +47,7 @@ export default function Rating({
   onInk = false,
 }: RatingProps) {
   const { t } = useTranslation()
+  const empty = value === null
 
   return (
     <div className={`flex items-center ${sizes[size]}`}>
@@ -45,14 +56,18 @@ export default function Rating({
           <svg
             key={star}
             viewBox="0 0 20 20"
-            className={`${size === 'sm' ? 'h-3.5 w-3.5' : 'h-4 w-4'} ${
-              star <= Math.round(value)
+            className={`${starSize[size]} ${
+              empty
                 ? onInk
-                  ? 'text-gold-on-ink'
-                  : 'text-gold-400'
-                : onInk
                   ? 'text-on-ink/25'
                   : 'text-ink-200'
+                : star <= Math.round(value)
+                  ? onInk
+                    ? 'text-gold-on-ink'
+                    : 'text-gold-400'
+                  : onInk
+                    ? 'text-on-ink/25'
+                    : 'text-ink-200'
             }`}
             fill="currentColor"
           >
@@ -60,11 +75,22 @@ export default function Rating({
           </svg>
         ))}
       </span>
-      <span className="sr-only">{t('rating.sr_value', { value })}</span>
-      {!compact && (
-        <span className={`font-medium ${onInk ? 'text-on-ink' : 'text-body'}`}>
-          {value.toFixed(1)}
-        </span>
+      {empty ? (
+        <>
+          <span className="sr-only">{t('rating.none')}</span>
+          {!compact && (
+            <span className={onInk ? 'text-on-ink' : 'text-muted'}>{t('rating.none')}</span>
+          )}
+        </>
+      ) : (
+        <>
+          <span className="sr-only">{t('rating.sr_value', { value })}</span>
+          {!compact && (
+            <span className={`font-medium ${onInk ? 'text-on-ink' : 'text-body'}`}>
+              {value.toFixed(1)}
+            </span>
+          )}
+        </>
       )}
     </div>
   )
