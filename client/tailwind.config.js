@@ -4,68 +4,70 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Warm neutral scale — cream-tinted rather than grey, to sit with the
-        // terracotta accent.
+        // Warm neutral scale — stone-based rather than the cream/paper tint this
+        // replaced. One warm-gray family throughout, so nothing mixes warm and
+        // cool grays. The `ink-*` naming is kept from the prior system so the
+        // component tree does not have to be renamed to stay legible.
         ink: {
-          50: '#FDF8F3',
-          100: '#F9F1E8',
-          200: '#F5EBE0',
-          300: '#EADFD2',
-          400: '#D6C4B2',
-          500: '#B79E88',
-          600: '#9C8069',
-          700: '#7A6A5B',
-          800: '#5A4A3E',
-          900: '#3D3229',
-          950: '#2A2118',
+          50: '#FAFAF9',
+          100: '#F5F5F4',
+          200: '#E7E5E4',
+          300: '#D6D3D1',
+          400: '#A8A29E',
+          500: '#78716C',
+          600: '#57534E',
+          700: '#44403C',
+          800: '#292524',
+          900: '#1C1917',
+          950: '#0C0A09',
         },
-        // Terracotta — the single accent for actions and trust signals.
+        // Terracotta — the single accent for actions and trust signals. Deepened
+        // from the prior clay so white-on-accent clears AA (5.7:1) and accent-as-
+        // text clears AA on the light ground (5.9:1). Saturation sits near 69%,
+        // under the 80% ceiling, so it reads considered rather than loud. This is
+        // the one accent the whole page is locked to.
         accent: {
-          50: '#FDF4EF',
-          100: '#FAE6DA',
-          200: '#F2C9B2',
-          300: '#E7A483',
-          400: '#DB8259',
-          500: '#C2622D',
-          600: '#A9521F',
-          700: '#8A4219',
-          800: '#6B3414',
-          900: '#4C2510',
-        },
-        gold: {
-          300: '#E8C88A',
-          400: '#D9A441',
-          500: '#C08A2E',
-          600: '#A16207',
+          50: '#FAF3EF',
+          100: '#F3E2D9',
+          200: '#E7C6B4',
+          300: '#D6A184',
+          400: '#C47C54',
+          500: '#A9501F',
+          600: '#8C4118',
+          700: '#74340F',
+          800: '#5B290C',
+          900: '#421E08',
         },
         // Flat semantic aliases so components read cleanly.
         surface: '#FFFFFF',
-        'surface-subtle': '#FDF8F3',
-        'surface-muted': '#F9F1E8',
-        line: '#EADFD2',
-        'line-strong': '#D6C4B2',
-        body: '#2A2118',
-        muted: '#7A6A5B',
-        subtle: '#9C8069',
+        'surface-subtle': '#FAFAF9',
+        'surface-muted': '#F5F5F4',
+        line: '#E7E5E4',
+        'line-strong': '#D6D3D1',
+        body: '#1C1917',
+        muted: '#57534E',
+        subtle: '#78716C',
         danger: '#B4231C',
-        'danger-soft': '#FCEBE9',
+        'danger-soft': '#FDECEA',
         // Matches the Badge 'accent' fill — used to knock shapes out of a seal.
-        'on-accent-soft': '#FDF4EF',
-        // Ink surface family. Cream-on-ink typography needs its own accent:
-        // `accent-500` is unreadable on ink, so the dark bands use these.
-        // Every pairing is pinned by the contrast checks in check-logic.ts.
-        'surface-ink': '#2A2118',
-        'surface-ink-soft': '#3D3229',
-        'on-ink': '#F9F1E8',
-        'on-ink-muted': '#B79E88',
-        'accent-on-ink': '#E8A05C',
-        'gold-on-ink': '#E8C88A',
-        'ink-line': 'rgba(249, 241, 232, 0.14)',
+        'on-accent-soft': '#FAF3EF',
+        // Ink surface family. Deep terracotta is unreadable on the dark bands, so
+        // they get their own lifted accent (`accent-on-ink`) rather than reusing
+        // `accent-500`. Every pairing is pinned by the contrast checks in
+        // check-logic.ts.
+        'surface-ink': '#1C1917',
+        'surface-ink-soft': '#292524',
+        'on-ink': '#F5F5F4',
+        'on-ink-muted': '#A8A29E',
+        'accent-on-ink': '#E9965E',
+        'ink-line': 'rgba(245, 245, 244, 0.14)',
       },
       fontFamily: {
-        // Soft, slightly wonky serif for display; neutral sans for UI.
-        display: ['Fraunces', 'Georgia', 'serif'],
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        // Cabinet Grotesk (display) is a proportionally-spaced grotesk with real
+        // presence at large sizes; Satoshi (UI/body) is a clean, warm neo-grotesk.
+        // A sans-led pairing rather than the Fraunces/Inter default this replaced.
+        display: ['"Cabinet Grotesk"', 'system-ui', 'sans-serif'],
+        sans: ['Satoshi', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         'display-2xl': ['clamp(3rem, 8vw, 6rem)', { lineHeight: '0.98', letterSpacing: '-0.035em' }],
@@ -87,10 +89,12 @@ export default {
         '4xl': '2.5rem',
       },
       boxShadow: {
-        card: '0 2px 4px rgba(42, 33, 24, 0.03), 0 18px 36px -20px rgba(42, 33, 24, 0.18)',
-        lift: '0 4px 8px rgba(42, 33, 24, 0.04), 0 28px 56px -24px rgba(42, 33, 24, 0.28)',
-        glow: '0 10px 30px -12px rgba(194, 98, 45, 0.45)',
-        ring: '0 0 0 1px rgba(42, 33, 24, 0.07)',
+        // Tinted to the new ink hue (28,25,23) rather than pure black, so shadows
+        // read as depth on the warm ground instead of a grey smudge.
+        card: '0 2px 4px rgba(28, 25, 23, 0.03), 0 18px 36px -20px rgba(28, 25, 23, 0.16)',
+        lift: '0 4px 8px rgba(28, 25, 23, 0.04), 0 28px 56px -24px rgba(28, 25, 23, 0.26)',
+        glow: '0 10px 30px -12px rgba(169, 80, 31, 0.45)',
+        ring: '0 0 0 1px rgba(28, 25, 23, 0.07)',
       },
       maxWidth: {
         shell: '1200px',

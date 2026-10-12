@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom'
 import { UserButton } from '@clerk/react'
 import Button from '../ui/Button'
 import Container from '../ui/Container'
+import BrandMark from '../ui/BrandMark'
 import LanguageToggle from '../ui/LanguageToggle'
 import { useCurrentUser } from '../../lib/useCurrentUser'
 import { useTranslation } from '../../i18n/LanguageContext'
@@ -47,12 +48,9 @@ export default function Navbar() {
     >
       <Container>
         <div className="flex h-16 items-center justify-between gap-6">
-          <Link to="/" className="group flex items-center gap-2.5">
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-accent-500 text-xs font-semibold text-white transition-transform duration-300 ease-spring group-hover:scale-110">
-              C
-            </span>
-            <span className="text-[15px] font-semibold tracking-tight text-ink-950">
-              Lataliye
+          <Link to="/" className="group flex items-center" aria-label="Lataliye home">
+            <span className="transition-transform duration-300 ease-spring group-hover:scale-[1.03]">
+              <BrandMark />
             </span>
           </Link>
 

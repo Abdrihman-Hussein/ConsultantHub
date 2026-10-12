@@ -16,20 +16,20 @@ import type { ClerkAppearanceTheme } from '@clerk/react/types'
 
 export const clerkAppearance: ClerkAppearanceTheme = {
   variables: {
-    /** accent-500 — the terracotta the whole app uses for actions. */
-    colorPrimary: '#C2622D',
-    /** ink-950 — the same near-black as `text-body`. */
-    colorForeground: '#2A2118',
-    /** surface — the cream form panel never changes. */
+    /** accent-500 — the deep terracotta the whole app uses for actions. */
+    colorPrimary: '#A9501F',
+    /** body — the same warm near-black as `text-body`. */
+    colorForeground: '#1C1917',
+    /** surface — the form panel never changes. */
     colorBackground: '#FFFFFF',
     /** line-strong — matches `border-line-strong` on the app's own inputs. */
-    colorBorder: '#D6C4B2',
+    colorBorder: '#D6D3D1',
     /** muted — the app's secondary text colour. */
-    colorMutedForeground: '#7A6A5B',
+    colorMutedForeground: '#57534E',
     /** danger — reused from the token of the same name. */
     colorDanger: '#B4231C',
     /** The app's sans stack, from `fontFamily.sans` in tailwind.config.js. */
-    fontFamily: 'Inter, system-ui, sans-serif',
+    fontFamily: 'Satoshi, system-ui, sans-serif',
   },
 };
 

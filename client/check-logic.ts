@@ -140,7 +140,12 @@ check(
 const days = upcomingDays(5)
 check('upcomingDays returns 5 weekdays', days.length === 5, days.join(','))
 check('upcomingDays excludes weekends', days.every((d) => ![0, 6].includes(new Date(`${d}T00:00:00`).getDay())))
-check('upcomingDays starts tomorrow', days[0] > new Date().toISOString().slice(0, 10))
+// Compared against the LOCAL today, not `toISOString()` (which is UTC):
+// `upcomingDays` builds local dates, so a UTC comparison spuriously fails
+// whenever the local day is behind UTC near midnight.
+const now = new Date()
+const todayLocal = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+check('upcomingDays starts tomorrow', days[0] > todayLocal)
 
 console.log('\nsearch')
 const base = { ...defaultFilters }
@@ -613,17 +618,16 @@ check(
 );
 
 console.log('\ndesign tokens');
-// Guards the spec's binding decision: terracotta is unreadable on ink, so the
-// dark bands need their own accent rather than reusing `accent-500`.
+// Guards the spec's binding decision: deep terracotta is unreadable on ink, so
+// the dark bands need their own lifted accent rather than reusing `accent-500`.
 check(
   'accent-on-ink clears AA on the ink surface',
-  contrast('#E8A05C', '#2A2118') >= 4.5,
-  contrast('#E8A05C', '#2A2118').toFixed(2),
+  contrast('#E9965E', '#1C1917') >= 4.5,
+  contrast('#E9965E', '#1C1917').toFixed(2),
 );
-check('on-ink clears AA on ink', contrast('#F9F1E8', '#2A2118') >= 4.5);
-check('on-ink-muted clears AA on ink', contrast('#B79E88', '#2A2118') >= 4.5);
-check('gold-on-ink clears AA on ink', contrast('#E8C88A', '#2A2118') >= 4.5);
-check('accent-500 on ink is NOT used', contrast('#C2622D', '#2A2118') < 4.5);
+check('on-ink clears AA on ink', contrast('#F5F5F4', '#1C1917') >= 4.5);
+check('on-ink-muted clears AA on ink', contrast('#A8A29E', '#1C1917') >= 4.5);
+check('accent-500 on ink is NOT used', contrast('#A9501F', '#1C1917') < 4.5);
 
 /* -------------------------------------------------------------------------- *
  * Ink surfaces: opacity-modified colours, composited before they are measured.
@@ -680,8 +684,8 @@ const srcDir = join(root, 'src')
 const config = readFileSync(join(root, 'tailwind.config.js'), 'utf8')
 
 /** The ink surface, its lifted soft variant, and the featured card's own fill. */
-const INK = '#2A2118'
-const INK_SOFT = '#3D3229'
+const INK = '#1C1917'
+const INK_SOFT = '#292524'
 const INK_CARD = composite('#FFFFFF', 0.07, INK)
 
 /** Reads a colour out of tailwind.config.js so the harness cannot drift from it. */
@@ -697,7 +701,7 @@ function tokenAlpha(value: string): number {
   return rgba ? Number(rgba[1]) : 1
 }
 
-const INK_TOKENS = ['on-ink', 'on-ink-muted', 'accent-on-ink', 'gold-on-ink', 'ink-line'] as const
+const INK_TOKENS = ['on-ink', 'on-ink-muted', 'accent-on-ink', 'ink-line'] as const
 
 /**
  * The surface a file's ink content is rendered on. Anything not listed sits
@@ -763,14 +767,14 @@ const EXEMPT: Array<{ file: string; cls: string; min: number; ratio: number; why
     file: 'components/ui/Rating.tsx',
     cls: 'text-on-ink/25',
     min: 4.5,
-    ratio: 2.17,
+    ratio: 2.18,
     why: 'the unfilled star glyph — decorative and fully redundant with the numeric rating printed beside it, and frozen as correct by the last review',
   },
   {
     file: 'pages/client/ClientAppointments.tsx',
     cls: 'bg-on-ink/15',
     min: 3,
-    ratio: 1.56,
+    ratio: 1.58,
     why: 'the fill behind a tab count; the count itself is text-on-ink, which clears AA over the filled result',
   },
 ]

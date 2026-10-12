@@ -142,7 +142,6 @@ export default function Home() {
       <section className="border-t border-line bg-surface">
         <div className="py-20 lg:py-28">
           <SectionHeading
-            eyebrow={t('home.top.eyebrow')}
             title={t('home.top.title')}
             description={t('home.top.description')}
             action={
@@ -169,7 +168,6 @@ export default function Home() {
       <section className="border-t border-line bg-surface-subtle">
         <Container className="py-20 lg:py-28">
           <SectionHeading
-            eyebrow={t('home.specialties.eyebrow')}
             title={t('home.specialties.title')}
             action={
               <Button to="/consultants" variant="outline">
@@ -213,34 +211,50 @@ export default function Home() {
         </Container>
       </section>
 
-      {/* Why book here — a ruled band, not three cards. */}
+      {/* Why book here — asymmetric bento with real imagery, not a third ruled list. */}
       <section className="border-t border-line bg-surface-muted">
         <Container className="py-20 lg:py-28">
           <Reveal>
-            <p className="eyebrow mb-3">{t('home.why.eyebrow')}</p>
             <h2 className="max-w-2xl font-display text-display-lg text-ink-950">
               {t('home.why.title')}
             </h2>
           </Reveal>
 
-          <div className="mt-12 border-t border-line-strong">
-            {GUARANTEES.map((guarantee) => (
-              <div
-                key={guarantee.titleKey}
-                className="grid gap-3 border-b border-line-strong py-7 md:grid-cols-[18rem_1fr] md:gap-10"
-              >
-                <h3 className="text-lg font-semibold tracking-tight text-ink-950">
-                  {t(guarantee.titleKey)}
-                </h3>
-                <p className="text-sm leading-relaxed text-muted">
-                  {/* Only the first body embeds the generated coverage
-                      sentence; the rest are plain copy. */}
-                  {guarantee.bodyKey === 'home.guarantee.identity_body'
-                    ? t(guarantee.bodyKey, { sentence: identityCheckSentence(consultants, t) })
-                    : t(guarantee.bodyKey)}
-                </p>
-              </div>
-            ))}
+          <div className="mt-12 grid gap-6 lg:grid-cols-3">
+            <Reveal className="lg:col-span-2">
+              <article className="relative flex h-full min-h-[22rem] flex-col justify-end overflow-hidden rounded-2xl border border-line bg-ink-950 p-8 text-on-ink">
+                <img
+                  src="https://picsum.photos/seed/lataliye-session/1200/800"
+                  alt=""
+                  aria-hidden="true"
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full object-cover opacity-40"
+                />
+                <div className="relative">
+                  <h3 className="text-xl font-semibold tracking-tight">
+                    {t(GUARANTEES[0].titleKey)}
+                  </h3>
+                  <p className="mt-2 max-w-md text-sm leading-relaxed text-on-ink-muted">
+                    {t(GUARANTEES[0].bodyKey, { sentence: identityCheckSentence(consultants, t) })}
+                  </p>
+                </div>
+              </article>
+            </Reveal>
+
+            <div className="grid gap-6">
+              {[1, 2].map((i) => (
+                <Reveal key={GUARANTEES[i].titleKey} delay={i * 90} className="h-full">
+                  <article className="flex h-full flex-col rounded-2xl border border-line bg-surface p-7">
+                    <h3 className="text-lg font-semibold tracking-tight text-ink-950">
+                      {t(GUARANTEES[i].titleKey)}
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-muted">
+                      {t(GUARANTEES[i].bodyKey)}
+                    </p>
+                  </article>
+                </Reveal>
+              ))}
+            </div>
           </div>
         </Container>
       </section>

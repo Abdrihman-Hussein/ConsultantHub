@@ -63,8 +63,8 @@ export default function Rating({
                   : 'text-ink-200'
                 : star <= Math.round(value)
                   ? onInk
-                    ? 'text-gold-on-ink'
-                    : 'text-gold-400'
+                    ? 'text-accent-on-ink'
+                    : 'text-accent-500'
                   : onInk
                     ? 'text-on-ink/25'
                     : 'text-ink-200'

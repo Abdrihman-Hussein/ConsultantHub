@@ -3,9 +3,9 @@ import Avatar from '../ui/Avatar'
 import Badge from '../ui/Badge'
 import type { Appointment, AppointmentStatus } from '../../types'
 
-const statusTone: Record<AppointmentStatus, 'accent' | 'gold' | 'muted' | 'danger'> = {
+const statusTone: Record<AppointmentStatus, 'accent' | 'muted' | 'neutral' | 'danger'> = {
   CONFIRMED: 'accent',
-  PENDING: 'gold',
+  PENDING: 'neutral',
   COMPLETED: 'muted',
   CANCELLED: 'danger',
 }

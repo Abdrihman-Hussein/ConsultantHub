@@ -44,13 +44,16 @@ export default function ConsultantCard({ consultant }: ConsultantCardProps) {
       <h3 className="mt-4 font-display text-xl text-ink-950 truncate transition-colors duration-300 group-hover:text-accent-600">
         {consultant.name}
       </h3>
-      <p className="mt-1 text-xs leading-relaxed text-muted">
-        {consultant.title} · {consultant.location}
+      <p className="mt-1 text-xs font-medium leading-relaxed text-body">
+        {consultant.title}
+      </p>
+      <p className="mt-0.5 truncate text-xs leading-relaxed text-subtle">
+        {consultant.location}
       </p>
 
-      <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
         <Rating value={rating} size="sm" />
-        <span aria-hidden="true" className="text-ink-200">·</span>
+        <span aria-hidden="true" className="h-3 w-px bg-line-strong" />
         {/* One key for the whole phrase rather than a count and a separate word:
             Somali orders and shapes the two differently, and a count helper
             cannot know that. */}

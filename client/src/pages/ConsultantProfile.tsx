@@ -77,12 +77,7 @@ export default function ConsultantProfile() {
 
   return (
     <>
-      <section className="relative overflow-hidden border-b border-line bg-surface-subtle">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full bg-accent-100/40 blur-3xl"
-        />
-
+      <section className="border-b border-line bg-surface-subtle">
         <Container className="relative py-14">
           <Reveal>
             <Link

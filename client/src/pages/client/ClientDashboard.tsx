@@ -244,7 +244,7 @@ function AppointmentRow({ appointment, cancelling, onCancel }: RowProps) {
     appointment.status === 'CONFIRMED'
       ? 'accent'
       : appointment.status === 'PENDING'
-        ? 'gold'
+        ? 'neutral'
         : appointment.status === 'CANCELLED'
           ? 'danger'
           : 'muted'

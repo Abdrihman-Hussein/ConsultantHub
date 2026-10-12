@@ -1,4 +1,52 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap');
+/*
+ * Self-hosted fonts (Cabinet Grotesk for display, Satoshi for UI/body).
+ * Served from /public/fonts rather than a Google Fonts <link>: the CDN round
+ * trip on first paint is a render-blocking cost we do not need, and self-hosting
+ * keeps the family available offline and under our own cache control.
+ * `font-display: swap` renders in the fallback until the face arrives.
+ */
+@font-face {
+  font-family: 'Cabinet Grotesk';
+  src: url('/fonts/cabinet-grotesk-500.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Cabinet Grotesk';
+  src: url('/fonts/cabinet-grotesk-700.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Cabinet Grotesk';
+  src: url('/fonts/cabinet-grotesk-800.woff2') format('woff2');
+  font-weight: 800;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/satoshi-400.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/satoshi-500.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/satoshi-700.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+  font-style: normal;
+}
 
 @tailwind base;
 @tailwind components;
@@ -11,10 +59,10 @@
    * value in markup — inline SVG attributes, mostly.
    */
   :root {
-    --ch-ink-100: #f9f1e8;
-    --ch-accent-50: #fdf4ef;
-    --ch-surface-muted: #f9f1e8;
-    --ch-danger-soft: #fcebe9;
+    --ch-ink-100: #f5f5f4;
+    --ch-accent-50: #faf3ef;
+    --ch-surface-muted: #f5f5f4;
+    --ch-danger-soft: #fdecea;
   }
 
   html {
@@ -25,18 +73,15 @@
 
   body {
     @apply bg-surface-subtle text-body font-sans antialiased;
+    /* Tabular figures keep prices, counts and times from jittering as they change. */
+    font-variant-numeric: tabular-nums;
   }
 
   /*
-   * Fraunces is a variable font. `font-optical-sizing: auto` lets the browser
-   * pick the correct optical size per point size — at display sizes Fraunces
-   * gets sturdier, at text sizes more delicate. Without this, headings render
-   * noticeably lighter than intended.
+   * Cabinet Grotesk (our display face) is a static weight family, so the old
+   * Fraunces optical-sizing hack is gone. Display headings rely on the tight
+   * tracking + line-height already carried by the `display-*` size tokens.
    */
-  .font-display {
-    font-optical-sizing: auto;
-    font-variation-settings: 'SOFT' 0, 'WONK' 0;
-  }
 
   ::selection {
     @apply bg-accent-500 text-white;

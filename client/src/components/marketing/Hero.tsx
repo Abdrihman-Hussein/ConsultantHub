@@ -24,17 +24,18 @@ interface HeroProps {
  * moving focus, and the dots expose the same navigation without the interval —
  * so a keyboard or reduced-motion user reaches every consultant either way.
  *
- * The band is cream, not ink: the page opens on light and keeps a single dark
- * surface — the footer — at the end of it. That means every colour here is one
- * the rest of the page already uses on cream, and the accent on the second
- * headline line is `accent-600`, which measures 5.08:1 on this ground.
- * `accent-on-ink` would have been the ink-band choice and is unreadable here.
+ * The band sits on the light ground, not ink: the page opens on light and keeps
+ * a single dark surface — the footer — at the end of it. That means every
+ * colour here is one the rest of the page already uses on light, and the
+ * accent on the second headline line is `accent-600`, which clears AA on this
+ * ground. `accent-on-ink` would have been the ink-band choice and is
+ * unreadable here.
  */
 export default function Hero({ consultant, onNext, position, total }: HeroProps) {
   const { t } = useTranslation()
 
   return (
-    <CreamBand className="border-b border-line">
+    <CreamBand flush className="border-b border-line py-16 lg:py-24">
       <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
         <div>
           <Reveal>

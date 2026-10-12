@@ -22,7 +22,7 @@ const variants: Record<Variant, string> = {
   // Dark-surface pairs. The shared `base` ring is tuned for cream and
   // disappears against ink, so these override the ring and its offset too.
   onInk:
-    'bg-accent-on-ink text-ink-950 hover:bg-gold-on-ink shadow-sm ' +
+    'bg-accent-on-ink text-ink-950 hover:bg-accent-300 shadow-sm ' +
     'focus-visible:ring-accent-on-ink/60 focus-visible:ring-offset-surface-ink',
   onInkOutline:
     'border border-ink-line bg-transparent text-on-ink hover:bg-ink-line ' +
