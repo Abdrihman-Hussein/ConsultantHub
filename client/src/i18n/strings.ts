@@ -160,18 +160,15 @@ export const en = {
   'home.hero.position': ' ({position} of {total} featured)',
 
   // ---- home: top rated ------------------------------------------------------
-  'home.top.eyebrow': 'Most booked',
   'home.top.title': 'More people worth a call',
   'home.top.description':
     'Ordered by sessions delivered, with every figure taken straight from the directory.',
 
   // ---- home: specialties ----------------------------------------------------
-  'home.specialties.eyebrow': 'Browse by specialty',
   'home.specialties.title': 'Start where your problem is',
   'home.specialties.all': 'All consultants',
 
   // ---- home: why book here --------------------------------------------------
-  'home.why.eyebrow': 'Why book here',
   'home.why.title': 'Less risk on both sides of the call',
   'home.guarantee.identity_title': 'Identity checks, counted',
   'home.guarantee.identity_body': '{sentence} Rates and availability are published for every listing.',
@@ -564,18 +561,15 @@ export const so: Dict = {
   'home.hero.position': ' ({position} oo ka mid ah {total})',
 
   // ---- home: top rated ------------------------------------------------------
-  'home.top.eyebrow': 'Ku ugu la ballansan yihiin',
   'home.top.title': 'Qofyo kale oo la wacagi karaa',
   'home.top.description':
     'Waxay ku kala horreeyaan tirada kulanada, tiro kastana waxay ka timid tahay liiska.',
 
   // ---- home: specialties ----------------------------------------------------
-  'home.specialties.eyebrow': 'U kala saar khibrad',
   'home.specialties.title': 'Ka shaqo halka dhibaatadaadu ku jirto',
   'home.specialties.all': 'Dhammaan la-talin',
 
   // ---- home: why book here --------------------------------------------------
-  'home.why.eyebrow': 'Maxaad halka u ballanqabato',
   'home.why.title': 'Khatar yar oo labada dhinac',
   'home.guarantee.identity_title': 'Hubinta aqoonsiga, oo la tiray',
   'home.guarantee.identity_body':
