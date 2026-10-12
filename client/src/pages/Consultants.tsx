@@ -174,11 +174,7 @@ export default function Consultants() {
 
   return (
     <>
-      <section className="relative overflow-hidden border-b border-line bg-surface">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-24 -top-32 h-80 w-80 rounded-full bg-accent-100/40 blur-3xl"
-        />
+      <section className="border-b border-line bg-surface">
         <Container className="relative py-14">
           <Reveal>
             <p className="eyebrow mb-3">{t('directory.eyebrow')}</p>

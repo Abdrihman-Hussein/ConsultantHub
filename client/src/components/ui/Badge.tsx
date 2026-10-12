@@ -1,11 +1,10 @@
 import type { CSSProperties, ReactNode } from 'react'
 
-type Tone = 'neutral' | 'accent' | 'gold' | 'muted' | 'danger'
+type Tone = 'neutral' | 'accent' | 'muted' | 'danger'
 
 const tones: Record<Tone, string> = {
   neutral: 'bg-ink-100 text-ink-800',
   accent: 'bg-accent-50 text-accent-700',
-  gold: 'bg-gold-300/25 text-gold-600',
   muted: 'bg-surface-muted text-muted',
   danger: 'bg-danger-soft text-danger',
 }
@@ -24,7 +23,6 @@ interface BadgeProps {
 const fills: Record<Tone, string> = {
   neutral: 'var(--ch-ink-100)',
   accent: 'var(--ch-accent-50)',
-  gold: '#F7EAD2',
   muted: 'var(--ch-surface-muted)',
   danger: 'var(--ch-danger-soft)',
 }

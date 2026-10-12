@@ -59,7 +59,7 @@ const TABS: {
 
 const statusTone = {
   CONFIRMED: 'accent',
-  PENDING: 'gold',
+  PENDING: 'neutral',
   COMPLETED: 'muted',
   CANCELLED: 'danger',
 } as const
@@ -146,7 +146,7 @@ export default function ClientAppointments() {
           padding scale rather than adding a second `pb-10`. Previously the two
           stacked into ~88px of unbroken ink between the title and these tabs,
           roughly twice the density of `/client/dashboard`. */}
-      <InkBand flush noGlow className="pb-6">
+      <InkBand flush className="pb-6">
         <div
           role="group"
           aria-label={t('appointments.filter_group')}

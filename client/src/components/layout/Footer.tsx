@@ -4,6 +4,7 @@ import { identityCheckSentence } from '../../lib/trust'
 import { useTranslation } from '../../i18n/LanguageContext'
 import type { MessageKey } from '../../i18n/strings'
 import Reveal from '../ui/Reveal'
+import BrandMark from '../ui/BrandMark'
 import InkBand from '../marketing/InkBand'
 
 /**
@@ -82,12 +83,9 @@ export default function Footer() {
       <div className="grid gap-12 md:grid-cols-[1.5fr_repeat(3,1fr)]">
         <Reveal>
           <div className="max-w-xs">
-            <Link to="/" className="group inline-flex items-center gap-2.5">
-              <span className="grid h-8 w-8 place-items-center rounded-full bg-accent-on-ink text-xs font-semibold text-ink-950 transition-transform duration-300 ease-spring group-hover:scale-110">
-                C
-              </span>
-              <span className="text-[15px] font-semibold tracking-tight text-on-ink">
-                Lataliye
+            <Link to="/" className="group inline-flex items-center" aria-label="Lataliye home">
+              <span className="transition-transform duration-300 ease-spring group-hover:scale-[1.03]">
+                <BrandMark onInk />
               </span>
             </Link>
             {/* Two sentences rather than one interpolated blob: the coverage

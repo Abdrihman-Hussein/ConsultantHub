@@ -16,12 +16,12 @@ interface FeaturedConsultantProps {
  * The consultant card that occupies the hero — the single strongest trust
  * signal on the page, and the way into the directory.
  *
- * It sits on cream, so it is a light-surface card rather than a translucent
+ * It sits on the light ground, so it is a light-surface card rather than a translucent
  * panel: an opaque `bg-surface` with a `border-line` edge, and the same muted
  * tiers every other card on the site uses. That also means the `Rating` runs
- * on its default palette (`gold-400` stars, `ink-200` empties) — the `onInk`
+ * on its default palette (`accent-500` stars, `ink-200` empties) — the `onInk`
  * variant exists because that palette disappears against a dark band, and on
- * cream it would be a light peach on white.
+ * the light ground it would be a pale tone on white.
  *
  * The one line of copy is the consultant's own first bio sentence, extracted
  * rather than written (see `lib/featured`). It is deliberately not wrapped in
@@ -43,20 +43,22 @@ export default function FeaturedConsultant({ consultant }: FeaturedConsultantPro
 
         <div className="min-w-0 flex-1">
           <h2 className="truncate font-display text-xl text-ink-950">{consultant.name}</h2>
-          <p className="mt-1 text-xs leading-relaxed text-muted truncate">
-            {consultant.title} · {consultant.location}
+          <p className="mt-1 truncate text-xs font-medium leading-relaxed text-body">
+            {consultant.title}
+          </p>
+          <p className="truncate text-xs leading-relaxed text-subtle">
+            {consultant.location}
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
             <Rating value={rating} size="sm" />
-            <span aria-hidden="true" className="text-ink-200 shrink-0">|</span>
+            <span aria-hidden="true" className="h-3 w-px shrink-0 bg-line-strong" />
             <span className="truncate">
               {t('common.sessions_delivered', { count: consultant.sessions })}
             </span>
-            <span aria-hidden="true" className="text-ink-200 shrink-0">|</span>
-            <span className="truncate">
-              {t('card.responds', { time: consultant.responseTime })}
-            </span>
           </div>
+          <p className="mt-1 truncate text-xs text-subtle">
+            {t('card.responds', { time: consultant.responseTime })}
+          </p>
         </div>
       </div>
 

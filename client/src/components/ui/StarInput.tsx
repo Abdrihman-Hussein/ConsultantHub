@@ -126,7 +126,7 @@ export default function StarInput({
                 viewBox="0 0 20 20"
                 aria-hidden="true"
                 className={`h-6 w-6 ${
-                  value !== null && star <= Math.round(value) ? 'text-gold-400' : 'text-ink-200'
+                  value !== null && star <= Math.round(value) ? 'text-accent-500' : 'text-ink-200'
                 }`}
                 fill="currentColor"
               >

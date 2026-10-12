@@ -166,7 +166,7 @@ export default function DashboardLayout() {
         <InkBand as="header" flush className="py-8 lg:py-10">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
-              <p className="eyebrow text-gold-on-ink">{t('dash.eyebrow')}</p>
+              <p className="eyebrow text-accent-on-ink">{t('dash.eyebrow')}</p>
               <h1 className="mt-3 font-display text-display-lg text-on-ink">{title}</h1>
               {subtitle && (
                 <p className="mt-2 text-base text-on-ink-muted">{subtitle}</p>

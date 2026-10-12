@@ -4,6 +4,7 @@ import { identityCheckSentence } from '../../lib/trust'
 import { useTranslation } from '../../i18n/LanguageContext'
 import Button from '../ui/Button'
 import Reveal from '../ui/Reveal'
+import BrandMark from '../ui/BrandMark'
 import InkBand from './InkBand'
 
 interface AuthShellProps {
@@ -24,12 +25,7 @@ export default function AuthShell({ title, subtitle, children, footer }: AuthShe
   const { t } = useTranslation()
 
   return (
-    <div className="relative flex min-h-full items-center overflow-hidden">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute left-1/4 top-0 h-96 w-[42rem] -translate-x-1/2 rounded-full bg-accent-100/40 blur-3xl"
-      />
-
+    <div className="relative flex min-h-full items-center">
       <div className="relative mx-auto grid w-full max-w-shell lg:grid-cols-[1.05fr_0.95fr]">
         {/* Cream form panel — the inputs never sit on ink. */}
         <div className="flex items-center px-5 py-16 sm:px-8 lg:py-24">
@@ -54,14 +50,7 @@ export default function AuthShell({ title, subtitle, children, footer }: AuthShe
 
         <InkBand as="aside" className="flex items-center">
           <Reveal delay={140}>
-            <div className="flex items-center gap-2.5">
-              <span className="grid h-9 w-9 place-items-center rounded-full bg-accent-on-ink text-sm font-semibold text-ink-950">
-                C
-              </span>
-              <span className="text-[15px] font-semibold tracking-tight text-on-ink">
-                Lataliye
-              </span>
-            </div>
+            <BrandMark size="md" onInk />
 
             <p className="mt-6 font-display text-2xl leading-snug text-on-ink">
               {identityCheckSentence(consultants, t)}
