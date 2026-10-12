@@ -223,17 +223,10 @@ export default function Home() {
           <div className="mt-12 grid gap-6 lg:grid-cols-3">
             <Reveal className="lg:col-span-2">
               <article className="relative flex h-full min-h-[22rem] flex-col justify-end overflow-hidden rounded-2xl border border-line bg-ink-950 p-8 text-on-ink">
-                {/*
-                  Real photograph, not a placeholder: members of the Somali
-                  business community in Minnesota at a diaspora engagement,
-                  October 2015 (AMISOM Public Information, via Wikimedia
-                  Commons). Licensed CC0 1.0 — public domain, verified by
-                  FlickreviewR — so it ships in the repo rather than hotlinked.
-                  Served from /public/images for the same reason the fonts are
-                  self-hosted: no third-party round trip on first paint.
-                */}
+                {/* Placeholder photography until a production asset lands (see
+                    issue #16). Served remote so no binary sits in the repo. */}
                 <img
-                  src="/images/somali-business-community.jpg"
+                  src="https://picsum.photos/seed/lataliye-session/1200/800"
                   alt=""
                   aria-hidden="true"
                   loading="lazy"
