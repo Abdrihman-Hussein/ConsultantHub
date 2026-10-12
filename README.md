@@ -5,7 +5,7 @@
 Lataliye is a consultant discovery and appointment-booking web app. Clients browse consultants by specialty, read reviews written only by people who completed a session with that consultant, and book time slots directly. The interface is available in English and Somali.
 
 > **Status: pre-backend MVP.** The interface, booking flow, review gating and bilingual content work in the browser. All data is stored in `localStorage`. There is no database, no payments and no deployed environment yet. See [Current status](#current-status).
-
+ 
 ---
 
 ## Table of contents
